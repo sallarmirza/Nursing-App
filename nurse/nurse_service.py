@@ -1,7 +1,7 @@
 from sqlalchemy import text
 from storage import DBManager
 from schema.nurse_schema import NurseSignUp,NurseRegister
-from nurse_helper import hash_password,verify_password
+from nurse.nurse_helper import hash_password,verify_password
 import uuid
 from datetime import datetime
 
@@ -12,7 +12,7 @@ class NurseService:
         self.db = db
 
     @staticmethod
-    def create_nurse_id():
+    def create_nurse_id()->str:
         year = datetime.now().year
         unique_part = uuid.uuid4().hex[:8].upper()
 
@@ -128,18 +128,59 @@ class NurseService:
             session.close()
             
     
-    def list_all_nurses(self):
-        session=self.db.get_session()
+    def list_all_nurses(self)->dict:
+        session = self.db.get_session()
+
         try:
-            list_nurse_query=text(
-                """"Select * from nurses"""
-            )
-            result=session.execute(self.list_all_nurses)
-            nurses=result.mappings().all()
+            list_nurse_query = text("""
+                SELECT
+                    nurse_id,
+                    nurse_name,
+                    nurse_email,
+                    nurse_qualification,
+                    nurse_designation,
+                    nurse_hospital,
+                    nurse_experience,
+                    nurse_created_at
+                FROM nurses
+            """)
+
+            result = session.execute(list_nurse_query)
+
+            nurses = result.mappings().all()
+
             return nurses
-        
+
         except Exception as e:
-            raise ValueError("No nurse found")
-        
+            raise ValueError("Failed to retrieve nurses")
+
+        finally:
+            session.close()
+            
+    def delete_nurse(self, nurse_id: str) -> bool:
+        session = self.db.get_session()
+
+        try:
+            delete_nurse_query = text("""
+                DELETE FROM nurses
+                WHERE nurse_id = :nurse_id
+            """)
+
+            result = session.execute(
+                delete_nurse_query,
+                {"nurse_id": nurse_id}
+            )
+
+            if result.rowcount == 0:
+                session.rollback()
+                return False
+
+            session.commit()
+            return True
+
+        except Exception:
+            session.rollback()
+            return False
+
         finally:
             session.close()

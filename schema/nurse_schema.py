@@ -12,3 +12,4 @@ class NurseRegister(BaseModel):
     nurse_designation: Optional[str] = None
     nurse_hospital: Optional[str] = None
     nurse_experience: Optional[float] = Field(default=None, ge=0)
+    
