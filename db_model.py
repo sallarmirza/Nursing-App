@@ -1,4 +1,4 @@
-from sqlalchemy import Column,INTEGER,String,Float,ForeignKey,DateTime,TEXT,JSON,DATE
+from sqlalchemy import Column,INTEGER,String,Float,ForeignKey,DateTime,TEXT,JSON,DATE,func
 from sqlalchemy.orm import declarative_base
 from datetime import datetime
 
@@ -10,7 +10,7 @@ class Nurse(Base):
     __tablename__='nurses'
     # create nurse id with uuid but with follow a pattern
     nurse_id=Column(String(36),primary_key=True)
-    nurse_name=Column(String(120),nullable=False)
+    nurse_name=Column(String(120),nullable=True)
     nurse_password_hash=Column(String(255),nullable=False)
     nurse_email=Column(String(255),nullable=False,unique=True,index=True)
     # this when nurse registers 
@@ -18,7 +18,7 @@ class Nurse(Base):
     nurse_designation=Column(String(255))
     nurse_hospital=Column(String(255))
     nurse_experience=Column(Float)
-    nurse_created_at=Column(DateTime,default=lambda:datetime.now())
+    nurse_created_at=Column(DateTime,server_default=func.current_timestamp())
 
 
 class Patient(Base):

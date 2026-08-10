@@ -32,9 +32,6 @@ class PatientRegister(BaseModel):
     patient_bed: Optional[str] = None
 
 
-
-
-
 class DosageCalculatorRegister(BaseModel):
     nurse_id: Optional[str] = None
     patient_id: Optional[str] = None

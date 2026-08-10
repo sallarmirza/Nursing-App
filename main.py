@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-
+from nurse.nurse_router import router as nursing_router
 from storage import DBManager
 
 
@@ -27,6 +27,7 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+app.include_router(nursing_router)
 
 @app.get("/health")
 def check_health():
