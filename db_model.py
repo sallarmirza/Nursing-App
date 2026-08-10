@@ -1,25 +1,9 @@
-from sqlalchemy import Column,INTEGER,String,Float,ForeignKey,DateTime,TEXT,JSON,create_engine,DATE
-from sqlalchemy.orm import declarative_base,sessionmaker
+from sqlalchemy import Column,INTEGER,String,Float,ForeignKey,DateTime,TEXT,JSON,DATE
+from sqlalchemy.orm import declarative_base
 from datetime import datetime
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-DB_URL=os.getenv('DATABASE_URL')
-
-engine=create_engine(DB_URL,connect_args={"check_same_thread":False})
-
-SessionLocal=sessionmaker(autocommit=False,autoflush=False,bind=engine)
 
 Base=declarative_base()
 
-def get_db():
-    db=SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
         
 
 class Nurse(Base):
@@ -75,7 +59,7 @@ class NursingNote(Base):
     patient_condition=Column(TEXT)
     conscious_level=Column(String(36))
     glasgow_coma_score=Column(INTEGER,nullable=True)
-    pain_scale=Column(INTEGER,)
+    pain_scale=Column(INTEGER)
     notes_created_at=Column(DateTime,default=lambda:datetime.now())
     
 class IVDripCalculation(Base):
@@ -126,6 +110,5 @@ class Vitals(Base):
     recorded_at=Column(DateTime,default=lambda:datetime.now())
     
 
-Base.metadata.create_all(bind=engine)
     
     
