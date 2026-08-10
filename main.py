@@ -1,8 +1,36 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from db_model import get_db
 
-app=FastAPI(title='Nursing-App')
+from storage import DBManager
 
-@app.get('/health')
+
+db = DBManager()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Initializing database...")
+
+    db.initialize_db()
+
+    print("Database initialized.")
+
+    yield
+
+    print("Closing database...")
+    db.close()
+    print("Database closed.")
+
+
+app = FastAPI(
+    title="Nursing-App",
+    lifespan=lifespan
+)
+
+
+@app.get("/health")
 def check_health():
-    return {"Status":"Live","Message":"Up n Running"}
+    return {
+        "status": "Live",
+        "message": "Up and Running"
+    }
