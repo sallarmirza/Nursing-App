@@ -184,3 +184,36 @@ class NurseService:
 
         finally:
             session.close()
+    
+    
+    def nurse_patients(self, nurse_id: str):
+        """Show all patients assigned to a nurse."""
+
+        session = self.db.get_session()
+
+        try:
+            show_patient_query = text("""
+                SELECT *
+                FROM patients
+                WHERE assigned_nurse_id = :nurse_id
+            """)
+
+            result = session.execute(
+                show_patient_query,
+                {"nurse_id": nurse_id}
+            )
+
+            patients = result.mappings().all()
+
+            if not patients:
+                return {
+                    "message": f"{nurse_id} has no patients"
+                }
+
+            return patients
+
+        except Exception as e:
+            raise ValueError("Failed to retrieve patients") from e
+
+        finally:
+            session.close()

@@ -24,13 +24,13 @@ class BloodGroup(str, Enum):
 class PatientRegister(BaseModel):
     patient_name: str = Field(min_length=2, max_length=100)
     gender: Gender
-    date_of_birth: date
-    patient_weight: float = Field(gt=0, le=250)
-    patient_height: float = Field(gt=0, le=250)
-    patient_blood_group: BloodGroup
+    date_of_birth: Optional[date]=None
+    patient_weight: Optional[float] = Field(default=None,gt=0, le=250)
+    patient_height: Optional[float] = Field(default=None,gt=0, le=250)
+    patient_blood_group: Optional[BloodGroup]=None
     patient_ward: Optional[str] = None
-    patient_bed: Optional[str] = None
-
+ 
+    
 
 class DosageCalculatorRegister(BaseModel):
     nurse_id: Optional[str] = None
@@ -51,14 +51,12 @@ class NursingNoteRegister(BaseModel):
     pain_scale: int = Field(ge=0, le=10)
 
 
-class IVDripCalculationRegister(BaseModel):
+class DripCalculationRegister(BaseModel):
     patient_id: Optional[str] = None
     nurse_id: Optional[str] = None
     total_volume: float = Field(gt=0)
     time_duration_min: float = Field(gt=0)
-    drop_factor: str
-    drop_per_min: int = Field(gt=0)
-
+    drop_factor: float = Field(gt=0)
 
 class SBARHandoverRegister(BaseModel):
     nurse_id: Optional[str] = None
