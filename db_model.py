@@ -26,14 +26,14 @@ class Patient(Base):
     __tablename__='patients'
     patient_id=Column(String(36),primary_key=True)
     patient_name=Column(String(320),nullable=False,index=True)
+    patient_gender=Column(String(20),nullable=True)
     patient_weight=Column(Float,nullable=True)
     patient_height=Column(Float,nullable=True)
-    patient_bloodgroup=Column(String(10),nullable=True)
+    patient_blood_group=Column(String(10),nullable=True)
     date_of_birth=Column(DATE,nullable=True)
     ward=Column(String(255),nullable=True)
-    admission_diagnosis=Column(TEXT,nullable=True)
     assigned_nurse_id=Column(String(36),ForeignKey('nurses.nurse_id'),nullable=False,index=True)
-    patient_created_at=Column(DateTime,default=lambda:datetime.now())
+    patient_created_at=Column(DateTime,server_default=func.current_timestamp())
     
 
 class DosageCalculation(Base):
@@ -63,16 +63,26 @@ class NursingNote(Base):
     notes_created_at=Column(DateTime,default=lambda:datetime.now())
     
 class IVDripCalculation(Base):
-    __tablename__='iv_drip_calculations'
-    
-    drip_calc_id=Column(String(36),primary_key=True)
-    patient_id=Column(String(36),ForeignKey('patients.patient_id'),nullable=True,index=True)
-    nurse_id=Column(String(36),ForeignKey('nurses.nurse_id'),nullable=True,index=True)
-    total_volume_ml=Column(Float,nullable=False)
-    time_duration_min=Column(Float,nullable=False)
-    drop_factor=Column(TEXT)
-    drop_per_min=Column(INTEGER)
-    created_at=Column(DateTime,default=lambda:datetime.now())
+    __tablename__ = 'iv_drip_calculations'
+
+    drip_calc_id = Column(String(36), primary_key=True)
+    patient_id = Column(
+        String(36),
+        ForeignKey('patients.patient_id'),
+        nullable=True,
+        index=True
+    )
+    nurse_id = Column(
+        String(36),
+        ForeignKey('nurses.nurse_id'),
+        nullable=True,
+        index=True
+    )
+    total_volume_ml = Column(Float, nullable=False)
+    time_duration_min = Column(Float, nullable=False)
+    drop_factor = Column(TEXT)
+    drop_per_min = Column(INTEGER)
+    created_at = Column(DateTime, default=lambda: datetime.now())
     
 class SBARHandover(Base):
     __tablename__='sbar_handovers'
