@@ -31,16 +31,19 @@ class PatientRegister(BaseModel):
     patient_ward: Optional[str] = None
  
     
-
 class DosageCalculatorRegister(BaseModel):
     nurse_id: Optional[str] = None
     patient_id: Optional[str] = None
+
     patient_weight: float = Field(gt=0, le=250)
+
     medication: str
+
+    dose_per_kg: float = Field(gt=0)
+    dose_unit: str
+
     concentration_value: float = Field(gt=0)
     concentration_unit: str
-    guideline: Optional[str] = None
-
 
 class NursingNoteRegister(BaseModel):
     patient_id: Optional[str] = None

@@ -37,18 +37,32 @@ class Patient(Base):
     
 
 class DosageCalculation(Base):
-    __tablename__='dosage_calculations'
-    
-    calc_id=Column(String(36),primary_key=True)
-    patient_id=Column(String(36),ForeignKey('patients.patient_id'),nullable=True,index=True)
-    nurse_id=Column(String(36),ForeignKey('nurses.nurse_id'),nullable=False,index=True)
-    patient_weight=Column(Float,nullable=False)
-    medication=Column(String,nullable=False)
-    concentration_value=Column(Float,nullable=False)
-    concentration_unit=Column(String,nullable=False)
-    guideline=Column(String)
-    dosage_created_at=Column(DateTime,default=lambda:datetime.now())
-    
+    __tablename__ = "dosage_calculations"
+
+    dose_calc_id = Column(String(36), primary_key=True)
+    patient_id = Column(
+        String(36),
+        ForeignKey("patients.patient_id"),
+        nullable=True,
+        index=True
+    )
+    nurse_id = Column(
+        String(36),
+        ForeignKey("nurses.nurse_id"),
+        nullable=False,
+        index=True
+    )
+    patient_weight = Column(Float, nullable=False)
+    medication = Column(String, nullable=False)
+    dose_per_kg = Column(Float, nullable=False)
+    dose_unit = Column(String(20), nullable=False)
+    concentration_value = Column(Float, nullable=False)
+    concentration_unit = Column(String(20), nullable=False)
+
+    dosage_created_at = Column(
+        DateTime,
+        default=lambda: datetime.now()
+    ) 
 
 class NursingNote(Base):
     __tablename__='nursing_notes'
