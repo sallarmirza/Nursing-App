@@ -25,7 +25,7 @@ def show_all_nurses():
         )
         
         
-@router.get('/{nurse_id}/patients/all')
+@router.get('/{nurse_id}/patients')
 def show_all_patients(nurse_id):
     """list all patients under nurse"""
     try:
