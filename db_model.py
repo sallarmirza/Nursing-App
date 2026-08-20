@@ -65,16 +65,35 @@ class DosageCalculation(Base):
     ) 
 
 class NursingNote(Base):
-    __tablename__='nursing_notes'
+    __tablename__ = "nursing_notes"
 
-    note_id=Column(String(36),primary_key=True)
-    patient_id=Column(String(36),ForeignKey('patients.patient_id'),index=True)
-    nurse_id=Column(String(36),ForeignKey('nurses.nurse_id'),index=True)
-    patient_condition=Column(TEXT)
-    conscious_level=Column(String(36))
-    glasgow_coma_score=Column(INTEGER,nullable=True)
-    pain_scale=Column(INTEGER)
-    notes_created_at=Column(DateTime,default=lambda:datetime.now())
+    note_id = Column(String(36), primary_key=True)
+
+    patient_id = Column(
+        String(36),
+        ForeignKey("patients.patient_id"),
+        nullable=False,
+        index=True
+    )
+
+    nurse_id = Column(
+        String(36),
+        ForeignKey("nurses.nurse_id"),
+        nullable=False,
+        index=True
+    )
+
+    patient_condition = Column(TEXT)
+    conscious_level = Column(String(36))
+    glasgow_coma_score = Column(INTEGER)
+    pain_scale = Column(INTEGER)
+
+    soap_history = Column(JSON, default=list)
+
+    notes_created_at = Column(
+        DateTime,
+        default=lambda: datetime.now()
+    )
     
 class IVDripCalculation(Base):
     __tablename__ = 'iv_drip_calculations'
