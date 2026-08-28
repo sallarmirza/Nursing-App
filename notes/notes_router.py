@@ -57,8 +57,13 @@ def save_soap(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(e)
         )
-
-
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
+        
+        
 @router.get('/{nurse_id}/{patient_id}')
 def show_notes(nurse_id: str, patient_id: str):
     """return the notes"""
