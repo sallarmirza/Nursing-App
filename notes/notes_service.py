@@ -79,7 +79,8 @@ class Notes:
 
         finally:
             session.close()
-
+            
+            
     def register_soap(
         self,
         nurse_id: str,
@@ -114,7 +115,15 @@ class Notes:
                     "to this nurse/patient"
                 )
 
-            soap_history = result[0] or []
+            raw_soap_history = result[0]
+            if raw_soap_history:
+                soap_history = (
+                    json.loads(raw_soap_history)
+                    if isinstance(raw_soap_history, str)
+                    else raw_soap_history
+                )
+            else:
+                soap_history = []
 
             new_version = len(soap_history) + 1
 
@@ -163,7 +172,8 @@ class Notes:
 
         finally:
             session.close()
-
+            
+            
     def show_nursing_notes(
         self,
         nurse_id: str,

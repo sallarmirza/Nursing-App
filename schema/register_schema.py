@@ -82,7 +82,5 @@ class CurrentMedicationRegister(BaseModel):
 
 
 class VitalsRegister(BaseModel):
-    patient_id: Optional[str] = None
-    nurse_id: Optional[str] = None
     source: str
     vitals_data: dict[str, Any]

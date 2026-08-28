@@ -16,22 +16,29 @@ class DripCalc:
         unique_part = uuid.uuid4().hex[:8].upper()
         return f"DRIP-{year}-{unique_part}"
     
-    def list_drip_cal(self,patient_id:str)->dict:
+    
+    def list_drip_cal(self, patient_id: str) -> dict:
+    
         """list all drips cal for patient"""
-        session=self.db.get_session()
+        session = self.db.get_session()
         try:
-            list_drips=text("""select * from iv_drip_calculations where patient_id=:patient_id""")
-            result=session.execute(list_drips,
-                                   {"patient_id":patient_id}).fetchall()
-            
-            if len(result)==0:
-                return f"No drip calculations for {patient_id}"
-            
-            patient_drips=result.mappings.all()
-            
-            return patient_drips
-        except :
-            raise ValueError("Unable to retrive drips record") 
+            list_drips = text("""SELECT * FROM iv_drip_calculations WHERE patient_id = :patient_id""")
+            result = session.execute(list_drips, {"patient_id": patient_id})
+            patient_drips = result.mappings().all()
+
+            if not patient_drips:
+                return {
+                    "message": f"No drip calculations for {patient_id}",
+                    "patient_id": patient_id,
+                    "drips": []
+                }
+
+            return {
+                "patient_id": patient_id,
+                "drips": patient_drips
+            }
+        except Exception:
+            raise ValueError("Unable to retrieve drip records")
             
 
     def cal_simple_driprate(
@@ -221,6 +228,28 @@ class DosageCalc:
         unique=uuid.uuid4().hex[:8].upper()
         return f"DOSE-{year}-{unique}"
     
+    def list_dosage_cal(self, patient_id: str) -> dict:
+        """List all dosage calculations for a patient."""
+        session = self.db.get_session()
+        try:
+            query = text("""SELECT * FROM dosage_calculations WHERE patient_id = :patient_id""")
+            result = session.execute(query, {"patient_id": patient_id})
+            records = result.mappings().all()
+
+            if not records:
+                return {
+                    "message": f"No dosage calculations for {patient_id}",
+                    "patient_id": patient_id,
+                    "dosages": []
+                }
+
+            return {
+                "patient_id": patient_id,
+                "dosages": records
+            }
+        except Exception:
+            raise ValueError("Unable to retrieve dosage records")
+    
 
     def calc_dosage(
         self,
@@ -332,46 +361,45 @@ class DosageCalc:
             session.close()
             
          
-    def delete_dosage_calculation(self,nurse_id: str,patient_id: str,dose_calc_id: str) -> dict[str, Any]:
-        """Delete a specific IV drip calculation."""
+    def delete_dosage_calculation(self, nurse_id: str, patient_id: str, dose_calc_id: str) -> dict[str, Any]:
+        """Delete a specific dosage calculation."""
 
         if not nurse_id or not patient_id or not dose_calc_id:
             raise ValueError(
-                "Nurse ID, patient ID and drip calculation ID are required"
+                "Nurse ID, patient ID and dosage calculation ID are required"
             )
 
         session = self.db.get_session()
 
         try:
-            delete_drip_cal = text("""
+            delete_query = text("""
                 DELETE FROM dosage_calculations
-                WHERE drip_dose_calc_id = :drip_dose_calc_id
+                WHERE dose_calc_id = :dose_calc_id
                 AND patient_id = :patient_id
                 AND nurse_id = :nurse_id
             """)
 
             result = session.execute(
-                delete_drip_cal,
+                delete_query,
                 {
-                    "drip_dose_calc_id": dose_calc_id,
+                    "dose_calc_id": dose_calc_id,
                     "patient_id": patient_id,
                     "nurse_id": nurse_id
                 }
             )
 
-            # Nothing was deleted
             if result.rowcount == 0:
                 raise ValueError(
-                    "Drip calculation not found or does not belong "
+                    "Dosage calculation not found or does not belong "
                     "to this nurse/patient"
                 )
 
             session.commit()
 
             return {
-                "message": f"Drip calculation {dose_calc_id} deleted successfully",
+                "message": f"Dosage calculation {dose_calc_id} deleted successfully",
                 "status": True,
-                "drip_dose_calc_id": dose_calc_id,
+                "dose_calc_id": dose_calc_id,
                 "patient_id": patient_id,
                 "nurse_id": nurse_id
             }
@@ -381,6 +409,5 @@ class DosageCalc:
             raise
 
         finally:
-            session.close()        
-                
+            session.close()
         

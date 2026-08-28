@@ -118,18 +118,18 @@ class IVDripCalculation(Base):
     created_at = Column(DateTime, default=lambda: datetime.now())
     
 class SBARHandover(Base):
-    __tablename__='sbar_handovers'
-    
-    sbar_id=Column(String(36),primary_key=True)
-    patient_id=Column(String(36),ForeignKey('patients.patient_id'),nullable=True,index=True)
-    nurse_id=Column(String(36),ForeignKey('nurses.nurse_id'),nullable=True,index=True)
-    situation=Column(TEXT)
-    background=Column(TEXT)
-    assessment=Column(TEXT)
-    recommendation=Column(TEXT)
-    current_iv_medications=Column(JSON,default=dict)
-    nursing_interventions=Column(JSON,default=dict)
-    soap_notes=Column(JSON,default=dict)
+    __tablename__ = 'sbar_handovers'
+    sbar_id = Column(String(36), primary_key=True)
+    patient_id = Column(String(36), ForeignKey('patients.patient_id'), nullable=True, index=True)
+    nurse_id = Column(String(36), ForeignKey('nurses.nurse_id'), nullable=True, index=True)
+    situation = Column(TEXT)
+    background = Column(TEXT)
+    assessment = Column(TEXT)
+    recommendation = Column(TEXT)
+    current_iv_medications = Column(JSON, default=dict)
+    nursing_interventions = Column(JSON, default=dict)
+    soap_notes = Column(JSON, default=dict)
+    sbar_created_at = Column(DateTime, default=lambda: datetime.now())   
     
 class CurrentMedication(Base):
     __tablename__='current_medications'
