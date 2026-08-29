@@ -5,7 +5,7 @@ from nurse.nurse_service import NurseService
 from storage import DBManager
 
 
-router = APIRouter(prefix="/nurse",tags=['Nurse'])
+router = APIRouter()
 
 db = DBManager()
 nurse_service = NurseService(db)
@@ -48,10 +48,7 @@ def nurse_account_creation(data: NurseSignUp):
 
 
 @router.post("/setup/{nurse_id}")
-def nurse_data_setup(
-    nurse_id: str,
-    data: NurseRegister
-):
+def nurse_data_setup(nurse_id: str,data: NurseRegister):
     try:
         return nurse_service.nurse_account_setup(
             nurse_id,

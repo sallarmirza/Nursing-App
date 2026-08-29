@@ -17,13 +17,8 @@ class Notes:
 
         return f"NOTE-{year}-{unique}"
 
-    def create_notes(
-        self,
-        nurse_id: str,
-        patient_id: str,
-        data: NursingNoteRegister
-    ) -> dict[str, str]:
-
+    def create_notes(self,nurse_id: str,patient_id: str,data: NursingNoteRegister) -> dict[str, str]:
+        """create notes by nurse for the patient"""
         session = self.db.get_session()
 
         try:
@@ -81,14 +76,8 @@ class Notes:
             session.close()
             
             
-    def register_soap(
-        self,
-        nurse_id: str,
-        patient_id: str,
-        note_id: str,
-        data: SoapRegister
-    ):
-
+    def register_soap(self,nurse_id: str,patient_id: str,note_id: str,data: SoapRegister)->dict[str,Any]:
+        """register soap and save it into json"""
         session = self.db.get_session()
 
         try:
@@ -174,11 +163,7 @@ class Notes:
             session.close()
             
             
-    def show_nursing_notes(
-        self,
-        nurse_id: str,
-        patient_id: str
-    ):
+    def show_nursing_notes(self,nurse_id: str,patient_id: str):
         """Show all nursing notes for a patient."""
 
         session = self.db.get_session()

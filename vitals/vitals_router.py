@@ -6,7 +6,7 @@ from storage import DBManager
 db=DBManager()
 vitals=Vitals(db)
 
-router=APIRouter(prefix='/vitals',tags=['Vitals'])
+router=APIRouter()
 
 @router.post("/{nurse_id}/{patient_id}/{note_id}")
 def create_vitals(

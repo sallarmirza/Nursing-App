@@ -2,7 +2,9 @@ from fastapi import APIRouter,HTTPException,status
 from patient.patient_service import PatientService
 from storage import DBManager
 from schema.register_schema import PatientRegister
-router=APIRouter(prefix='/patient',tags=['Patient'])
+
+
+router=APIRouter()
 
 db=DBManager()
 patient_service=PatientService(db)
@@ -12,7 +14,7 @@ patient_service=PatientService(db)
 def create_patient_profile(nurse_id:str,data:PatientRegister):
     """creating patient profile"""
     try:
-        return patient_service.create_patient(nurse_id,data)
+        return patient_service.create_patient_account(nurse_id,data)
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_406_NOT_ACCEPTABLE,

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status
 
-from notes.notes_service import Notes
+from nursing_notes.notes_service import Notes
 from storage import DBManager
 from schema.note_schema import (
     NursingNoteRegister,
@@ -11,10 +11,7 @@ from schema.note_schema import (
 db = DBManager()
 notes = Notes(db)
 
-router = APIRouter(
-    prefix="/notes",
-    tags=["Notes"]
-)
+router = APIRouter()
 
 
 @router.post("/{nurse_id}/{patient_id}")

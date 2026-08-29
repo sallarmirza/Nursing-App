@@ -17,7 +17,7 @@ class PatientService:
 
         return f"PAT-{year}-{unique_part}"
 
-    def create_patient(
+    def create_patient_account(
         self,
         nurse_id: str,
         data: PatientRegister

@@ -58,44 +58,39 @@ class Medication:
             # Insert medication
             insert_medication = text("""
                 INSERT INTO current_medications (
-                    cm_id,
+                    med_id,
                     patient_id,
                     med_name,
                     dose,
                     dose_unit,
-                    frequency,
-                    med_start_date
+                    frequency
                 )
                 VALUES (
-                    :cm_id,
+                    :med_id,
                     :patient_id,
                     :med_name,
                     :dose,
                     :dose_unit,
-                    :frequency,
-                    :med_start_date
+                    :frequency
                 )
             """)
 
             session.execute(
                 insert_medication,
                 {
-                    "cm_id": med_id,
+                    "med_id": med_id,
                     "patient_id": patient_id,
                     "med_name": data.med_name,
                     "dose": data.dose,
                     "dose_unit": data.dose_unit,
-                    "frequency": data.frequency,
-                    "med_start_date": datetime.now()
+                    "frequency": data.frequency
                 }
             )
-
-            session.commit()
 
             return {
                 "status": True,
                 "message": "Medication added successfully",
-                "cm_id": med_id,
+                "med_id": med_id,
                 "patient_id": patient_id,
                 "nurse_id": nurse_id,
                 "med_name": data.med_name,
@@ -111,10 +106,10 @@ class Medication:
         finally:
             session.close()
             
-    def delete_medicine(self,nurse_id: str,patient_id: str,cm_id: str) -> dict:
+    def delete_medicine(self,nurse_id: str,patient_id: str,med_id: str) -> dict:
         """Delete a medication for a patient."""
     
-        if not nurse_id or not patient_id or not cm_id:
+        if not nurse_id or not patient_id or not med_id:
             raise ValueError(
                 "Nurse ID, Patient ID and Medication ID are required"
             )
@@ -126,11 +121,11 @@ class Medication:
             # Check medication belongs to this patient
             # and patient belongs to this nurse
             check_medication = text("""
-                SELECT cm.cm_id
+                SELECT cm.med_id
                 FROM current_medications AS cm
                 JOIN patients AS p
                     ON cm.patient_id = p.patient_id
-                WHERE cm.cm_id = :cm_id
+                WHERE cm.med_id = :med_id
                 AND cm.patient_id = :patient_id
                 AND p.assigned_nurse_id = :nurse_id
             """)
@@ -138,7 +133,7 @@ class Medication:
             result = session.execute(
                 check_medication,
                 {
-                    "cm_id": cm_id,
+                    "med_id": med_id,
                     "patient_id": patient_id,
                     "nurse_id": nurse_id
                 }
@@ -154,14 +149,14 @@ class Medication:
             # Delete medication
             delete_medication = text("""
                 DELETE FROM current_medications
-                WHERE cm_id = :cm_id
+                WHERE med_id = :med_id
                 AND patient_id = :patient_id
             """)
 
             session.execute(
                 delete_medication,
                 {
-                    "cm_id": cm_id,
+                    "med_id": med_id,
                     "patient_id": patient_id
                 }
             )
@@ -171,7 +166,7 @@ class Medication:
             return {
                 "status": True,
                 "message": "Medication deleted successfully",
-                "cm_id": cm_id,
+                "med_id": med_id,
                 "patient_id": patient_id,
                 "nurse_id": nurse_id
             }
@@ -192,7 +187,7 @@ class Medication:
 
             show_meds_query = text("""
                 SELECT
-                    cm.cm_id,
+                    cm.med_id,
                     cm.patient_id,
                     cm.med_name,
                     cm.dose,
