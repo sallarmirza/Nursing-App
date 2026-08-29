@@ -19,7 +19,7 @@ def calculate_medication_dosage_for_patient(
     try:
         return dosage_cal.calculate_dosage_for_patient(nurse_id, patient_id, data)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 @router.get("/{patient_id}")

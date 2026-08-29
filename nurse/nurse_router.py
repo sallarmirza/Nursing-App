@@ -64,17 +64,19 @@ def nurse_data_setup(nurse_id: str,data: NurseRegister):
 @router.delete('/delete/{nurse_id}')
 def delete_nurse_account(nurse_id):
     try:
-        deleted=nurse_service.delete_nurse(nurse_id)
-        
+        deleted = nurse_service.delete_nurse(nurse_id)
+
         if not deleted:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Nurse not found"
             )
-        
+
         return {
-            "status":True,
-            "Message":f"Nurse {nurse_id} deleted successfully"
+            "status": True,
+            "Message": f"Nurse {nurse_id} deleted successfully"
         }
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED,detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

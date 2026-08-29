@@ -31,7 +31,7 @@ class Sbar:
             sbar_id = self.create_sbar_id()
 
             query = text("""
-                INSERT INTO sbar_handovers (
+                INSERT INTO sbar (
                     sbar_id,
                     patient_id,
                     nurse_id,
@@ -111,7 +111,7 @@ class Sbar:
                     nursing_interventions,
                     soap_notes,
                     sbar_created_at
-                FROM sbar_handovers
+                FROM sbar
                 WHERE nurse_id = :nurse_id
                   AND patient_id = :patient_id
                 ORDER BY sbar_created_at DESC
@@ -152,7 +152,7 @@ class Sbar:
 
         try:
             delete_query = text("""
-                DELETE FROM sbar_handovers
+                DELETE FROM sbar
                 WHERE sbar_id = :sbar_id
                   AND nurse_id = :nurse_id
                   AND patient_id = :patient_id

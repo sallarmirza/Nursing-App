@@ -11,6 +11,20 @@ db = DBManager()
 medication_service = Medication(db)
 
 
+        
+@router.get("/{nurse_id}/{patient_id}")
+def list_medications(nurse_id: str, patient_id: str):
+    try:
+        return medication_service.list_all_medication(
+            nurse_id=nurse_id,
+            patient_id=patient_id
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
+
 @router.post("/{nurse_id}/{patient_id}")
 def add_medication(
     nurse_id: str,
@@ -50,22 +64,3 @@ def delete_medication(nurse_id: str,patient_id: str,cm_id: str):
             detail=str(e)
         )
         
-        
-@router.get("/{nurse_id}/{patient_id}")
-def list_medications(
-    nurse_id: str,
-    patient_id: str
-):
-    try:
-
-        return medication_service.list_all_medication(
-            nurse_id=nurse_id,
-            patient_id=patient_id
-        )
-
-    except ValueError as e:
-
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e)
-        )

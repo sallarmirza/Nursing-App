@@ -20,24 +20,17 @@ class Vitals:
 
         return f"VITAL-{year}-{unique}"
 
-    def create_vitals(
-        self,
-        nurse_id: str,
-        patient_id: str,
-        note_id: str,
-        data: VitalsRegister
-    ):
-        """Create and save patient vitals."""
+    def create_vitals(self, nurse_id: str, patient_id: str, data: VitalsRegister):
+        """Create and save patient vitals. but source has to be defined by frontend"""
 
         session = self.db.get_session()
 
         try:
-
             patient_check = text("""
                 SELECT patient_id
                 FROM patients
                 WHERE patient_id = :patient_id
-                  AND assigned_nurse_id = :nurse_id
+                AND assigned_nurse_id = :nurse_id
             """)
 
             patient_result = session.execute(
@@ -54,29 +47,6 @@ class Vitals:
                     "to this nurse"
                 )
 
-            note_check = text("""
-                SELECT note_id
-                FROM nursing_notes
-                WHERE note_id = :note_id
-                  AND patient_id = :patient_id
-                  AND nurse_id = :nurse_id
-            """)
-
-            note_result = session.execute(
-                note_check,
-                {
-                    "note_id": note_id,
-                    "patient_id": patient_id,
-                    "nurse_id": nurse_id
-                }
-            ).fetchone()
-
-            if note_result is None:
-                raise ValueError(
-                    "Nursing note does not exist or does not "
-                    "belong to this patient/nurse"
-                )
-
             vital_id = self.create_vital_id()
 
             insert_query = text("""
@@ -84,7 +54,6 @@ class Vitals:
                     vital_id,
                     patient_id,
                     nurse_id,
-                    note_id,
                     source,
                     vitals_data
                 )
@@ -92,7 +61,6 @@ class Vitals:
                     :vital_id,
                     :patient_id,
                     :nurse_id,
-                    :note_id,
                     :source,
                     :vitals_data
                 )
@@ -104,7 +72,6 @@ class Vitals:
                     "vital_id": vital_id,
                     "patient_id": patient_id,
                     "nurse_id": nurse_id,
-                    "note_id": note_id,
                     "source": data.source,
                     "vitals_data": json.dumps(data.vitals_data)
                 }
@@ -117,7 +84,6 @@ class Vitals:
                 "vital_id": vital_id,
                 "patient_id": patient_id,
                 "nurse_id": nurse_id,
-                "note_id": note_id,
                 "source": data.source,
                 "vitals_data": data.vitals_data
             }
@@ -140,7 +106,6 @@ class Vitals:
                     vital_id,
                     patient_id,
                     nurse_id,
-                    note_id,
                     source,
                     vitals_data,
                     recorded_at
