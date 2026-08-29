@@ -1,10 +1,11 @@
 from storage import DBManager
 from schema.note_schema import NursingNoteRegister, SoapRegister, NursingNotesResponse
-from sqlalchemy import text
 from datetime import datetime
 import uuid
-import json
 from typing import Any
+
+from db_model import NursingNote
+
 
 class Notes:
     def __init__(self, db: DBManager):
@@ -13,54 +14,29 @@ class Notes:
     @staticmethod
     def create_note_id():
         year = datetime.now().year
-        unique = uuid.uuid4().hex[:8].upper()
+        unique = uuid.uuid4().hex[:12].upper()
 
         return f"NOTE-{year}-{unique}"
 
-    def create_notes(self,nurse_id: str,patient_id: str,data: NursingNoteRegister) -> dict[str, str]:
+    def create_notes(self, nurse_id: str, patient_id: str, data: NursingNoteRegister) -> dict[str, str]:
         """create notes by nurse for the patient"""
         session = self.db.get_session()
 
         try:
-            query = text("""
-                INSERT INTO nursing_notes (
-                    note_id,
-                    patient_id,
-                    nurse_id,
-                    patient_condition,
-                    conscious_level,
-                    glasgow_coma_score,
-                    pain_scale,
-                    soap_history
-                )
-                VALUES (
-                    :note_id,
-                    :patient_id,
-                    :nurse_id,
-                    :patient_condition,
-                    :conscious_level,
-                    :glasgow_coma_score,
-                    :pain_scale,
-                    :soap_history
-                )
-            """)
-
             note_id = self.create_note_id()
 
-            session.execute(
-                query,
-                {
-                    "note_id": note_id,
-                    "patient_id": patient_id,
-                    "nurse_id": nurse_id,
-                    "patient_condition": data.patient_condition,
-                    "conscious_level": data.conscious_level,
-                    "glasgow_coma_score": data.glasgow_coma_score,
-                    "pain_scale": data.pain_scale,
-                    "soap_history": json.dumps([]),
-                }
+            note = NursingNote(
+                note_id=note_id,
+                patient_id=patient_id,
+                nurse_id=nurse_id,
+                patient_condition=data.patient_condition,
+                conscious_level=data.conscious_level,
+                glasgow_coma_score=data.glasgow_coma_score,
+                pain_scale=data.pain_scale,
+                soap_history=[],
             )
 
+            session.add(note)
             session.commit()
 
             return {
@@ -74,45 +50,29 @@ class Notes:
 
         finally:
             session.close()
-            
-            
-    def register_soap(self,nurse_id: str,patient_id: str,note_id: str,data: SoapRegister)->dict[str,Any]:
+
+    def register_soap(self, nurse_id: str, patient_id: str, note_id: str, data: SoapRegister) -> dict[str, Any]:
         """register soap and save it into json"""
         session = self.db.get_session()
 
         try:
-            query = text("""
-                SELECT soap_history
-                FROM nursing_notes
-                WHERE note_id = :note_id
-                  AND patient_id = :patient_id
-                  AND nurse_id = :nurse_id
-            """)
+            note = (
+                session.query(NursingNote)
+                .filter(
+                    NursingNote.note_id == note_id,
+                    NursingNote.patient_id == patient_id,
+                    NursingNote.nurse_id == nurse_id,
+                )
+                .first()
+            )
 
-            result = session.execute(
-                query,
-                {
-                    "note_id": note_id,
-                    "patient_id": patient_id,
-                    "nurse_id": nurse_id
-                }
-            ).fetchone()
-
-            if result is None:
+            if note is None:
                 raise ValueError(
                     "Nursing note not found or does not belong "
                     "to this nurse/patient"
                 )
 
-            raw_soap_history = result[0]
-            if raw_soap_history:
-                soap_history = (
-                    json.loads(raw_soap_history)
-                    if isinstance(raw_soap_history, str)
-                    else raw_soap_history
-                )
-            else:
-                soap_history = []
+            soap_history = list(note.soap_history) if note.soap_history else []
 
             new_version = len(soap_history) + 1
 
@@ -128,23 +88,8 @@ class Notes:
 
             soap_history.append(new_soap)
 
-            update_query = text("""
-                UPDATE nursing_notes
-                SET soap_history = :soap_history
-                WHERE note_id = :note_id
-                  AND patient_id = :patient_id
-                  AND nurse_id = :nurse_id
-            """)
-
-            session.execute(
-                update_query,
-                {
-                    "soap_history": json.dumps(soap_history),
-                    "note_id": note_id,
-                    "patient_id": patient_id,
-                    "nurse_id": nurse_id
-                }
-            )
+            # Reassign (not in-place append) so SQLAlchemy detects the change
+            note.soap_history = soap_history
 
             session.commit()
 
@@ -161,56 +106,50 @@ class Notes:
 
         finally:
             session.close()
-            
-            
-    def show_nursing_notes(self,nurse_id: str,patient_id: str):
+
+    def show_nursing_notes(self, nurse_id: str, patient_id: str):
         """Show all nursing notes for a patient."""
 
         session = self.db.get_session()
 
         try:
-            list_notes_query = text("""
-                SELECT
-                    note_id,
-                    patient_id,
-                    nurse_id,
-                    patient_condition,
-                    conscious_level,
-                    glasgow_coma_score,
-                    pain_scale,
-                    soap_history,
-                    notes_created_at
-                FROM nursing_notes
-                WHERE nurse_id = :nurse_id
-                AND patient_id = :patient_id
-                ORDER BY notes_created_at DESC
-            """)
-
-            result = session.execute(
-                list_notes_query,
-                {
-                    "nurse_id": nurse_id,
-                    "patient_id": patient_id
-                }
+            rows = (
+                session.query(NursingNote)
+                .filter(
+                    NursingNote.nurse_id == nurse_id,
+                    NursingNote.patient_id == patient_id,
+                )
+                .order_by(NursingNote.notes_created_at.desc())
+                .all()
             )
 
-            notes = result.mappings().all()
-
-            if not notes:
+            if not rows:
                 return {
                     "message": "No nursing notes found",
                     "patient_id": patient_id,
                     "notes": []
                 }
 
+            notes = [
+                {
+                    "note_id": n.note_id,
+                    "patient_id": n.patient_id,
+                    "nurse_id": n.nurse_id,
+                    "patient_condition": n.patient_condition,
+                    "conscious_level": n.conscious_level,
+                    "glasgow_coma_score": n.glasgow_coma_score,
+                    "pain_scale": n.pain_scale,
+                    "soap_history": n.soap_history,
+                    "notes_created_at": n.notes_created_at,
+                }
+                for n in rows
+            ]
+
             return {
                 "patient_id": patient_id,
                 "nurse_id": nurse_id,
                 "notes": notes
             }
-
-        except Exception:
-            raise
 
         finally:
             session.close()
@@ -219,26 +158,25 @@ class Notes:
         """Deleting notes for patient by nurse"""
         session = self.db.get_session()
         try:
-            delete_query = text("""
-                DELETE FROM nursing_notes
-                WHERE note_id = :note_id
-                AND nurse_id = :nurse_id
-                AND patient_id = :patient_id
-            """)
-            result = session.execute(
-                delete_query,
-                {
-                    "note_id": note_id,
-                    "nurse_id": nurse_id,
-                    "patient_id": patient_id
-                }
+            note = (
+                session.query(NursingNote)
+                .filter(
+                    NursingNote.note_id == note_id,
+                    NursingNote.nurse_id == nurse_id,
+                    NursingNote.patient_id == patient_id,
+                )
+                .first()
             )
-            if result.rowcount == 0:
+
+            if note is None:
                 raise ValueError(
                     "Nursing note not found or does not belong "
                     "to this nurse/patient"
                 )
+
+            session.delete(note)
             session.commit()
+
             return {
                 "message": f"{note_id} deleted successfully",
                 "status": True,
@@ -246,8 +184,10 @@ class Notes:
                 "patient_id": patient_id,
                 "nurse_id": nurse_id
             }
+
         except Exception:
             session.rollback()
             raise
+
         finally:
             session.close()
