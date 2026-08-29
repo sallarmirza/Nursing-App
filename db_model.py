@@ -35,7 +35,6 @@ class Patient(Base):
     assigned_nurse_id=Column(String(36),ForeignKey('nurses.nurse_id'),nullable=False,index=True)
     patient_created_at=Column(DateTime,server_default=func.current_timestamp())
     
-
 class DosageCalculation(Base):
     __tablename__ = "dosage_calculations"
 
@@ -61,27 +60,16 @@ class DosageCalculation(Base):
 
     dosage_created_at = Column(
         DateTime,
-        default=lambda: datetime.now()
-    ) 
+        server_default=func.current_timestamp()
+    )
+
 
 class NursingNote(Base):
     __tablename__ = "nursing_notes"
 
     note_id = Column(String(36), primary_key=True)
-
-    patient_id = Column(
-        String(36),
-        ForeignKey("patients.patient_id"),
-        nullable=False,
-        index=True
-    )
-
-    nurse_id = Column(
-        String(36),
-        ForeignKey("nurses.nurse_id"),
-        nullable=False,
-        index=True
-    )
+    patient_id = Column(String(36), ForeignKey("patients.patient_id"), nullable=False, index=True)
+    nurse_id = Column(String(36), ForeignKey("nurses.nurse_id"), nullable=False, index=True)
 
     patient_condition = Column(TEXT)
     conscious_level = Column(String(36))
@@ -92,31 +80,23 @@ class NursingNote(Base):
 
     notes_created_at = Column(
         DateTime,
-        default=lambda: datetime.now()
+        server_default=func.current_timestamp()
     )
-    
+
+
 class IVDripCalculation(Base):
     __tablename__ = 'iv_drip_calculations'
 
     drip_calc_id = Column(String(36), primary_key=True)
-    patient_id = Column(
-        String(36),
-        ForeignKey('patients.patient_id'),
-        nullable=True,
-        index=True
-    )
-    nurse_id = Column(
-        String(36),
-        ForeignKey('nurses.nurse_id'),
-        nullable=True,
-        index=True
-    )
+    patient_id = Column(String(36), ForeignKey('patients.patient_id'), nullable=True, index=True)
+    nurse_id = Column(String(36), ForeignKey('nurses.nurse_id'), nullable=True, index=True)
     total_volume_ml = Column(Float, nullable=False)
     time_duration_min = Column(Float, nullable=False)
     drop_factor = Column(TEXT)
     drop_per_min = Column(INTEGER)
-    created_at = Column(DateTime, default=lambda: datetime.now())
-    
+    created_at = Column(DateTime, server_default=func.current_timestamp())
+
+
 class SBARHandover(Base):
     __tablename__ = 'sbar_handovers'
     sbar_id = Column(String(36), primary_key=True)
@@ -129,29 +109,28 @@ class SBARHandover(Base):
     current_iv_medications = Column(JSON, default=dict)
     nursing_interventions = Column(JSON, default=dict)
     soap_notes = Column(JSON, default=dict)
-    sbar_created_at = Column(DateTime, default=lambda: datetime.now())   
-    
-class CurrentMedication(Base):
-    __tablename__='current_medications'
-    cm_id=Column(String(36),primary_key=True)
-    patient_id=Column(String(36),ForeignKey('patients.patient_id'),nullable=False,index=True)
-    med_name=Column(String(255),nullable=False)
-    dose=Column(Float)
-    dose_unit=Column(String(20))
-    frequency=Column(String(50))
-    med_start_date=Column(DateTime,default=lambda:datetime.now())
+    sbar_created_at = Column(DateTime, server_default=func.current_timestamp())
+
 
 class Vitals(Base):
-    __tablename__='vitals'
-    
-    vital_id=Column(String(36),primary_key=True)
-    patient_id=Column(String(36),ForeignKey('patients.patient_id'),nullable=False,index=True)
-    nurse_id=Column(String(36),ForeignKey('nurses.nurse_id'),nullable=True,index=True)
-    note_id=Column(String(36),ForeignKey('nursing_notes.note_id'),nullable=True)
-    source=Column(String(20),nullable=False) #nursing notes, or intial checkup 
-    vitals_data=Column(JSON,default=dict)
-    recorded_at=Column(DateTime,default=lambda:datetime.now())
-    
+    __tablename__ = 'vitals'
 
+    vital_id = Column(String(36), primary_key=True)
+    patient_id = Column(String(36), ForeignKey('patients.patient_id'), nullable=False, index=True)
+    nurse_id = Column(String(36), ForeignKey('nurses.nurse_id'), nullable=True, index=True)
+    note_id = Column(String(36), ForeignKey('nursing_notes.note_id'), nullable=True)
+    source = Column(String(20), nullable=False)
+    vitals_data = Column(JSON, default=dict)
+    recorded_at = Column(DateTime, server_default=func.current_timestamp())
     
     
+class CurrentMedication(Base):
+    __tablename__ = 'current_medications'
+    
+    med_id = Column(String(36), primary_key=True)
+    patient_id = Column(String(36), ForeignKey('patients.patient_id'), nullable=False, index=True)
+    med_name = Column(String(255), nullable=False)
+    dose = Column(Float)
+    dose_unit = Column(String(20))
+    frequency = Column(String(50))
+    med_start_date = Column(DateTime, server_default=func.current_timestamp())

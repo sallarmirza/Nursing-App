@@ -146,14 +146,8 @@ class Sbar:
         finally:
             session.close()
 
-    def delete_sbar(
-        self,
-        nurse_id: str,
-        patient_id: str,
-        sbar_id: str
-    ) -> dict[str, Any]:
-        """Delete an SBAR handover."""
-
+    def delete_sbar_by_nurse(self,nurse_id: str,patient_id: str,sbar_id: str) -> dict[str, Any]:
+        """Delete sbar by nurse"""
         session = self.db.get_session()
 
         try:
