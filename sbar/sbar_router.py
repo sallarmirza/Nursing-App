@@ -28,16 +28,16 @@ def create_sbar_handover(
 
 
 @router.get("/{nurse_id}/{patient_id}")
-def show_sbar_handovers(
-    nurse_id: str,
-    patient_id: str
-):
-    return sbar.show_sbar(
-        nurse_id=nurse_id,
-        patient_id=patient_id
-    )
-
-
+def show_sbar_handovers(nurse_id: str, patient_id: str):
+    try:
+        return sbar.show_sbar(
+            nurse_id=nurse_id,
+            patient_id=patient_id
+        )
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+    
+    
 @router.delete("/{nurse_id}/{patient_id}/{sbar_id}")
 def remove_sbar_handover(nurse_id: str,patient_id: str,sbar_id: str):
     try:

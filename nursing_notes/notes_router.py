@@ -61,7 +61,7 @@ def save_soap(
         )
         
         
-@router.get('/{nurse_id}/{patient_id}')
+@router.get('/{nurse_id}/{patient_id}',response_model=NursingNotesResponse)
 def show_notes(nurse_id: str, patient_id: str):
     """return the notes"""
     try:

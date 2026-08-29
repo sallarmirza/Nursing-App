@@ -52,7 +52,7 @@ class DosageCalculation(Base):
         index=True
     )
     patient_weight = Column(Float, nullable=False)
-    medication = Column(String, nullable=False)
+    medication = Column(String(200), nullable=False)
     dose_per_kg = Column(Float, nullable=False)
     dose_unit = Column(String(20), nullable=False)
     concentration_value = Column(Float, nullable=False)
@@ -97,8 +97,8 @@ class IVDripCalculation(Base):
     created_at = Column(DateTime, server_default=func.current_timestamp())
 
 
-class SBARHandover(Base):
-    __tablename__ = 'sbar_handovers'
+class SBAR(Base):
+    __tablename__ = 'sbar'
     sbar_id = Column(String(36), primary_key=True)
     patient_id = Column(String(36), ForeignKey('patients.patient_id'), nullable=True, index=True)
     nurse_id = Column(String(36), ForeignKey('nurses.nurse_id'), nullable=True, index=True)
@@ -117,9 +117,8 @@ class Vitals(Base):
 
     vital_id = Column(String(36), primary_key=True)
     patient_id = Column(String(36), ForeignKey('patients.patient_id'), nullable=False, index=True)
-    nurse_id = Column(String(36), ForeignKey('nurses.nurse_id'), nullable=True, index=True)
-    note_id = Column(String(36), ForeignKey('nursing_notes.note_id'), nullable=True)
-    source = Column(String(20), nullable=False)
+    nurse_id = Column(String(36), ForeignKey('nurses.nurse_id'), nullable=False, index=True)
+    source = Column(String(30), nullable=False)
     vitals_data = Column(JSON, default=dict)
     recorded_at = Column(DateTime, server_default=func.current_timestamp())
     
