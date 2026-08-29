@@ -2,8 +2,8 @@ from storage import DBManager
 from datetime import datetime
 import uuid
 from schema.register_schema import PatientRegister
-from sqlalchemy import text
 
+from db_model import Patient, Nurse  
 
 class PatientService:
 
@@ -13,7 +13,7 @@ class PatientService:
     @staticmethod
     def create_patient_id() -> str:
         year = datetime.now().year
-        unique_part = uuid.uuid4().hex[:8].upper()
+        unique_part = uuid.uuid4().hex[:12].upper()
 
         return f"PAT-{year}-{unique_part}"
 
@@ -26,69 +26,30 @@ class PatientService:
         session = self.db.get_session()
 
         try:
-            # Checking if nurse exists or not
-            nurse_check = text("""
-                SELECT nurse_id
-                FROM nurses
-                WHERE nurse_id = :nurse_id
-            """)
-
-            nurse = session.execute(
-                nurse_check,
-                {"nurse_id": nurse_id}
-            ).fetchone()
+            nurse = session.query(Nurse).filter(Nurse.nurse_id == nurse_id).first()
 
             if not nurse:
                 raise ValueError("Nurse does not exist")
 
-         
             patient_id = self.create_patient_id()
 
-         
-            patient_creation_query = text("""
-                INSERT INTO patients (
-                    patient_id,
-                    patient_name,
-                    patient_gender,
-                    date_of_birth,
-                    patient_weight,
-                    patient_height,
-                    patient_blood_group,
-                    ward,
-                    assigned_nurse_id
-                )
-                VALUES (
-                    :patient_id,
-                    :patient_name,
-                    :patient_gender,
-                    :date_of_birth,
-                    :patient_weight,
-                    :patient_height,
-                    :patient_blood_group,
-                    :ward,
-                    :nurse_id
-                )
-            """)
-
-            session.execute(
-            patient_creation_query,
-            {
-                "patient_id": patient_id,
-                "patient_name": data.patient_name,
-                "patient_gender": data.gender.value,
-                "date_of_birth": data.date_of_birth,
-                "patient_weight": data.patient_weight,
-                "patient_height": data.patient_height,
-                "patient_blood_group": (
+            patient = Patient(
+                patient_id=patient_id,
+                patient_name=data.patient_name,
+                patient_gender=data.gender.value,
+                date_of_birth=data.date_of_birth,
+                patient_weight=data.patient_weight,
+                patient_height=data.patient_height,
+                patient_blood_group=(
                     data.patient_blood_group.value
                     if data.patient_blood_group
                     else None
                 ),
-                "ward": data.patient_ward,
-                "nurse_id": nurse_id
-            }
-        )
+                ward=data.patient_ward,
+                assigned_nurse_id=nurse_id,
+            )
 
+            session.add(patient)
             session.commit()
 
             return {
@@ -105,85 +66,65 @@ class PatientService:
 
         finally:
             session.close()
-            
+
     def all_patients(self, nurse_id: str):
         """List all patients assigned to a nurse."""
         session = self.db.get_session()
 
         try:
-            nurse_check_query = text("""
-                SELECT nurse_id
-                FROM nurses
-                WHERE nurse_id = :nurse_id
-            """)
-
-            nurse = session.execute(
-                nurse_check_query,
-                {"nurse_id": nurse_id}
-            ).fetchone()
+            nurse = session.query(Nurse).filter(Nurse.nurse_id == nurse_id).first()
 
             if not nurse:
                 raise ValueError("Nurse not found")
 
-            list_patient_query = text("""
-                SELECT
-                    patient_id,
-                    patient_name,
-                    patient_gender,
-                    date_of_birth,
-                    patient_weight,
-                    patient_height,
-                    patient_blood_group,
-                    ward,
-                    assigned_nurse_id,
-                    patient_created_at
-                FROM patients
-                WHERE assigned_nurse_id = :nurse_id
-            """)
-
-            result = session.execute(
-                list_patient_query,
-                {"nurse_id": nurse_id}
+            patients = (
+                session.query(Patient)
+                .filter(Patient.assigned_nurse_id == nurse_id)
+                .all()
             )
-
-            patients = result.mappings().all()
 
             if not patients:
                 return []
 
-            return patients
-
-        except Exception:
-            raise
+            return [
+                {
+                    "patient_id": p.patient_id,
+                    "patient_name": p.patient_name,
+                    "patient_gender": p.patient_gender,
+                    "date_of_birth": p.date_of_birth,
+                    "patient_weight": p.patient_weight,
+                    "patient_height": p.patient_height,
+                    "patient_blood_group": p.patient_blood_group,
+                    "ward": p.ward,
+                    "assigned_nurse_id": p.assigned_nurse_id,
+                    "patient_created_at": p.patient_created_at,
+                }
+                for p in patients
+            ]
 
         finally:
             session.close()
-                
+
     def delete_patient_acc(self, nurse_id: str, patient_id: str) -> dict:
         """Delete a patient only if assigned to the requesting nurse."""
         session = self.db.get_session()
 
         try:
-            delete_patient_query = text("""
-                DELETE FROM patients
-                WHERE patient_id = :patient_id
-                AND assigned_nurse_id = :nurse_id
-            """)
-
-            result = session.execute(
-                delete_patient_query,
-                {
-                    "patient_id": patient_id,
-                    "nurse_id": nurse_id
-                }
+            patient = (
+                session.query(Patient)
+                .filter(
+                    Patient.patient_id == patient_id,
+                    Patient.assigned_nurse_id == nurse_id,
+                )
+                .first()
             )
 
-            if result.rowcount == 0:
-                session.rollback()
+            if patient is None:
                 raise ValueError(
                     "Patient not found or you are not authorized to delete this patient"
                 )
 
+            session.delete(patient)
             session.commit()
 
             return {

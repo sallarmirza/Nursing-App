@@ -1,12 +1,9 @@
 import uuid
-import json
 from datetime import datetime
-
-from sqlalchemy import text
 
 from schema.register_schema import VitalsRegister
 from storage import DBManager
-
+from db_model import Vitals as VitalsModel, Patient 
 
 class Vitals:
 
@@ -16,76 +13,48 @@ class Vitals:
     @staticmethod
     def create_vital_id():
         year = datetime.now().year
-        unique = uuid.uuid4().hex[:8].upper()
-
+        unique = uuid.uuid4().hex[:12].upper()
         return f"VITAL-{year}-{unique}"
 
     def create_vitals(self, nurse_id: str, patient_id: str, data: VitalsRegister):
-        """Create and save patient vitals. but source has to be defined by frontend"""
+        """Create and save patient vitals. Source is defined by frontend."""
 
         session = self.db.get_session()
 
         try:
-            patient_check = text("""
-                SELECT patient_id
-                FROM patients
-                WHERE patient_id = :patient_id
-                AND assigned_nurse_id = :nurse_id
-            """)
-
-            patient_result = session.execute(
-                patient_check,
-                {
-                    "patient_id": patient_id,
-                    "nurse_id": nurse_id
-                }
-            ).fetchone()
-
-            if patient_result is None:
-                raise ValueError(
-                    "Patient does not exist or is not assigned "
-                    "to this nurse"
+            patient = (
+                session.query(Patient)
+                .filter(
+                    Patient.patient_id == patient_id,
+                    Patient.assigned_nurse_id == nurse_id,
                 )
-
-            vital_id = self.create_vital_id()
-
-            insert_query = text("""
-                INSERT INTO vitals (
-                    vital_id,
-                    patient_id,
-                    nurse_id,
-                    source,
-                    vitals_data
-                )
-                VALUES (
-                    :vital_id,
-                    :patient_id,
-                    :nurse_id,
-                    :source,
-                    :vitals_data
-                )
-            """)
-
-            session.execute(
-                insert_query,
-                {
-                    "vital_id": vital_id,
-                    "patient_id": patient_id,
-                    "nurse_id": nurse_id,
-                    "source": data.source,
-                    "vitals_data": json.dumps(data.vitals_data)
-                }
+                .first()
             )
 
+            if patient is None:
+                raise ValueError(
+                    "Patient does not exist or is not assigned to this nurse"
+                )
+
+            vital = VitalsModel(
+                vital_id=self.create_vital_id(),
+                patient_id=patient_id,
+                nurse_id=nurse_id,
+                source=data.source,
+                vitals_data=data.vitals_data, 
+            )
+
+            session.add(vital)
             session.commit()
+            session.refresh(vital)  
 
             return {
                 "message": "Vitals created successfully",
-                "vital_id": vital_id,
-                "patient_id": patient_id,
-                "nurse_id": nurse_id,
-                "source": data.source,
-                "vitals_data": data.vitals_data
+                "vital_id": vital.vital_id,
+                "patient_id": vital.patient_id,
+                "nurse_id": vital.nurse_id,
+                "source": vital.source,
+                "vitals_data": vital.vitals_data,
             }
 
         except Exception:
@@ -94,60 +63,47 @@ class Vitals:
 
         finally:
             session.close()
-            
+
     def show_vitals(self, nurse_id: str, patient_id: str):
         """List all vitals recorded for a patient by a given nurse."""
 
         session = self.db.get_session()
 
         try:
-            query = text("""
-                SELECT
-                    vital_id,
-                    patient_id,
-                    nurse_id,
-                    source,
-                    vitals_data,
-                    recorded_at
-                FROM vitals
-                WHERE nurse_id = :nurse_id
-                  AND patient_id = :patient_id
-                ORDER BY recorded_at DESC
-            """)
-
-            result = session.execute(
-                query,
-                {
-                    "nurse_id": nurse_id,
-                    "patient_id": patient_id
-                }
+            rows = (
+                session.query(VitalsModel)
+                .filter(
+                    VitalsModel.nurse_id == nurse_id,
+                    VitalsModel.patient_id == patient_id,
+                )
+                .order_by(VitalsModel.recorded_at.desc())
+                .all()
             )
-
-            rows = result.mappings().all()
 
             if not rows:
                 return {
                     "message": "No vitals found",
                     "patient_id": patient_id,
-                    "vitals": []
+                    "vitals": [],
                 }
 
-            vitals = []
-            for row in rows:
-                row_dict = dict(row)
-                raw = row_dict.get("vitals_data")
-                if isinstance(raw, str):
-                    row_dict["vitals_data"] = json.loads(raw)
-                vitals.append(row_dict)
+            vitals = [
+                {
+                    "vital_id": v.vital_id,
+                    "patient_id": v.patient_id,
+                    "nurse_id": v.nurse_id,
+                    "source": v.source,
+                    "vitals_data": v.vitals_data,  
+                    "recorded_at": v.recorded_at,
+                }
+                for v in rows
+            ]
 
             return {
                 "patient_id": patient_id,
                 "nurse_id": nurse_id,
-                "vitals": vitals
+                "vitals": vitals,
             }
-
-        except Exception:
-            raise
 
         finally:
             session.close()
