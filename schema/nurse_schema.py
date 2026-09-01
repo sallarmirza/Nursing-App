@@ -6,6 +6,10 @@ class NurseSignUp(BaseModel):
     nurse_email:EmailStr
     nurse_password:str
 
+class NurseSignIn(BaseModel):
+    nurse_email:EmailStr
+    nurse_password:str
+    
 class NurseRegister(BaseModel):
     nurse_name:str
     nurse_qualification: Optional[str] = None

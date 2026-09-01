@@ -147,7 +147,8 @@ def show_notes():
             if not patient_id or not note_id:
                 st.error("Patient ID and Note ID are required")
             else:
-                resp = delete(f"/notes/{note_id}/{nurse_id}/{patient_id}")
+                # param order now matches every other notes route: /notes/{nurse_id}/{patient_id}/...
+                resp = delete(f"/notes/{nurse_id}/{patient_id}/{note_id}")
                 if resp.status_code == 200:
                     st.success("Note deleted")
                 else:

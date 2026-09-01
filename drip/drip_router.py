@@ -18,7 +18,7 @@ def return_all_drip_for_patient(nurse_id:str,patient_id: str):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-@router.post("")
+@router.post("/calculate")
 def calculate_drip_rate(data: DripCalculationRegister):
     """Calculate a simple drip rate (not saved)."""
     try:
@@ -35,7 +35,7 @@ def calculate_patient_drip_rate(
 ):
     """Calculate and save drip rate for a patient."""
     try:
-        return drip_rate.cal_with_patient(nurse_id, patient_id, data)
+        return drip_rate.calculate_driprate_with_patient(nurse_id, patient_id, data)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
