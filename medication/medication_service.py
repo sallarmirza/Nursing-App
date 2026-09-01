@@ -3,7 +3,7 @@ import uuid
 from datetime import datetime
 from schema.register_schema import CurrentMedicationRegister
 
-from db_model import CurrentMedication, Patient  # your SQLAlchemy models
+from db_model import CurrentMedication, Patient  
 
 
 class Medication:

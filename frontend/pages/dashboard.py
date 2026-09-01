@@ -50,8 +50,9 @@ def _gather_dashboard_stats(nurse_id):
         totals["vitals"] += _count_from(get(f"/vitals/{nurse_id}/{pid}"), "vitals")
         totals["sbar"] += _count_from(get(f"/sbar/{nurse_id}/{pid}"), "handovers")
         totals["medications"] += _count_from(get(f"/medications/{nurse_id}/{pid}"), "medications")
-        totals["drip_calcs"] += _count_from(get(f"/calc/drip/{pid}"), "drips")
-        totals["dosage_calcs"] += _count_from(get(f"/calc/dose/{pid}"), "dosages")
+        # nurse_id scoping added to list_drip_cal / list_dosage_cal — must be included here
+        totals["drip_calcs"] += _count_from(get(f"/calc/drip/{nurse_id}/{pid}"), "drips")
+        totals["dosage_calcs"] += _count_from(get(f"/calc/dose/{nurse_id}/{pid}"), "dosages")
 
     return totals
 

@@ -14,7 +14,7 @@ class DripCalc:
     @staticmethod
     def drip_calc_id():
         year = datetime.now().year
-        unique_part = uuid.uuid4().hex[:8].upper()
+        unique_part = uuid.uuid4().hex[:12].upper()
         return f"DRIP-{year}-{unique_part}"
 
     def list_all_patient_drip_calculations(self, nurse_id: str, patient_id: str) -> dict:

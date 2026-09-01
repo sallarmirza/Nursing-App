@@ -17,16 +17,24 @@ class DosageCalc:
         unique = uuid.uuid4().hex[:8].upper()
         return f"DOSE-{year}-{unique}"
 
-    def list_dosage_calculations(self, patient_id: str) -> dict:
-        """List all dosage calculations for a patient.
-
-        NOTE: unlike the equivalent methods on other classes (Vitals,
-        Sbar, Medication, DripCalc), this does not scope by nurse_id —
-        carried over unchanged from the raw-SQL version. Flagging this
-        as worth revisiting given it's medication dosage data.
-        """
+    def list_dosage_calculations(self, nurse_id: str, patient_id: str) -> dict:
+        """List all dosage calculations for a patient, scoped by nurse."""
         session = self.db.get_session()
         try:
+            patient = (
+                session.query(Patient)
+                .filter(
+                    Patient.patient_id == patient_id,
+                    Patient.assigned_nurse_id == nurse_id,
+                )
+                .first()
+            )
+
+            if patient is None:
+                raise ValueError(
+                    "Patient does not exist or is not assigned to this nurse"
+                )
+
             rows = (
                 session.query(DosageCalculation)
                 .filter(DosageCalculation.patient_id == patient_id)
@@ -61,11 +69,14 @@ class DosageCalc:
                 "patient_id": patient_id,
                 "dosages": dosages
             }
+        except ValueError:
+            raise
         except Exception:
             raise ValueError("Unable to retrieve dosage records")
         finally:
             session.close()
-
+            
+        
     def calculate_simple_dosage(self, data: DosageCalculatorRegister):
         """Calculate dosage without patient. No DB access needed."""
         try:

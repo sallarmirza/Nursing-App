@@ -61,7 +61,7 @@ def show_dosage_calculator():
     with tab_history:
         patient_id = st.text_input("Patient ID", value=active_patient_id, key="dose_history_patient_id")
         if st.button("Load History"):
-            resp = get(f"/calc/dose/{patient_id}")
+            resp = get(f"/calc/dose/{nurse_id}/{patient_id}")
             if resp.status_code == 200:
                 data = resp.json()
                 dosages = data.get("dosages", [])

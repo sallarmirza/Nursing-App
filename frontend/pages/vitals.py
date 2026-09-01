@@ -17,19 +17,8 @@ def show_vitals():
     with tab_add:
         patient_id = st.text_input("Patient ID", value=active_patient_id, key="vitals_patient_id")
 
-        note_options = []
-        if patient_id:
-            notes_resp = get(f"/notes/{nurse_id}/{patient_id}")
-            if notes_resp.status_code == 200:
-                note_options = [n["note_id"] for n in notes_resp.json().get("notes", [])]
-
-        if note_options:
-            note_id = st.selectbox("Note ID (from existing notes)", note_options)
-        else:
-            st.info("No existing notes for this patient — create one on the Nursing Notes page first, or enter a Note ID manually.")
-            note_id = st.text_input("Note ID (manual)")
-
-        source = st.selectbox("Source", ["Manual", "Monitor", "Device"])
+        # Vitals model no longer has a note_id FK — source is just a descriptive tag now
+        source = st.selectbox("Source", ["admission", "nursing_note", "manual"])
 
         col1, col2, col3 = st.columns(3)
         with col1:
@@ -43,8 +32,8 @@ def show_vitals():
             spo2 = st.number_input("SpO2 (%)", min_value=0, max_value=100, step=1)
 
         if st.button("Save Vitals"):
-            if not patient_id or not note_id:
-                st.error("Patient ID and Note ID are required")
+            if not patient_id:
+                st.error("Patient ID is required")
             else:
                 vitals_data = {
                     "heart_rate": heart_rate,
@@ -58,7 +47,7 @@ def show_vitals():
                     "source": source,
                     "vitals_data": vitals_data,
                 }
-                resp = post(f"/vitals/{nurse_id}/{patient_id}/{note_id}", payload)
+                resp = post(f"/vitals/{nurse_id}/{patient_id}", payload)
                 if resp.status_code == 200:
                     st.success("Vitals recorded")
                     st.json(resp.json())

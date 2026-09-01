@@ -12,7 +12,8 @@ from pages.sbar import show_sbar
 
 st.set_page_config(
     page_title="Nursing App",
-    layout='wide'
+    layout="wide",
+    
 )
 
 if "logged_in" not in st.session_state:

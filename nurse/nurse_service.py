@@ -1,6 +1,6 @@
 from sqlalchemy.exc import IntegrityError
 from storage import DBManager
-from schema.nurse_schema import NurseSignUp, NurseRegister
+from schema.nurse_schema import NurseSignUp, NurseRegister,NurseSignIn
 from nurse.nurse_helper import hash_password, verify_password
 import uuid
 from datetime import datetime
@@ -67,9 +67,8 @@ class NurseService:
             session.close()
 
     def nurse_account_setup(self, nurse_id: str, data: NurseRegister):
-
+        """additional info of nurse"""
         session = self.db.get_session()
-
         try:
             nurse = session.query(Nurse).filter(Nurse.nurse_id == nurse_id).first()
 
@@ -116,13 +115,14 @@ class NurseService:
                 for n in rows
             ]
 
-        except Exception:
-            raise ValueError("Failed to retrieve nurses")
+        except Exception as e:
+            raise ValueError("Failed to retrieve nurses") from e
 
         finally:
             session.close()
 
     def delete_nurse(self, nurse_id: str) -> bool:
+        """delete nurse"""
         session = self.db.get_session()
 
         try:
@@ -147,6 +147,34 @@ class NurseService:
         finally:
             session.close()
 
+
+    def nurse_signIn(self, data: NurseSignIn):
+        """nurse login"""
+        session = self.db.get_session()
+
+        try:
+            nurse = (
+                session.query(Nurse)
+                .filter(Nurse.nurse_email == data.nurse_email)
+                .first()
+            )
+
+            if not nurse or not verify_password(data.nurse_password, nurse.nurse_password_hash):
+                return None
+
+            return {
+                "nurse_id": nurse.nurse_id,
+                "nurse_name": nurse.nurse_name,
+                "nurse_email": nurse.nurse_email,
+            }
+
+        except Exception as e:
+            raise ValueError("Login failed") from e
+
+        finally:
+            session.close()
+        
+    
     def nurse_patients(self, nurse_id: str):
         """Show all patients assigned to a nurse."""
 

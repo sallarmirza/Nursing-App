@@ -77,7 +77,7 @@ def show_drip_calculator():
     with tab_history:
         patient_id = st.text_input("Patient ID", value=active_patient_id, key="drip_history_patient_id")
         if st.button("Load History"):
-            resp = get(f"/calc/drip/{patient_id}")
+            resp = get(f"/calc/drip/{nurse_id}/{patient_id}")
             if resp.status_code == 200:
                 data = resp.json()
                 drips = data.get("drips", [])

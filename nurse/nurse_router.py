@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status
 
-from schema.nurse_schema import NurseRegister, NurseSignUp
+from schema.nurse_schema import NurseRegister, NurseSignUp,NurseSignIn
 from nurse.nurse_service import NurseService
 from storage import DBManager
 
@@ -45,22 +45,37 @@ def nurse_account_creation(data: NurseSignUp):
             status_code=status.HTTP_409_CONFLICT,
             detail=str(e)
         )
-
-
+        
 @router.post("/setup/{nurse_id}")
-def nurse_data_setup(nurse_id: str,data: NurseRegister):
+def nurse_profile_setup(nurse_id, data: NurseRegister):
+    """Complete a nurse's profile after signup."""
     try:
-        return nurse_service.nurse_account_setup(
-            nurse_id,
-            data
-        )
+        return nurse_service.nurse_account_setup(nurse_id, data) 
 
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(e)
         )
+ 
+@router.post("/login")
+def nurse_login(data: NurseSignIn):
+    try:
+        nurse = nurse_service.nurse_signIn(data)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
 
+    if nurse is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password"
+        )
+
+    return nurse
+ 
 @router.delete('/delete/{nurse_id}')
 def delete_nurse_account(nurse_id):
     try:

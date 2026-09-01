@@ -39,18 +39,8 @@ class DosageCalculation(Base):
     __tablename__ = "dosage_calculations"
 
     dose_calc_id = Column(String(36), primary_key=True)
-    patient_id = Column(
-        String(36),
-        ForeignKey("patients.patient_id"),
-        nullable=True,
-        index=True
-    )
-    nurse_id = Column(
-        String(36),
-        ForeignKey("nurses.nurse_id"),
-        nullable=False,
-        index=True
-    )
+    patient_id = Column(String(36),ForeignKey("patients.patient_id"),nullable=False,index=True)
+    nurse_id = Column(String(36),ForeignKey("nurses.nurse_id"),nullable=False,index=True)
     patient_weight = Column(Float, nullable=False)
     medication = Column(String(200), nullable=False)
     dose_per_kg = Column(Float, nullable=False)
@@ -70,29 +60,23 @@ class NursingNote(Base):
     note_id = Column(String(36), primary_key=True)
     patient_id = Column(String(36), ForeignKey("patients.patient_id"), nullable=False, index=True)
     nurse_id = Column(String(36), ForeignKey("nurses.nurse_id"), nullable=False, index=True)
-
     patient_condition = Column(TEXT)
     conscious_level = Column(String(36))
     glasgow_coma_score = Column(INTEGER)
     pain_scale = Column(INTEGER)
-
     soap_history = Column(JSON, default=list)
-
-    notes_created_at = Column(
-        DateTime,
-        server_default=func.current_timestamp()
-    )
+    notes_created_at = Column(DateTime,server_default=func.current_timestamp())
 
 
 class IVDripCalculation(Base):
     __tablename__ = 'iv_drip_calculations'
 
     drip_calc_id = Column(String(36), primary_key=True)
-    patient_id = Column(String(36), ForeignKey('patients.patient_id'), nullable=True, index=True)
-    nurse_id = Column(String(36), ForeignKey('nurses.nurse_id'), nullable=True, index=True)
+    patient_id = Column(String(36), ForeignKey('patients.patient_id'), nullable=False, index=True)
+    nurse_id = Column(String(36), ForeignKey('nurses.nurse_id'), nullable=False, index=True)
     total_volume_ml = Column(Float, nullable=False)
     time_duration_min = Column(Float, nullable=False)
-    drop_factor = Column(TEXT)
+    drop_factor = Column(Float)
     drop_per_min = Column(INTEGER)
     created_at = Column(DateTime, server_default=func.current_timestamp())
 
@@ -100,8 +84,8 @@ class IVDripCalculation(Base):
 class SBAR(Base):
     __tablename__ = 'sbar'
     sbar_id = Column(String(36), primary_key=True)
-    patient_id = Column(String(36), ForeignKey('patients.patient_id'), nullable=True, index=True)
-    nurse_id = Column(String(36), ForeignKey('nurses.nurse_id'), nullable=True, index=True)
+    patient_id = Column(String(36), ForeignKey('patients.patient_id'), nullable=False, index=True)
+    nurse_id = Column(String(36), ForeignKey('nurses.nurse_id'), nullable=False, index=True)
     situation = Column(TEXT)
     background = Column(TEXT)
     assessment = Column(TEXT)

@@ -35,8 +35,8 @@ def show_medications():
             elif not frequency:
                 st.error("Enter a frequency")
             else:
+                # patient_id comes from the URL path only — never duplicated in the body
                 payload = {
-                    "patient_id": patient_id,
                     "med_name": med_name,
                     "dose": dose,
                     "dose_unit": dose_unit,
