@@ -14,7 +14,47 @@ def show_dosage_calculator():
     else:
         st.warning("No active patient selected — go to Patients and click Select, or enter an ID manually below.")
 
-    tab_calc, tab_history, tab_delete = st.tabs(["Calculate & Save", "History", "Delete"])
+    tab_quick, tab_calc, tab_history, tab_delete = st.tabs(
+        ["Quick Calculate", "Calculate & Save", "History", "Delete"]
+    )
+
+    with tab_quick:
+        st.caption("Not tied to a patient record — nothing is saved.")
+        col1, col2 = st.columns(2)
+        with col1:
+            q_medication = st.text_input("Medication Name", key="quick_medication")
+            q_patient_weight = st.number_input("Patient Weight (kg)", min_value=0.0, step=0.1, key="quick_weight")
+            q_dose_per_kg = st.number_input("Ordered Dose (per kg)", min_value=0.0, step=0.01, format="%.2f", key="quick_dose_per_kg")
+            q_dose_unit = st.text_input("Dose Unit (e.g. mg)", value="mg", key="quick_dose_unit")
+        with col2:
+            q_concentration_value = st.number_input("Drug Concentration (value)", min_value=0.0, step=0.1, key="quick_conc_value")
+            q_concentration_unit = st.text_input("Concentration Unit (e.g. mg/mL)", value="mg/mL", key="quick_conc_unit")
+
+        if st.button("Calculate", key="quick_calc_btn"):
+            if not q_medication:
+                st.error("Enter a medication name")
+            elif q_patient_weight <= 0 or q_dose_per_kg <= 0:
+                st.error("Enter a valid weight and dose per kg")
+            elif q_concentration_value <= 0:
+                st.error("Concentration must be greater than 0")
+            else:
+                payload = {
+                    "patient_weight": q_patient_weight,
+                    "medication": q_medication,
+                    "concentration_value": q_concentration_value,
+                    "concentration_unit": q_concentration_unit,
+                    "dose_per_kg": q_dose_per_kg,
+                    "dose_unit": q_dose_unit,
+                }
+                resp = post("/calc/dose/calculate", payload)
+                if resp.status_code == 200:
+                    result = resp.json()
+                    st.success("Calculated")
+                    col_a, col_b = st.columns(2)
+                    col_a.metric("Required Dose", f"{result['required_dose']:.2f} {result['dose_unit']}")
+                    col_b.metric("Volume to Administer", f"{result['volume_to_administer_ml']:.2f} mL")
+                else:
+                    st.error(resp.json().get("detail", "Calculation failed"))
 
     with tab_calc:
         patient_id = st.text_input("Patient ID", value=active_patient_id, key="dose_patient_id")

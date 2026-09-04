@@ -2,17 +2,21 @@ import streamlit as st
 from api.client import get
 
 
-def show_health():
-    st.title("🏥 Nursing Dashboard")
-
+def _check_backend():
     try:
         response = get("/nurse/all")
-        if response.status_code == 200:
-            st.success("Backend connected")
-        else:
-            st.error(f"Backend returned {response.status_code}")
+        return response.status_code == 200
     except Exception:
-        st.error("Could not connect to FastAPI backend")
+        return False
+
+
+def show_health():
+    """Slim connection indicator, no longer takes over the page with its own title."""
+    connected = _check_backend()
+    if connected:
+        st.caption("🟢 Backend connected")
+    else:
+        st.caption("🔴 Could not reach backend — some data may be stale or unavailable")
 
 
 def _count_from(resp, key):
@@ -50,7 +54,6 @@ def _gather_dashboard_stats(nurse_id):
         totals["vitals"] += _count_from(get(f"/vitals/{nurse_id}/{pid}"), "vitals")
         totals["sbar"] += _count_from(get(f"/sbar/{nurse_id}/{pid}"), "handovers")
         totals["medications"] += _count_from(get(f"/medications/{nurse_id}/{pid}"), "medications")
-        # nurse_id scoping added to list_drip_cal / list_dosage_cal — must be included here
         totals["drip_calcs"] += _count_from(get(f"/calc/drip/{nurse_id}/{pid}"), "drips")
         totals["dosage_calcs"] += _count_from(get(f"/calc/dose/{nurse_id}/{pid}"), "dosages")
 
@@ -58,38 +61,61 @@ def _gather_dashboard_stats(nurse_id):
 
 
 def show_dashboard():
-    st.title("Dashboard")
-
     nurse_id = st.session_state.get("nurse_id", "")
+    nurse_name = st.session_state.get("nurse_name", "")
 
     if not nurse_id:
         st.warning("No nurse logged in.")
         return
 
+    # Greeting header
+    greeting_col, refresh_col = st.columns([5, 1])
+    with greeting_col:
+        st.subheader(f"Welcome back{', ' + nurse_name if nurse_name else ''} 👋")
+        show_health()
+    with refresh_col:
+        st.write("")
+        refresh_clicked = st.button("🔄 Refresh", use_container_width=True)
+
     if "dashboard_stats" not in st.session_state:
         st.session_state.dashboard_stats = None
 
-    col_refresh, _ = st.columns([1, 5])
-    with col_refresh:
-        if st.button("🔄 Refresh"):
-            with st.spinner("Loading stats across all patients..."):
-                st.session_state.dashboard_stats = _gather_dashboard_stats(nurse_id)
+    # Auto-load on first visit, or when refresh is clicked
+    if refresh_clicked or st.session_state.dashboard_stats is None:
+        with st.spinner("Loading stats across all patients..."):
+            st.session_state.dashboard_stats = _gather_dashboard_stats(nurse_id)
 
     stats = st.session_state.dashboard_stats
 
-    if stats is None:
-        st.info("Click Refresh to load dashboard stats.")
+    st.divider()
+
+    if stats["patients"] == 0:
+        st.info("No patients assigned yet. Add a patient to start seeing activity here.")
         return
 
+    # Primary stat cards
+    st.markdown("#### Overview")
     row1 = st.columns(3)
-    row1[0].metric("Patients", stats["patients"])
-    row1[1].metric("Nursing Notes", stats["notes"])
-    row1[2].metric("Vitals Recorded", stats["vitals"])
+    row1[0].metric("🧑‍🤝‍🧑 Patients", stats["patients"])
+    row1[1].metric("📝 Nursing Notes", stats["notes"])
+    row1[2].metric("❤️ Vitals Recorded", stats["vitals"])
 
     row2 = st.columns(3)
-    row2[0].metric("SBAR Handovers", stats["sbar"])
-    row2[1].metric("Medications", stats["medications"])
-    row2[2].metric("Calculations Saved", stats["drip_calcs"] + stats["dosage_calcs"])
+    row2[0].metric("🔁 SBAR Handovers", stats["sbar"])
+    row2[1].metric("💊 Medications", stats["medications"])
+    row2[2].metric("🧮 Calculations Saved", stats["drip_calcs"] + stats["dosage_calcs"])
+
+    # Breakdown chart
+    st.markdown("#### Activity breakdown")
+    chart_data = {
+        "Notes": stats["notes"],
+        "Vitals": stats["vitals"],
+        "SBAR": stats["sbar"],
+        "Medications": stats["medications"],
+        "Drip Calcs": stats["drip_calcs"],
+        "Dosage Calcs": stats["dosage_calcs"],
+    }
+    st.bar_chart(chart_data)
 
     st.caption(
         "Counts are aggregated across every patient assigned to this nurse. "

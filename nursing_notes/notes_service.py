@@ -106,12 +106,11 @@ class Notes:
 
         finally:
             session.close()
-
-    def show_nursing_notes(self, nurse_id: str, patient_id: str):
+    
+    def show_nursing_notes(self, nurse_id: str, patient_id: str) -> dict[str, Any]:
+        
         """Show all nursing notes for a patient."""
-
         session = self.db.get_session()
-
         try:
             rows = (
                 session.query(NursingNote)
@@ -122,13 +121,6 @@ class Notes:
                 .order_by(NursingNote.notes_created_at.desc())
                 .all()
             )
-
-            if not rows:
-                return {
-                    "message": "No nursing notes found",
-                    "patient_id": patient_id,
-                    "notes": []
-                }
 
             notes = [
                 {
@@ -148,12 +140,12 @@ class Notes:
             return {
                 "patient_id": patient_id,
                 "nurse_id": nurse_id,
-                "notes": notes
+                "notes": notes,
             }
 
         finally:
             session.close()
-
+            
     def delete_notes(self, nurse_id: str, patient_id: str, note_id: str) -> dict[str, Any]:
         """Deleting notes for patient by nurse"""
         session = self.db.get_session()

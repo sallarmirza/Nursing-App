@@ -37,7 +37,7 @@ def show_drip_calculator():
                     "time_duration_min": time_duration_min,
                     "drop_factor": drop_factor,
                 }
-                resp = post("/calc/drip", payload)
+                resp = post("/calc/drip/calculate", payload)
                 if resp.status_code == 200:
                     result = resp.json()
                     st.metric("Drip Rate", f"{result['drop_rate_gtt_min']} gtt/min")

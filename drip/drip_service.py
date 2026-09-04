@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 from typing import Any
-from schema.register_schema import DripCalculationRegister
+from schema.calculation_schema import DripCalculationRegister
 from storage import DBManager
 
 from db_model import IVDripCalculation, Patient 

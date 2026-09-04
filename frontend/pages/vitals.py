@@ -16,9 +16,7 @@ def show_vitals():
 
     with tab_add:
         patient_id = st.text_input("Patient ID", value=active_patient_id, key="vitals_patient_id")
-
-        # Vitals model no longer has a note_id FK — source is just a descriptive tag now
-        source = st.selectbox("Source", ["admission", "nursing_note", "manual"])
+        source = st.selectbox("Source", ["Nursing Notes", "SBAR", "Patient Registration","Patient Record"])
 
         col1, col2, col3 = st.columns(3)
         with col1:

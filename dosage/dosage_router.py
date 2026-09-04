@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException, status
-
-from schema.register_schema import DosageCalculatorRegister
+from schema.calculation_schema import DosageCalculatorRegister
 from dosage.dosage_service import DosageCalc
 from storage import DBManager
 
