@@ -117,3 +117,6 @@ class CurrentMedication(Base):
     dose_unit = Column(String(20))
     frequency = Column(String(50))
     med_start_date = Column(DateTime, server_default=func.current_timestamp())
+    
+    
+    

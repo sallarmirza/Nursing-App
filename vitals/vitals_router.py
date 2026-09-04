@@ -8,9 +8,8 @@ vitals=Vitals(db)
 
 router=APIRouter()
 
-@router.post("/{nurse_id}/{patient_id")
-def create_vitals(nurse_id: str,patient_id: str,data: VitalsRegister
-):
+@router.post("/{nurse_id}/{patient_id}")
+def create_vitals(nurse_id: str,patient_id: str,data: VitalsRegister):
     try:
         return vitals.create_vitals(
             nurse_id=nurse_id,

@@ -1,9 +1,9 @@
 import streamlit as st
 from api.client import post
 
+
 def show_nurse_setup():
-    st.title("Complete Profile")
-    
+    st.title("Complete Profile")    
     nurse_id=st.session_state.get("nurse_id","")
     st.caption(f"Nurse ID: {nurse_id}")
     
@@ -12,7 +12,8 @@ def show_nurse_setup():
         nurse_qualification=st.text_input('Qualification')
         nurse_designation=st.text_input("Designation")
         nurse_hospital=st.text_input("Hospital")
-        nurse_experience=st.number_input("Experience")      
+        nurse_experience=st.number_input("Experience")
+        nurse_ward=st.text_input("Ward")
         nurse_submit_button=st.form_submit_button("Save Profile")
         
     if nurse_submit_button:
@@ -29,6 +30,8 @@ def show_nurse_setup():
             payload['nurse_experience']=nurse_experience
         if nurse_hospital:
             payload['nurse_hospital']=nurse_hospital
+        if nurse_ward:
+            payload['nurse_ward']=nurse_ward
         
         resp = post(f"/nurse/setup/{nurse_id}", payload)
         if resp.status_code == 200:
@@ -41,4 +44,4 @@ def show_nurse_setup():
     
     if st.button("Skip for now"):
         st.session_state.profile_complete=True
-        st.rerun()        
+        st.rerun()

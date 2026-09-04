@@ -34,7 +34,9 @@ class NursingNoteOut(BaseModel):
     soap_history: list[SoapEntry]
     notes_created_at: datetime
 
-
+    class Config:
+        from_attributes = True
+        
 class NursingNotesResponse(BaseModel):
     patient_id: str
     nurse_id: str

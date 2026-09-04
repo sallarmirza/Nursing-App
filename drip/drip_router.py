@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status
 
-from schema.register_schema import DripCalculationRegister
+from schema.calculation_schema import DripCalculationRegister
 from drip.drip_service import DripCalc
 from storage import DBManager
 
