@@ -41,3 +41,5 @@ class NursingNotesResponse(BaseModel):
     patient_id: str
     nurse_id: str
     notes: list[NursingNoteOut]
+    
+    
