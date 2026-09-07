@@ -4,7 +4,7 @@ from typing import Optional,List
 from datetime import date
 from schema.register_schema import VitalsResponse,MedicationResponse,SBARResponse
 from schema.calculation_schema import DripResponse,DosageResponse
-from schema.note_schema import NursingNotesResponse
+from schema.note_schema import NursingNoteOut
 
 class Gender(str, Enum):
     MALE = "Male"
@@ -49,11 +49,11 @@ class PatientResponse(BaseModel):
     patient_ward: Optional[str] = None
     
     vitals: List[VitalsResponse] = []
-    nursing_notes: List[NursingNotesResponse] = []
+    nursing_notes: List[NursingNoteOut] = []
     medications: List[MedicationResponse] = []
     sbar_handovers: List[SBARResponse] = []
     dosage_calculations: List[DosageResponse] = []
     drip_calculations: List[DripResponse] = []
     
-    class config:
+    class Config:
         from_attributes=True
