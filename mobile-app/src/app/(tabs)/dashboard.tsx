@@ -1,13 +1,15 @@
+// app/(tabs)/dashboard
+
 import { Ionicons } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { router } from "expo-router";
 import {
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const TOOLS = [
   {
@@ -34,7 +36,7 @@ const TOOLS = [
     subtitle: "Daily Digital Observations",
     href: "/(tabs)/notes",
   },
-];
+] as const;
 
 const PATIENTS = [
   {
@@ -70,85 +72,93 @@ const PATIENTS = [
 ];
 
 export default function DashboardScreen() {
+  const insets = useSafeAreaInsets();
+
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.container}>
+    <View style={[styles.mainContainer, { paddingTop: insets.top }]}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.container,
+          { paddingBottom: insets.bottom + 80 },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.header}>
           <View>
             <Text style={styles.greeting}>Welcome Sarah!</Text>
             <Text style={styles.shiftText}>Morning Shift, July 15, 2026</Text>
           </View>
-          <Link href="/(tabs)/profile" asChild>
-            <TouchableOpacity style={styles.avatarContainer}>
-              <Ionicons name="person" size={24} color="#A78BFA" />
-            </TouchableOpacity>
-          </Link>
+          <TouchableOpacity
+            style={styles.avatarContainer}
+            onPress={() => router.push("/(tabs)/profile")}
+          >
+            <Ionicons name="person" size={24} color="#A78BFA" />
+          </TouchableOpacity>
         </View>
 
         <View style={styles.toolsList}>
           {TOOLS.map((tool) => (
-            <Link key={tool.id} href={tool.href as any} asChild>
-              <TouchableOpacity style={styles.toolCard}>
-                <View style={styles.toolTextContainer}>
-                  <Text style={styles.toolTitle}>{tool.title}</Text>
-                  <Text style={styles.toolSubtitle}>{tool.subtitle}</Text>
-                </View>
-                <Ionicons name="chevron-forward" size={18} color="#2C3E50" />
-              </TouchableOpacity>
-            </Link>
+            <TouchableOpacity
+              key={tool.id}
+              style={styles.toolCard}
+              onPress={() => router.push(tool.href as any)}
+            >
+              <View style={styles.toolTextContainer}>
+                <Text style={styles.toolTitle}>{tool.title}</Text>
+                <Text style={styles.toolSubtitle}>{tool.subtitle}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color="#2C3E50" />
+            </TouchableOpacity>
           ))}
         </View>
 
         <View style={styles.patientsHeader}>
           <Text style={styles.sectionTitle}>Recent Patients</Text>
-          <Link href="/(tabs)/patients" asChild>
-            <TouchableOpacity>
-              <Text style={styles.seeAllText}>See all</Text>
-            </TouchableOpacity>
-          </Link>
+          <TouchableOpacity onPress={() => router.push("/(tabs)/patients")}>
+            <Text style={styles.seeAllText}>See all</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.patientsCard}>
           {PATIENTS.map((patient, index) => (
-            <Link
+            <TouchableOpacity
               key={patient.id}
-              href={`/patients/${patient.id}` as any}
-              asChild
+              style={[
+                styles.patientRow,
+                index < PATIENTS.length - 1 && styles.patientRowBorder,
+              ]}
+              onPress={() =>
+                router.push({
+                  pathname: "/patients/[id]" as any,
+                  params: { id: patient.id },
+                })
+              }
             >
-              <TouchableOpacity
-                style={[
-                  styles.patientRow,
-                  index < PATIENTS.length - 1 && styles.patientRowBorder,
-                ]}
-              >
-                <View style={styles.patientInfo}>
-                  <View style={styles.patientAvatar}>
-                    <Ionicons name="person" size={18} color="#A78BFA" />
-                  </View>
-                  <Text style={styles.patientName}>{patient.name}</Text>
+              <View style={styles.patientInfo}>
+                <View style={styles.patientAvatar}>
+                  <Ionicons name="person" size={18} color="#A78BFA" />
                 </View>
-                <Text
-                  style={[styles.statusText, { color: patient.statusColor }]}
-                >
-                  {patient.status}
-                </Text>
-              </TouchableOpacity>
-            </Link>
+                <Text style={styles.patientName}>{patient.name}</Text>
+              </View>
+              <Text style={[styles.statusText, { color: patient.statusColor }]}>
+                {patient.status}
+              </Text>
+            </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
+  mainContainer: {
     flex: 1,
     backgroundColor: "#F4F3F3",
   },
   container: {
     paddingHorizontal: 20,
-    paddingVertical: 24,
+    paddingTop: 16,
   },
   header: {
     flexDirection: "row",
