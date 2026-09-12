@@ -1,8 +1,7 @@
-import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { colors } from "../../theme/colors";
+import { BackButton } from "./BackButton";
 
 interface ScreenHeaderProps {
   title: string;
@@ -21,13 +20,7 @@ export function ScreenHeader({
 }: ScreenHeaderProps) {
   return (
     <View style={styles.header}>
-      {showBack ? (
-        <TouchableOpacity onPress={() => router.back()} style={styles.side}>
-          <Ionicons name="chevron-back" size={24} color={colors.textPrimary} />
-        </TouchableOpacity>
-      ) : (
-        <View style={styles.side} />
-      )}
+      {showBack ? <BackButton /> : <View style={styles.side} />}
 
       <Text style={styles.title} numberOfLines={1}>
         {title}

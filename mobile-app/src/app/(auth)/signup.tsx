@@ -1,14 +1,10 @@
-// app/(auth)/singup
-
+// app/(auth)/signup
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
-import {
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { FormInput } from "../../components/common/FormInput";
+import { PrimaryButton } from "../../components/common/PrimaryButton";
+import { colors } from "../../theme/colors";
 
 export default function SignupScreen() {
   return (
@@ -18,33 +14,17 @@ export default function SignupScreen() {
         <Text style={styles.subtitle}>Sign up to join DNA Account</Text>
 
         <View style={styles.form}>
-          <TextInput
-            style={styles.input}
-            placeholder="Full Name"
-            placeholderTextColor="#A0A0A0"
-          />
-
-          <TextInput
-            style={styles.input}
+          <FormInput placeholder="Full Name" />
+          <FormInput
             placeholder="Email"
-            placeholderTextColor="#A0A0A0"
             keyboardType="email-address"
             autoCapitalize="none"
           />
+          <FormInput placeholder="Password" secureTextEntry />
 
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            placeholderTextColor="#A0A0A0"
-            secureTextEntry
-          />
-
-          <TouchableOpacity style={styles.signUpButton}>
-            <Text style={styles.signUpButtonText}>Sign up</Text>
-          </TouchableOpacity>
+          <PrimaryButton label="Sign up" style={styles.signUpButton} />
         </View>
 
-        {/* Divider 1 */}
         <View style={styles.dividerContainer}>
           <View style={styles.line} />
           <Text style={styles.dividerText}>or</Text>
@@ -53,7 +33,6 @@ export default function SignupScreen() {
 
         <Text style={styles.sectionHeader}>Continue with</Text>
 
-        {/* Google Button */}
         <TouchableOpacity style={styles.socialButton}>
           <Ionicons
             name="logo-google"
@@ -64,7 +43,6 @@ export default function SignupScreen() {
           <Text style={styles.socialButtonText}>Google</Text>
         </TouchableOpacity>
 
-        {/* Login Link */}
         <View style={styles.loginContainer}>
           <Text style={styles.loginText}>Already have an account? </Text>
           <Link href="/(auth)/login" style={styles.link}>
@@ -79,7 +57,7 @@ export default function SignupScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F4F3F3",
+    backgroundColor: colors.background,
     justifyContent: "center",
   },
   content: {
@@ -88,37 +66,19 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "600",
-    color: "#000000",
+    color: colors.textPrimary,
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
-    color: "#8E8D8A",
+    color: colors.textMuted,
     marginBottom: 24,
   },
   form: {
     gap: 16,
   },
-  input: {
-    height: 52,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    fontSize: 15,
-    color: "#000000",
-  },
   signUpButton: {
-    height: 52,
-    backgroundColor: "#2089DC",
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
     marginTop: 8,
-  },
-  signUpButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "600",
   },
   dividerContainer: {
     flexDirection: "row",
@@ -128,23 +88,23 @@ const styles = StyleSheet.create({
   line: {
     flex: 1,
     height: 1,
-    backgroundColor: "#000000",
+    backgroundColor: colors.textPrimary,
   },
   dividerText: {
     marginHorizontal: 16,
-    color: "#8E8D8A",
+    color: colors.textMuted,
     fontSize: 14,
   },
   sectionHeader: {
     textAlign: "center",
-    color: "#8E8D8A",
+    color: colors.textMuted,
     fontSize: 14,
     marginBottom: 16,
     fontWeight: "500",
   },
   socialButton: {
     height: 52,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     borderRadius: 8,
     flexDirection: "row",
     alignItems: "center",
@@ -154,7 +114,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   socialButtonText: {
-    color: "#2C3E50",
+    color: colors.textHeading,
     fontSize: 15,
     fontWeight: "500",
   },
@@ -164,11 +124,11 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   loginText: {
-    color: "#8E8D8A",
+    color: colors.textMuted,
     fontSize: 14,
   },
   link: {
-    color: "#2089DC",
+    color: colors.primaryAlt,
     fontWeight: "600",
     fontSize: 14,
   },

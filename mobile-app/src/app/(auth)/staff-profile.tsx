@@ -1,21 +1,16 @@
 // app/(auth)/staff-profile
-import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
-import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { FormInput } from "../../components/common/FormInput";
+import { PersonAvatar } from "../../components/common/PersonAvatar";
+import { PrimaryButton } from "../../components/common/PrimaryButton";
+import { colors } from "../../theme/colors";
 
 export default function StaffProfileScreen() {
   const [isEditing, setIsEditing] = useState(true);
 
-  // Form State
   const [name, setName] = useState("");
   const [qualification, setQualification] = useState("");
   const [designation, setDesignation] = useState("Staff Nurse...");
@@ -24,7 +19,6 @@ export default function StaffProfileScreen() {
 
   const handleSave = () => {
     setIsEditing(false);
-    // Complete onboarding and replace root stack to tabs
     router.replace("/(tabs)/dashboard");
   };
 
@@ -38,93 +32,54 @@ export default function StaffProfileScreen() {
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        {/* Title Header */}
         <View style={styles.headerRow}>
           <Text style={styles.headerTitle}>Staff Profile</Text>
-          <View style={styles.avatarBadge}>
-            <Ionicons name="person" size={18} color="#A78BFA" />
-          </View>
+          <PersonAvatar size={32} />
         </View>
 
-        {/* Name Input */}
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Name</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your name"
-            placeholderTextColor="#C4B5FD"
-            editable={isEditing}
-            value={name}
-            onChangeText={setName}
-          />
-        </View>
+        <FormInput
+          label="Name"
+          placeholder="Enter your name"
+          editable={isEditing}
+          value={name}
+          onChangeText={setName}
+        />
 
-        {/* Qualification Input */}
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Qualification</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your Qualification"
-            placeholderTextColor="#C4B5FD"
-            editable={isEditing}
-            value={qualification}
-            onChangeText={setQualification}
-          />
-        </View>
+        <FormInput
+          label="Qualification"
+          placeholder="Enter your Qualification"
+          editable={isEditing}
+          value={qualification}
+          onChangeText={setQualification}
+        />
 
-        {/* Designation Input */}
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Designation</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Staff Nurse..."
-            placeholderTextColor="#C4B5FD"
-            editable={isEditing}
-            value={designation}
-            onChangeText={setDesignation}
-          />
-        </View>
+        <FormInput
+          label="Designation"
+          placeholder="Staff Nurse..."
+          editable={isEditing}
+          value={designation}
+          onChangeText={setDesignation}
+        />
 
-        {/* Hospital Input */}
-        <View style={styles.formGroup}>
-          <View style={styles.labelRow}>
-            <Text style={styles.label}>Hospital</Text>
-            <TouchableOpacity disabled={!isEditing}>
-              <Text style={styles.addIcon}>+</Text>
-            </TouchableOpacity>
-          </View>
-          <TextInput
-            style={styles.input}
-            placeholder="Ibadat International Hospital"
-            placeholderTextColor="#C4B5FD"
-            editable={isEditing}
-            value={hospital}
-            onChangeText={setHospital}
-          />
-        </View>
+        <FormInput
+          label="Hospital"
+          placeholder="Ibadat International Hospital"
+          editable={isEditing}
+          value={hospital}
+          onChangeText={setHospital}
+        />
 
-        {/* Experience Input */}
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Experience</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="5 Years"
-            placeholderTextColor="#C4B5FD"
-            editable={isEditing}
-            value={experience}
-            onChangeText={setExperience}
-          />
-        </View>
+        <FormInput
+          label="Experience"
+          placeholder="5 Years"
+          editable={isEditing}
+          value={experience}
+          onChangeText={setExperience}
+        />
 
-        {/* Buttons */}
         <View style={styles.buttonGroup}>
-          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.saveButtonText}>Save</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.editButton} onPress={handleEdit}>
-            <Text style={styles.editButtonText}>Edit</Text>
-          </TouchableOpacity>
+          <PrimaryButton label="Save" onPress={handleSave} />
+          <PrimaryButton label="Edit" variant="outline" onPress={handleEdit} />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -134,7 +89,7 @@ export default function StaffProfileScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F3EFEF",
+    backgroundColor: colors.backgroundAlt,
   },
   container: {
     padding: 24,
@@ -151,68 +106,10 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: "700",
-    color: "#000000",
-  },
-  avatarBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "#EDE9FE",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  formGroup: {
-    gap: 6,
-  },
-  labelRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  label: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#1F2937",
-  },
-  addIcon: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#000000",
-  },
-  input: {
-    height: 48,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    fontSize: 15,
-    color: "#C4B5FD",
+    color: colors.textPrimary,
   },
   buttonGroup: {
     gap: 12,
     marginTop: 16,
-  },
-  saveButton: {
-    height: 48,
-    backgroundColor: "#1D9BF0",
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  saveButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  editButton: {
-    height: 48,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  editButtonText: {
-    color: "#000000",
-    fontSize: 16,
-    fontWeight: "600",
   },
 });

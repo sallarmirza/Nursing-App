@@ -1,6 +1,5 @@
 // app/(tabs)/dashboard
-
-import { Ionicons } from "@expo/vector-icons";
+// app/(tabs)/dashboard
 import { router } from "expo-router";
 import {
   ScrollView,
@@ -10,6 +9,9 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { PersonAvatar } from "../../components/common/PersonAvatar";
+import { ToolCard } from "../../components/common/ToolCard";
+import { colors } from "../../theme/colors";
 
 const TOOLS = [
   {
@@ -39,37 +41,23 @@ const TOOLS = [
 ] as const;
 
 const PATIENTS = [
-  {
-    id: "1",
-    name: "Mr. Ahmed Ali Khan",
-    status: "Vitals Updated",
-    statusColor: "#8E8D8A",
-  },
-  {
-    id: "2",
-    name: "Mrs. Fatima Sana",
-    status: "Pending Medication",
-    statusColor: "#8E8D8A",
-  },
-  {
-    id: "3",
-    name: "Mrs. Nida Farooq",
-    status: "Vitals Overdue",
-    statusColor: "#EF4444",
-  },
+  { id: "1", name: "Mr. Ahmed Ali Khan", status: "Vitals Updated" },
+  { id: "2", name: "Mrs. Fatima Sana", status: "Pending Medication" },
+  { id: "3", name: "Mrs. Nida Farooq", status: "Vitals Overdue", alert: true },
   {
     id: "4",
     name: "Mr. Altaf Ahmed",
     status: "Medication Overdue",
-    statusColor: "#EF4444",
+    alert: true,
   },
-  {
-    id: "5",
-    name: "Mr. Daniyal Ali",
-    status: "IV Bag Low",
-    statusColor: "#84CC16",
-  },
+  { id: "5", name: "Mr. Daniyal Ali", status: "IV Bag Low", warning: true },
 ];
+
+function getStatusColor(patient: (typeof PATIENTS)[number]) {
+  if (patient.alert) return colors.dangerAlt;
+  if (patient.warning) return colors.warning;
+  return colors.textMuted;
+}
 
 export default function DashboardScreen() {
   const insets = useSafeAreaInsets();
@@ -88,27 +76,19 @@ export default function DashboardScreen() {
             <Text style={styles.greeting}>Welcome Sarah!</Text>
             <Text style={styles.shiftText}>Morning Shift, July 15, 2026</Text>
           </View>
-          <TouchableOpacity
-            style={styles.avatarContainer}
-            onPress={() => router.push("/(tabs)/profile")}
-          >
-            <Ionicons name="person" size={24} color="#A78BFA" />
+          <TouchableOpacity onPress={() => router.push("/(tabs)/profile")}>
+            <PersonAvatar size={40} />
           </TouchableOpacity>
         </View>
 
         <View style={styles.toolsList}>
           {TOOLS.map((tool) => (
-            <TouchableOpacity
+            <ToolCard
               key={tool.id}
-              style={styles.toolCard}
+              title={tool.title}
+              subtitle={tool.subtitle}
               onPress={() => router.push(tool.href as any)}
-            >
-              <View style={styles.toolTextContainer}>
-                <Text style={styles.toolTitle}>{tool.title}</Text>
-                <Text style={styles.toolSubtitle}>{tool.subtitle}</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={18} color="#2C3E50" />
-            </TouchableOpacity>
+            />
           ))}
         </View>
 
@@ -135,12 +115,12 @@ export default function DashboardScreen() {
               }
             >
               <View style={styles.patientInfo}>
-                <View style={styles.patientAvatar}>
-                  <Ionicons name="person" size={18} color="#A78BFA" />
-                </View>
+                <PersonAvatar size={32} />
                 <Text style={styles.patientName}>{patient.name}</Text>
               </View>
-              <Text style={[styles.statusText, { color: patient.statusColor }]}>
+              <Text
+                style={[styles.statusText, { color: getStatusColor(patient) }]}
+              >
                 {patient.status}
               </Text>
             </TouchableOpacity>
@@ -154,7 +134,7 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: "#F4F3F3",
+    backgroundColor: colors.background,
   },
   container: {
     paddingHorizontal: 20,
@@ -169,46 +149,16 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#000000",
+    color: colors.textPrimary,
   },
   shiftText: {
     fontSize: 14,
-    color: "#8E8D8A",
+    color: colors.textMuted,
     marginTop: 2,
-  },
-  avatarContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#EDE9FE",
-    alignItems: "center",
-    justifyContent: "center",
   },
   toolsList: {
     gap: 12,
     marginBottom: 28,
-  },
-  toolCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 18,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  toolTextContainer: {
-    flex: 1,
-  },
-  toolTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#000000",
-    marginBottom: 2,
-  },
-  toolSubtitle: {
-    fontSize: 13,
-    color: "#8E8D8A",
   },
   patientsHeader: {
     flexDirection: "row",
@@ -219,15 +169,15 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 15,
     fontWeight: "600",
-    color: "#6B7280",
+    color: colors.textSecondary,
   },
   seeAllText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#000000",
+    color: colors.textPrimary,
   },
   patientsCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 8,
@@ -240,25 +190,17 @@ const styles = StyleSheet.create({
   },
   patientRowBorder: {
     borderBottomWidth: 1,
-    borderBottomColor: "#E5E7EB",
+    borderBottomColor: colors.border,
   },
   patientInfo: {
     flexDirection: "row",
     alignItems: "center",
-  },
-  patientAvatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "#EDE9FE",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
+    gap: 12,
   },
   patientName: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#1F2937",
+    color: colors.textHeading,
   },
   statusText: {
     fontSize: 12,
