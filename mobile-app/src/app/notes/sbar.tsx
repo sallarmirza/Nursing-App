@@ -1,23 +1,25 @@
-// // app/notes/sbar
-
+// app/notes/sbar
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
-    Modal,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { PersonAvatar } from "../../components/common/PersonAvatar";
+import { PrimaryButton } from "../../components/common/PrimaryButton";
+import { ScreenHeader } from "../../components/common/ScreenHeader";
+import { StatusBadge } from "../../components/common/StatusBadge";
+import { colors } from "../../theme/colors";
 
 export default function SbarHandoverScreen() {
   const [modalVisible, setModalVisible] = useState(false);
 
-  // Form State
   const [situation, setSituation] = useState(
     "Problem: Sudden Drop in BP (90/50) & Patient is restless, etc....",
   );
@@ -46,27 +48,14 @@ export default function SbarHandoverScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <Ionicons name="chevron-back" size={24} color="#000000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Patients Record</Text>
-        <View style={styles.headerPlaceholder} />
-      </View>
+      <ScreenHeader title="Patients Record" />
 
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        {/* Patient Card */}
         <View style={styles.patientCard}>
-          <View style={styles.avatarContainer}>
-            <Ionicons name="person" size={20} color="#A78BFA" />
-          </View>
+          <PersonAvatar size={36} />
           <View style={styles.patientDetails}>
             <Text style={styles.patientName}>Maria Khan</Text>
             <Text style={styles.patientSubtext}>35 years, Female</Text>
@@ -74,12 +63,9 @@ export default function SbarHandoverScreen() {
               ID: 123XYZ | 35 Years, F | 65kg
             </Text>
           </View>
-          <View style={styles.statusBadge}>
-            <Text style={styles.statusBadgeText}>Stable</Text>
-          </View>
+          <StatusBadge label="Stable" tone="success" />
         </View>
 
-        {/* Situation */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Situation</Text>
           <TextInput
@@ -88,11 +74,10 @@ export default function SbarHandoverScreen() {
             numberOfLines={3}
             value={situation}
             onChangeText={setSituation}
-            placeholderTextColor="#C4B5FD"
+            placeholderTextColor={colors.placeholder}
           />
         </View>
 
-        {/* Background */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Background</Text>
           <TextInput
@@ -101,29 +86,27 @@ export default function SbarHandoverScreen() {
             numberOfLines={3}
             value={background}
             onChangeText={setBackground}
-            placeholderTextColor="#C4B5FD"
+            placeholderTextColor={colors.placeholder}
           />
         </View>
 
-        {/* SpO2 & Temp Vitals Row */}
         <View style={styles.vitalsRow}>
           <TextInput
             style={styles.vitalInput}
             placeholder="SpO2"
-            placeholderTextColor="#C4B5FD"
+            placeholderTextColor={colors.placeholder}
             value={spo2}
             onChangeText={setSpo2}
           />
           <TextInput
             style={styles.vitalInput}
             placeholder="Temp (°F)"
-            placeholderTextColor="#C4B5FD"
+            placeholderTextColor={colors.placeholder}
             value={temp}
             onChangeText={setTemp}
           />
         </View>
 
-        {/* Current Medications */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Current Medications</Text>
 
@@ -131,7 +114,7 @@ export default function SbarHandoverScreen() {
             <TextInput
               style={styles.medNameInput}
               placeholder="Name"
-              placeholderTextColor="#C4B5FD"
+              placeholderTextColor={colors.placeholder}
               value={med1Name}
               onChangeText={setMed1Name}
             />
@@ -139,7 +122,7 @@ export default function SbarHandoverScreen() {
             <TextInput
               style={styles.medDoseInput}
               placeholder="Dose"
-              placeholderTextColor="#C4B5FD"
+              placeholderTextColor={colors.placeholder}
               value={med1Dose}
               onChangeText={setMed1Dose}
             />
@@ -149,7 +132,7 @@ export default function SbarHandoverScreen() {
             <TextInput
               style={styles.medNameInput}
               placeholder="Name"
-              placeholderTextColor="#C4B5FD"
+              placeholderTextColor={colors.placeholder}
               value={med2Name}
               onChangeText={setMed2Name}
             />
@@ -157,14 +140,13 @@ export default function SbarHandoverScreen() {
             <TextInput
               style={styles.medDoseInput}
               placeholder="Dose"
-              placeholderTextColor="#C4B5FD"
+              placeholderTextColor={colors.placeholder}
               value={med2Dose}
               onChangeText={setMed2Dose}
             />
           </View>
         </View>
 
-        {/* Current IV Medications */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Current IV Medications</Text>
 
@@ -172,7 +154,7 @@ export default function SbarHandoverScreen() {
             <TextInput
               style={styles.medNameInput}
               placeholder="Name"
-              placeholderTextColor="#C4B5FD"
+              placeholderTextColor={colors.placeholder}
               value={ivMedName}
               onChangeText={setIvMedName}
             />
@@ -180,23 +162,23 @@ export default function SbarHandoverScreen() {
             <TextInput
               style={styles.medDoseInput}
               placeholder="Dose"
-              placeholderTextColor="#C4B5FD"
+              placeholderTextColor={colors.placeholder}
               value={ivMedDose}
               onChangeText={setIvMedDose}
             />
           </View>
         </View>
 
-        {/* Submit Action */}
-        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-          <Text style={styles.submitButtonText}>Submit Handover</Text>
-        </TouchableOpacity>
+        <PrimaryButton
+          label="Submit Handover"
+          onPress={handleSubmit}
+          style={styles.submitButton}
+        />
       </ScrollView>
 
-      {/* Success Modal */}
       <Modal
         animationType="fade"
-        transparent={true}
+        transparent
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
@@ -208,15 +190,13 @@ export default function SbarHandoverScreen() {
             </Text>
 
             <View style={styles.checkCircle}>
-              <Ionicons name="checkmark" size={48} color="#FFFFFF" />
+              <Ionicons name="checkmark" size={48} color={colors.white} />
             </View>
 
-            <TouchableOpacity
-              style={styles.modalButton}
+            <PrimaryButton
+              label="Dashboard"
               onPress={handleNavigateDashboard}
-            >
-              <Text style={styles.modalButtonText}>Dashboard</Text>
-            </TouchableOpacity>
+            />
           </View>
         </View>
       </Modal>
@@ -227,28 +207,7 @@ export default function SbarHandoverScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F3EFEF",
-  },
-  header: {
-    height: 56,
-    backgroundColor: "#FFFFFF",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E5E7EB",
-  },
-  backButton: {
-    padding: 4,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#000000",
-  },
-  headerPlaceholder: {
-    width: 28,
+    backgroundColor: colors.backgroundAlt,
   },
   container: {
     padding: 20,
@@ -256,20 +215,12 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   patientCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     borderRadius: 8,
     padding: 12,
     flexDirection: "row",
     alignItems: "center",
-  },
-  avatarContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "#EDE9FE",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 10,
+    gap: 10,
   },
   patientDetails: {
     flex: 1,
@@ -277,26 +228,15 @@ const styles = StyleSheet.create({
   patientName: {
     fontSize: 15,
     fontWeight: "700",
-    color: "#000000",
+    color: colors.textPrimary,
   },
   patientSubtext: {
     fontSize: 12,
-    color: "#6B7280",
+    color: colors.textSecondary,
   },
   patientMeta: {
     fontSize: 10,
-    color: "#9CA3AF",
-  },
-  statusBadge: {
-    backgroundColor: "#DCFCE7",
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 4,
-  },
-  statusBadgeText: {
-    fontSize: 11,
-    color: "#16A34A",
-    fontWeight: "600",
+    color: colors.textFaint,
   },
   formGroup: {
     gap: 6,
@@ -304,15 +244,15 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 15,
     fontWeight: "700",
-    color: "#1F2937",
+    color: colors.textHeading,
   },
   input: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     borderRadius: 8,
     paddingHorizontal: 14,
     paddingVertical: 10,
     fontSize: 13,
-    color: "#4B5563",
+    color: colors.textSecondary,
   },
   textArea: {
     minHeight: 64,
@@ -326,16 +266,16 @@ const styles = StyleSheet.create({
   vitalInput: {
     width: "42%",
     height: 44,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     borderRadius: 8,
     textAlign: "center",
     fontSize: 14,
-    color: "#000000",
+    color: colors.textPrimary,
   },
   medRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     borderRadius: 8,
     height: 44,
     paddingHorizontal: 14,
@@ -344,81 +284,57 @@ const styles = StyleSheet.create({
   medNameInput: {
     flex: 1,
     fontSize: 14,
-    color: "#000000",
+    color: colors.textPrimary,
   },
   divider: {
     width: 1,
     height: "60%",
-    backgroundColor: "#E5E7EB",
+    backgroundColor: colors.border,
     marginHorizontal: 12,
   },
   medDoseInput: {
     flex: 1,
     fontSize: 14,
-    color: "#000000",
+    color: colors.textPrimary,
   },
   submitButton: {
-    height: 48,
-    backgroundColor: "#1D9BF0",
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
     marginTop: 8,
   },
-  submitButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  /* Modal Styles */
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
+    backgroundColor: colors.overlay,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 24,
   },
   modalCard: {
     width: "100%",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     borderRadius: 16,
     padding: 24,
     alignItems: "center",
+    gap: 4,
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: "700",
-    color: "#000000",
-    marginBottom: 8,
+    color: colors.textPrimary,
     textAlign: "center",
   },
   modalSubtitle: {
     fontSize: 13,
-    color: "#4B5563",
+    color: colors.textSecondary,
     textAlign: "center",
     lineHeight: 18,
-    marginBottom: 20,
+    marginBottom: 16,
   },
   checkCircle: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: "#10B981",
+    backgroundColor: colors.successAlt,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 24,
-  },
-  modalButton: {
-    width: "60%",
-    height: 44,
-    backgroundColor: "#1D9BF0",
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  modalButtonText: {
-    color: "#FFFFFF",
-    fontSize: 15,
-    fontWeight: "600",
+    marginBottom: 20,
   },
 });

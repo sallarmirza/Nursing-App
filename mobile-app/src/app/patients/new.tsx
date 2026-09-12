@@ -1,17 +1,19 @@
-// // app/patients/new
-
-import { Ionicons } from "@expo/vector-icons";
+// app/(tabs)/patients/newimport { router } from "expo-router";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { FormInput } from "../../components/common/FormInput";
+import { PrimaryButton } from "../../components/common/PrimaryButton";
+import { ScreenHeader } from "../../components/common/ScreenHeader";
+import { colors } from "../../theme/colors";
 
 export default function AddNewPatientScreen() {
   const [name, setName] = useState("");
@@ -22,7 +24,6 @@ export default function AddNewPatientScreen() {
   const [bloodGroup, setBloodGroup] = useState("");
   const [bedNo, setBedNo] = useState("");
 
-  // Vitals
   const [bp, setBp] = useState("");
   const [hr, setHr] = useState("");
   const [rr, setRr] = useState("");
@@ -30,53 +31,31 @@ export default function AddNewPatientScreen() {
   const [temp, setTemp] = useState("");
 
   const handleSave = () => {
-    // Save logic goes here
     router.back();
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <Ionicons name="chevron-back" size={24} color="#000000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Add New Patient</Text>
-        <View style={styles.headerPlaceholder} />
-      </View>
+      <ScreenHeader title="Add New Patient" showBack={true} />
 
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        {/* Patient Name */}
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Patient Name*</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter Patient Name"
-            placeholderTextColor="#C4B5FD"
-            value={name}
-            onChangeText={setName}
-          />
-        </View>
+        <FormInput
+          label="Patient Name*"
+          placeholder="Enter Patient Name"
+          value={name}
+          onChangeText={setName}
+        />
 
-        {/* Patient ID */}
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>ID*</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter Patient ID"
-            placeholderTextColor="#C4B5FD"
-            value={patientId}
-            onChangeText={setPatientId}
-          />
-        </View>
+        <FormInput
+          label="ID*"
+          placeholder="Enter Patient ID"
+          value={patientId}
+          onChangeText={setPatientId}
+        />
 
-        {/* Gender Selection */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Gender*</Text>
           <View style={styles.genderContainer}>
@@ -105,26 +84,20 @@ export default function AddNewPatientScreen() {
           </View>
         </View>
 
-        {/* Weight & Height (Side by Side) */}
         <View style={styles.row}>
-          <View style={[styles.formGroup, styles.halfWidth]}>
-            <Text style={styles.label}>Weight (kg)</Text>
-            <TextInput
-              style={styles.input}
+          <View style={styles.halfWidth}>
+            <FormInput
+              label="Weight (kg)"
               placeholder="Weight"
-              placeholderTextColor="#C4B5FD"
               keyboardType="numeric"
               value={weight}
               onChangeText={setWeight}
             />
           </View>
-
-          <View style={[styles.formGroup, styles.halfWidth]}>
-            <Text style={styles.label}>Height (cm)</Text>
-            <TextInput
-              style={styles.input}
+          <View style={styles.halfWidth}>
+            <FormInput
+              label="Height (cm)"
               placeholder="Height"
-              placeholderTextColor="#C4B5FD"
               keyboardType="numeric"
               value={height}
               onChangeText={setHeight}
@@ -132,47 +105,35 @@ export default function AddNewPatientScreen() {
           </View>
         </View>
 
-        {/* Blood Group */}
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Blood Group</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter Blood Group"
-            placeholderTextColor="#C4B5FD"
-            value={bloodGroup}
-            onChangeText={setBloodGroup}
-          />
-        </View>
+        <FormInput
+          label="Blood Group"
+          placeholder="Enter Blood Group"
+          value={bloodGroup}
+          onChangeText={setBloodGroup}
+        />
 
-        {/* Bed No */}
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Bed No.*</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter Bed No.."
-            placeholderTextColor="#C4B5FD"
-            value={bedNo}
-            onChangeText={setBedNo}
-          />
-        </View>
+        <FormInput
+          label="Bed No.*"
+          placeholder="Enter Bed No.."
+          value={bedNo}
+          onChangeText={setBedNo}
+        />
 
-        {/* Initial Vitals */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Initial vitals</Text>
 
-          {/* Row 1: BP, HR, RR */}
           <View style={styles.vitalsRow}>
             <TextInput
               style={styles.vitalsInput}
               placeholder="_ BP _"
-              placeholderTextColor="#C4B5FD"
+              placeholderTextColor={colors.placeholder}
               value={bp}
               onChangeText={setBp}
             />
             <TextInput
               style={styles.vitalsInput}
               placeholder="_ HR _"
-              placeholderTextColor="#C4B5FD"
+              placeholderTextColor={colors.placeholder}
               keyboardType="numeric"
               value={hr}
               onChangeText={setHr}
@@ -180,19 +141,18 @@ export default function AddNewPatientScreen() {
             <TextInput
               style={styles.vitalsInput}
               placeholder="_ RR _"
-              placeholderTextColor="#C4B5FD"
+              placeholderTextColor={colors.placeholder}
               keyboardType="numeric"
               value={rr}
               onChangeText={setRr}
             />
           </View>
 
-          {/* Row 2: SpO2, Temp */}
           <View style={[styles.vitalsRow, styles.vitalsRowCentered]}>
             <TextInput
               style={styles.vitalsInputHalf}
               placeholder="SpO2"
-              placeholderTextColor="#C4B5FD"
+              placeholderTextColor={colors.placeholder}
               keyboardType="numeric"
               value={spo2}
               onChangeText={setSpo2}
@@ -200,7 +160,7 @@ export default function AddNewPatientScreen() {
             <TextInput
               style={styles.vitalsInputHalf}
               placeholder="Temp (°F)"
-              placeholderTextColor="#C4B5FD"
+              placeholderTextColor={colors.placeholder}
               keyboardType="numeric"
               value={temp}
               onChangeText={setTemp}
@@ -208,10 +168,11 @@ export default function AddNewPatientScreen() {
           </View>
         </View>
 
-        {/* Save Button */}
-        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-          <Text style={styles.saveButtonText}>Save</Text>
-        </TouchableOpacity>
+        <PrimaryButton
+          label="Save"
+          onPress={handleSave}
+          style={styles.saveButton}
+        />
       </ScrollView>
     </SafeAreaView>
   );
@@ -220,28 +181,7 @@ export default function AddNewPatientScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F3EFEF",
-  },
-  header: {
-    height: 56,
-    backgroundColor: "#FFFFFF",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E5E7EB",
-  },
-  backButton: {
-    padding: 4,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#000000",
-  },
-  headerPlaceholder: {
-    width: 32,
+    backgroundColor: colors.backgroundAlt,
   },
   container: {
     padding: 20,
@@ -254,15 +194,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 15,
     fontWeight: "600",
-    color: "#1F2937",
-  },
-  input: {
-    height: 48,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    fontSize: 15,
-    color: "#000000",
+    color: colors.textHeading,
   },
   genderContainer: {
     flexDirection: "row",
@@ -271,21 +203,21 @@ const styles = StyleSheet.create({
   genderOption: {
     flex: 1,
     height: 48,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
   },
   genderOptionSelected: {
     borderWidth: 1.5,
-    borderColor: "#1D9BF0",
+    borderColor: colors.primary,
   },
   genderText: {
     fontSize: 15,
-    color: "#6B7280",
+    color: colors.textSecondary,
   },
   genderTextSelected: {
-    color: "#1D9BF0",
+    color: colors.primary,
     fontWeight: "600",
   },
   row: {
@@ -306,32 +238,22 @@ const styles = StyleSheet.create({
   vitalsInput: {
     flex: 1,
     height: 48,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     borderRadius: 8,
     textAlign: "center",
     fontSize: 14,
-    color: "#000000",
+    color: colors.textPrimary,
   },
   vitalsInputHalf: {
     width: "48%",
     height: 48,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     borderRadius: 8,
     textAlign: "center",
     fontSize: 14,
-    color: "#000000",
+    color: colors.textPrimary,
   },
   saveButton: {
-    height: 50,
-    backgroundColor: "#1D9BF0",
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
     marginTop: 12,
-  },
-  saveButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "600",
   },
 });

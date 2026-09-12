@@ -4,14 +4,19 @@ import Slider from "@react-native-community/slider";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { PersonAvatar } from "../../components/common/PersonAvatar";
+import { PrimaryButton } from "../../components/common/PrimaryButton";
+import { ScreenHeader } from "../../components/common/ScreenHeader";
+import { StatusBadge } from "../../components/common/StatusBadge";
+import { colors } from "../../theme/colors";
 
 export default function NursingAssessmentScreen() {
   const params = useLocalSearchParams<{
@@ -19,21 +24,18 @@ export default function NursingAssessmentScreen() {
     patientName?: string;
   }>();
 
-  // Selection states
   const [condition, setCondition] = useState<string>("Stable");
   const [consciousness, setConsciousness] =
     useState<string>("Responds to Voice");
   const [gcs, setGcs] = useState<string>("");
   const [painScale, setPainScale] = useState<number>(4);
 
-  // Vitals states
   const [bp, setBp] = useState("");
   const [hr, setHr] = useState("");
   const [rr, setRr] = useState("");
   const [spO2, setSpO2] = useState("");
   const [temp, setTemp] = useState("");
 
-  // Interventions state
   const [interventions, setInterventions] = useState<{
     [key: string]: boolean;
   }>({
@@ -76,28 +78,15 @@ export default function NursingAssessmentScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <Ionicons name="chevron-back" size={24} color="#000000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Nursing Notes</Text>
-        <View style={styles.headerPlaceholder} />
-      </View>
+      <ScreenHeader title="Nursing Notes" />
 
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        {/* Patient Info Card */}
         <View style={styles.patientCard}>
           <View style={styles.patientLeft}>
-            <View style={styles.patientAvatar}>
-              <Ionicons name="person" size={20} color="#A78BFA" />
-            </View>
+            <PersonAvatar size={36} />
             <View>
               <Text style={styles.patientName}>
                 {params.patientName || "Maria Khan"}
@@ -108,12 +97,9 @@ export default function NursingAssessmentScreen() {
               </Text>
             </View>
           </View>
-          <View style={styles.badgeStable}>
-            <Text style={styles.badgeStableText}>Stable</Text>
-          </View>
+          <StatusBadge label="Stable" tone="success" />
         </View>
 
-        {/* Patient Condition */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Patient Condition</Text>
           <View style={styles.grid2x2}>
@@ -139,7 +125,6 @@ export default function NursingAssessmentScreen() {
           </View>
         </View>
 
-        {/* Level of Consciousness */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Level of Consciousness</Text>
           <View style={styles.grid2x2}>
@@ -165,14 +150,13 @@ export default function NursingAssessmentScreen() {
           </View>
         </View>
 
-        {/* GCS */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>GCS</Text>
           <View style={styles.gcsInputRow}>
             <TextInput
               style={styles.gcsInput}
               placeholder="--"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={colors.textFaint}
               keyboardType="numeric"
               maxLength={2}
               value={gcs}
@@ -182,7 +166,6 @@ export default function NursingAssessmentScreen() {
           </View>
         </View>
 
-        {/* Pain Scale */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Pain Scale</Text>
           <View style={styles.sliderContainer}>
@@ -200,35 +183,34 @@ export default function NursingAssessmentScreen() {
               step={1}
               value={painScale}
               onValueChange={setPainScale}
-              minimumTrackTintColor="#1D9BF0"
+              minimumTrackTintColor={colors.primary}
               maximumTrackTintColor="#CBD5E1"
-              thumbTintColor="#1D9BF0"
+              thumbTintColor={colors.primary}
             />
           </View>
         </View>
 
-        {/* Vitals */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Vitals</Text>
           <View style={styles.vitalsGridTop}>
             <TextInput
               style={styles.vitalInput}
               placeholder="BP"
-              placeholderTextColor="#C4B5FD"
+              placeholderTextColor={colors.placeholder}
               value={bp}
               onChangeText={setBp}
             />
             <TextInput
               style={styles.vitalInput}
               placeholder="HR"
-              placeholderTextColor="#C4B5FD"
+              placeholderTextColor={colors.placeholder}
               value={hr}
               onChangeText={setHr}
             />
             <TextInput
               style={styles.vitalInput}
               placeholder="RR"
-              placeholderTextColor="#C4B5FD"
+              placeholderTextColor={colors.placeholder}
               value={rr}
               onChangeText={setRr}
             />
@@ -237,21 +219,20 @@ export default function NursingAssessmentScreen() {
             <TextInput
               style={styles.vitalInputHalf}
               placeholder="SpO2"
-              placeholderTextColor="#C4B5FD"
+              placeholderTextColor={colors.placeholder}
               value={spO2}
               onChangeText={setSpO2}
             />
             <TextInput
               style={styles.vitalInputHalf}
               placeholder="Temp (°F)"
-              placeholderTextColor="#C4B5FD"
+              placeholderTextColor={colors.placeholder}
               value={temp}
               onChangeText={setTemp}
             />
           </View>
         </View>
 
-        {/* Nursing Interventions */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Nursing Interventions</Text>
           <View style={styles.interventionsList}>
@@ -265,7 +246,7 @@ export default function NursingAssessmentScreen() {
                 <Ionicons
                   name={checked ? "checkbox" : "square-outline"}
                   size={20}
-                  color={checked ? "#000000" : "#6B7280"}
+                  color={checked ? colors.textPrimary : colors.textSecondary}
                 />
                 <Text style={styles.checkboxLabel}>{key}</Text>
               </TouchableOpacity>
@@ -273,10 +254,11 @@ export default function NursingAssessmentScreen() {
           </View>
         </View>
 
-        {/* Action Button */}
-        <TouchableOpacity style={styles.proceedButton} onPress={handleProceed}>
-          <Text style={styles.proceedButtonText}>Proceed to Notes</Text>
-        </TouchableOpacity>
+        <PrimaryButton
+          label="Proceed to Notes"
+          onPress={handleProceed}
+          style={styles.proceedButton}
+        />
       </ScrollView>
     </SafeAreaView>
   );
@@ -285,28 +267,7 @@ export default function NursingAssessmentScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F3EFEF",
-  },
-  header: {
-    height: 52,
-    backgroundColor: "#FFFFFF",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E5E7EB",
-  },
-  backButton: {
-    padding: 4,
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#000000",
-  },
-  headerPlaceholder: {
-    width: 28,
+    backgroundColor: colors.backgroundAlt,
   },
   container: {
     padding: 20,
@@ -314,7 +275,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   patientCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     borderRadius: 12,
     padding: 14,
     flexDirection: "row",
@@ -326,38 +287,19 @@ const styles = StyleSheet.create({
     gap: 12,
     alignItems: "center",
   },
-  patientAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "#EDE9FE",
-    alignItems: "center",
-    justifyContent: "center",
-  },
   patientName: {
     fontSize: 15,
     fontWeight: "700",
-    color: "#1F2937",
+    color: colors.textHeading,
   },
   patientMeta: {
     fontSize: 12,
-    color: "#6B7280",
+    color: colors.textSecondary,
   },
   patientSubMeta: {
     fontSize: 10,
-    color: "#9CA3AF",
+    color: colors.textFaint,
     marginTop: 2,
-  },
-  badgeStable: {
-    backgroundColor: "#DCFCE7",
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  badgeStableText: {
-    fontSize: 11,
-    fontWeight: "600",
-    color: "#166534",
   },
   section: {
     gap: 8,
@@ -365,7 +307,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#1F2937",
+    color: colors.textHeading,
   },
   grid2x2: {
     flexDirection: "row",
@@ -375,29 +317,29 @@ const styles = StyleSheet.create({
   toggleChip: {
     width: "48.5%",
     height: 44,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 8,
   },
   activeChip: {
-    backgroundColor: "#1D9BF0",
+    backgroundColor: colors.primary,
   },
   chipText: {
     fontSize: 13,
     fontWeight: "500",
-    color: "#374151",
+    color: colors.textSecondary,
     textAlign: "center",
   },
   activeChipText: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontWeight: "600",
   },
   gcsInputRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     borderRadius: 8,
     width: 130,
     height: 44,
@@ -406,13 +348,13 @@ const styles = StyleSheet.create({
   },
   gcsInput: {
     fontSize: 15,
-    color: "#1F2937",
+    color: colors.textHeading,
     textAlign: "center",
     width: 30,
   },
   gcsDenominator: {
     fontSize: 14,
-    color: "#1F2937",
+    color: colors.textHeading,
     fontWeight: "600",
     marginLeft: 4,
   },
@@ -426,13 +368,13 @@ const styles = StyleSheet.create({
   },
   sliderMinMax: {
     fontSize: 12,
-    color: "#6B7280",
+    color: colors.textSecondary,
     fontWeight: "600",
   },
   sliderValueText: {
     fontSize: 13,
     fontWeight: "700",
-    color: "#1F2937",
+    color: colors.textHeading,
   },
   slider: {
     width: "100%",
@@ -451,20 +393,20 @@ const styles = StyleSheet.create({
   vitalInput: {
     flex: 1,
     height: 44,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     borderRadius: 8,
     textAlign: "center",
     fontSize: 13,
-    color: "#8B5CF6",
+    color: colors.inputValue,
   },
   vitalInputHalf: {
     width: "48.5%",
     height: 44,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     borderRadius: 8,
     textAlign: "center",
     fontSize: 13,
-    color: "#8B5CF6",
+    color: colors.inputValue,
   },
   interventionsList: {
     gap: 10,
@@ -477,20 +419,10 @@ const styles = StyleSheet.create({
   },
   checkboxLabel: {
     fontSize: 13,
-    color: "#1F2937",
+    color: colors.textHeading,
     fontWeight: "500",
   },
   proceedButton: {
-    height: 48,
-    backgroundColor: "#1D9BF0",
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
     marginTop: 12,
-  },
-  proceedButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "600",
   },
 });

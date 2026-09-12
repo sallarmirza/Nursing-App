@@ -1,16 +1,13 @@
 // app/calculations/dosage
 import { Ionicons } from "@expo/vector-icons";
-import { router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { FormInput } from "../../components/common/FormInput";
+import { PrimaryButton } from "../../components/common/PrimaryButton";
+import { ScreenHeader } from "../../components/common/ScreenHeader";
+import { colors } from "../../theme/colors";
 
 export default function DosageCalculatorScreen() {
   const params = useLocalSearchParams<{
@@ -19,7 +16,6 @@ export default function DosageCalculatorScreen() {
     patientWeight?: string;
   }>();
 
-  // Pre-fill weight if patient is passed from Patient Record screen
   const [weight, setWeight] = useState(params.patientWeight || "");
   const [medication, setMedication] = useState("Cefotaxime");
   const [concentration, setConcentration] = useState("120mg/5ml");
@@ -31,7 +27,6 @@ export default function DosageCalculatorScreen() {
     : "Dosage Calculator";
 
   const handleCalculate = () => {
-    // Dynamic calculation logic based on weight, guideline & concentration
     if (weight) {
       setResult("3.75 ml");
     }
@@ -39,78 +34,41 @@ export default function DosageCalculatorScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <Ionicons name="chevron-back" size={24} color="#000000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle} numberOfLines={1}>
-          {headerTitle}
-        </Text>
-        <View style={styles.headerPlaceholder} />
-      </View>
+      <ScreenHeader title={headerTitle} />
 
       <ScrollView contentContainerStyle={styles.container}>
-        {/* Patient Weight */}
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Patient Weight</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter weight in kgs"
-            placeholderTextColor="#C4B5FD"
-            keyboardType="numeric"
-            value={weight}
-            onChangeText={setWeight}
-          />
-        </View>
+        <FormInput
+          label="Patient Weight"
+          placeholder="Enter weight in kgs"
+          keyboardType="numeric"
+          value={weight}
+          onChangeText={setWeight}
+        />
 
-        {/* Medication Field */}
-        <View style={styles.formGroup}>
-          <View style={styles.labelRow}>
-            <Text style={styles.label}>Medication</Text>
-            <TouchableOpacity>
-              <Text style={styles.addIcon}>+</Text>
-            </TouchableOpacity>
-          </View>
-          <TextInput
-            style={styles.input}
-            value={medication}
-            onChangeText={setMedication}
-            placeholderTextColor="#C4B5FD"
-          />
-        </View>
+        <FormInput
+          label="Medication"
+          value={medication}
+          onChangeText={setMedication}
+        />
 
-        {/* Available Concentration */}
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Available Concentration</Text>
-          <TextInput
-            style={styles.input}
-            value={concentration}
-            onChangeText={setConcentration}
-            placeholderTextColor="#C4B5FD"
-          />
-        </View>
+        <FormInput
+          label="Available Concentration"
+          value={concentration}
+          onChangeText={setConcentration}
+        />
 
-        {/* Guideline */}
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Guideline</Text>
-          <TextInput
-            style={styles.input}
-            value={guideline}
-            onChangeText={setGuideline}
-            placeholderTextColor="#C4B5FD"
-          />
-        </View>
+        <FormInput
+          label="Guideline"
+          value={guideline}
+          onChangeText={setGuideline}
+        />
 
-        {/* Calculate Button */}
-        <TouchableOpacity style={styles.calcButton} onPress={handleCalculate}>
-          <Text style={styles.calcButtonText}>Calculate Dosage</Text>
-        </TouchableOpacity>
+        <PrimaryButton
+          label="Calculate Dosage"
+          onPress={handleCalculate}
+          style={styles.calcButton}
+        />
 
-        {/* Result Box */}
         {result && (
           <View style={styles.resultCard}>
             <Text style={styles.resultLabel}>Administer</Text>
@@ -120,7 +78,7 @@ export default function DosageCalculatorScreen() {
             </Text>
 
             <View style={styles.warningRow}>
-              <Ionicons name="alert-circle" size={16} color="#DC2626" />
+              <Ionicons name="alert-circle" size={16} color={colors.danger} />
               <Text style={styles.warningText}>
                 Verify concentration & check dose
               </Text>
@@ -135,77 +93,18 @@ export default function DosageCalculatorScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F3EFEF",
-  },
-  header: {
-    height: 56,
-    backgroundColor: "#FFFFFF",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E5E7EB",
-  },
-  backButton: {
-    padding: 4,
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#000000",
-    flex: 1,
-    textAlign: "center",
-  },
-  headerPlaceholder: {
-    width: 28,
+    backgroundColor: colors.backgroundAlt,
   },
   container: {
     padding: 20,
     gap: 16,
     paddingBottom: 40,
   },
-  formGroup: {
-    gap: 6,
-  },
-  labelRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  label: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#1F2937",
-  },
-  addIcon: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#000000",
-  },
-  input: {
-    height: 48,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    fontSize: 15,
-    color: "#8B5CF6",
-  },
   calcButton: {
-    height: 48,
-    backgroundColor: "#1D9BF0",
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
     marginTop: 8,
   },
-  calcButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "600",
-  },
   resultCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     borderRadius: 12,
     padding: 16,
     marginTop: 8,
@@ -214,16 +113,16 @@ const styles = StyleSheet.create({
   resultLabel: {
     fontSize: 15,
     fontWeight: "700",
-    color: "#16A34A",
+    color: colors.success,
   },
   resultValue: {
     fontSize: 26,
     fontWeight: "700",
-    color: "#1D9BF0",
+    color: colors.primary,
   },
   resultSubtext: {
     fontSize: 12,
-    color: "#4B5563",
+    color: colors.textSecondary,
   },
   warningRow: {
     flexDirection: "row",
@@ -233,6 +132,6 @@ const styles = StyleSheet.create({
   },
   warningText: {
     fontSize: 12,
-    color: "#1F2937",
+    color: colors.textHeading,
   },
 });

@@ -1,16 +1,17 @@
-// app/patients/index
-import { Ionicons } from "@expo/vector-icons";
+// app/(tabs)/patients/index
 import { router } from "expo-router";
-import { useState } from "react";
 import {
-  FlatList,
-  SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { PersonAvatar } from "../../components/common/PersonAvatar";
+import { ScreenHeader } from "../../components/common/ScreenHeader";
+import { StatusBadge } from "../../components/common/StatusBadge";
+import { colors } from "../../theme/colors";
 
 interface Patient {
   id: string;
@@ -21,96 +22,41 @@ interface Patient {
 }
 
 const PATIENTS_DATA: Patient[] = [
-  {
-    id: "1",
-    name: "Maria Khan",
-    age: 35,
-    gender: "Female",
-    status: "Stable",
-  },
-  {
-    id: "2",
-    name: "Ahmed Raza",
-    age: 35,
-    gender: "Male",
-    status: "Critical",
-  },
-  {
-    id: "3",
-    name: "Ali Khan",
-    age: 31,
-    gender: "Male",
-    status: "Discharged",
-  },
+  { id: "1", name: "Maria Khan", age: 35, gender: "Female", status: "Stable" },
+  { id: "2", name: "Ahmed Raza", age: 35, gender: "Male", status: "Critical" },
+  { id: "3", name: "Ali Khan", age: 31, gender: "Male", status: "Discharged" },
 ];
 
-export default function PatientsRecordScreen() {
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const filteredPatients = PATIENTS_DATA.filter((patient) =>
-    patient.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
-
-  const getStatusColor = (status: Patient["status"]) => {
-    switch (status) {
-      case "Stable":
-        return "#16A34A";
-      case "Critical":
-        return "#DC2626";
-      case "Discharged":
-        return "#4B5563";
-      default:
-        return "#4B5563";
-    }
+const STATUS_TONE: Record<Patient["status"], "success" | "danger" | "neutral"> =
+  {
+    Stable: "success",
+    Critical: "danger",
+    Discharged: "neutral",
   };
 
+export default function PatientsRecordScreen() {
   return (
-    <SafeAreaView style={styles.safeArea}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <Ionicons name="chevron-back" size={24} color="#000000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Patients Record</Text>
-        <View style={styles.headerPlaceholder} />
-      </View>
+    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+      <ScreenHeader title="Patients Record" />
 
-      {/* Search Bar */}
-      <View style={styles.searchBarContainer}>
-        <Ionicons name="search-outline" size={20} color="#9CA3AF" />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search by Patient Name"
-          placeholderTextColor="#C4B5FD"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-      </View>
-
-      <View style={styles.content}>
-        {/* Section Title & Add Button */}
+      <ScrollView
+        contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>My Active Patients</Text>
           <TouchableOpacity
             style={styles.addButton}
             onPress={() => router.push("/patients/new" as any)}
           >
-            <Ionicons name="add" size={16} color="#FFFFFF" />
-            <Text style={styles.addButtonText}>Add New</Text>
+            <Text style={styles.addButtonText}>+ Add New</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Patient Cards List */}
-        <FlatList
-          data={filteredPatients}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.listContainer}
-          showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => (
+        <View style={styles.listContainer}>
+          {PATIENTS_DATA.map((item) => (
             <TouchableOpacity
+              key={item.id}
               style={styles.patientCard}
               activeOpacity={0.7}
               onPress={() =>
@@ -121,9 +67,7 @@ export default function PatientsRecordScreen() {
               }
             >
               <View style={styles.patientInfo}>
-                <View style={styles.avatar}>
-                  <Ionicons name="person" size={20} color="#A78BFA" />
-                </View>
+                <PersonAvatar size={36} />
                 <View>
                   <Text style={styles.patientName}>{item.name}</Text>
                   <Text style={styles.patientSubtext}>
@@ -132,20 +76,14 @@ export default function PatientsRecordScreen() {
                 </View>
               </View>
 
-              <View style={styles.badge}>
-                <Text
-                  style={[
-                    styles.badgeText,
-                    { color: getStatusColor(item.status) },
-                  ]}
-                >
-                  {item.status}
-                </Text>
-              </View>
+              <StatusBadge
+                label={item.status}
+                tone={STATUS_TONE[item.status]}
+              />
             </TouchableOpacity>
-          )}
-        />
-      </View>
+          ))}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -153,48 +91,12 @@ export default function PatientsRecordScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F3EFEF",
+    backgroundColor: colors.backgroundAlt,
   },
-  header: {
-    height: 56,
-    backgroundColor: "#FFFFFF",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E5E7EB",
-  },
-  backButton: {
-    padding: 4,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#000000",
-  },
-  headerPlaceholder: {
-    width: 32,
-  },
-  searchBarContainer: {
-    backgroundColor: "#FFFFFF",
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    height: 48,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E5E7EB",
-    gap: 10,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 15,
-    color: "#000000",
-  },
-  content: {
-    flex: 1,
+  container: {
     paddingHorizontal: 20,
     paddingTop: 20,
+    paddingBottom: 40,
   },
   sectionHeader: {
     flexDirection: "row",
@@ -205,28 +107,24 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 15,
     fontWeight: "700",
-    color: "#1F2937",
+    color: colors.textHeading,
   },
   addButton: {
-    backgroundColor: "#1D9BF0",
-    flexDirection: "row",
-    alignItems: "center",
+    backgroundColor: colors.primary,
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 6,
-    gap: 4,
   },
   addButtonText: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: 13,
     fontWeight: "600",
   },
   listContainer: {
     gap: 12,
-    paddingBottom: 24,
   },
   patientCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
@@ -239,32 +137,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
   },
-  avatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "#EDE9FE",
-    alignItems: "center",
-    justifyContent: "center",
-  },
   patientName: {
     fontSize: 16,
     fontWeight: "700",
-    color: "#1F2937",
+    color: colors.textHeading,
     marginBottom: 2,
   },
   patientSubtext: {
     fontSize: 13,
-    color: "#6B7280",
-  },
-  badge: {
-    backgroundColor: "#E5E7EB",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  badgeText: {
-    fontSize: 12,
-    fontWeight: "600",
+    color: colors.textSecondary,
   },
 });

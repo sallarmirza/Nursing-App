@@ -1,14 +1,10 @@
 // app/(auth)/login
-
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import {
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { FormInput } from "../../components/common/FormInput";
+import { PrimaryButton } from "../../components/common/PrimaryButton";
+import { colors } from "../../theme/colors";
 
 export default function LoginScreen() {
   return (
@@ -18,34 +14,24 @@ export default function LoginScreen() {
         <Text style={styles.subtitle}>Sign in to your DNA Account</Text>
 
         <View style={styles.form}>
-          <TextInput
-            style={styles.input}
+          <FormInput
             placeholder="Email"
-            placeholderTextColor="#A0A0A0"
             keyboardType="email-address"
             autoCapitalize="none"
           />
-
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            placeholderTextColor="#A0A0A0"
-            secureTextEntry
-          />
+          <FormInput placeholder="Password" secureTextEntry />
 
           <TouchableOpacity style={styles.forgotPassword}>
             <Text style={styles.forgotPasswordText}>Forgot password?</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.signInButton}
+          <PrimaryButton
+            label="Sign in"
             onPress={() => router.replace("/(tabs)")}
-          >
-            <Text style={styles.signInButtonText}>Sign in</Text>
-          </TouchableOpacity>
+            style={styles.signInButton}
+          />
         </View>
 
-        {/* Signup Link */}
         <View style={styles.signupContainer}>
           <Text style={styles.signupText}>Don't have an account? </Text>
           <TouchableOpacity onPress={() => router.push("/(auth)/signup")}>
@@ -53,7 +39,6 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Divider 1 */}
         <View style={styles.dividerContainer}>
           <View style={styles.line} />
           <Text style={styles.dividerText}>or</Text>
@@ -62,7 +47,6 @@ export default function LoginScreen() {
 
         <Text style={styles.sectionHeader}>Continue with</Text>
 
-        {/* Google Button */}
         <TouchableOpacity style={styles.socialButton}>
           <Ionicons
             name="logo-google"
@@ -73,19 +57,17 @@ export default function LoginScreen() {
           <Text style={styles.socialButtonText}>Google</Text>
         </TouchableOpacity>
 
-        {/* Divider 2 */}
         <View style={styles.dividerContainer}>
           <View style={styles.line} />
           <Text style={styles.dividerText}>login with</Text>
           <View style={styles.line} />
         </View>
 
-        {/* Mobile Button */}
         <TouchableOpacity style={styles.socialButton}>
           <Ionicons
             name="phone-portrait-outline"
             size={20}
-            color="#2089DC"
+            color={colors.primaryAlt}
             style={styles.buttonIcon}
           />
           <Text style={styles.socialButtonText}>Continue with Mobile</Text>
@@ -98,7 +80,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F4F3F3",
+    backgroundColor: colors.background,
     justifyContent: "center",
   },
   content: {
@@ -107,45 +89,27 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "600",
-    color: "#000000",
+    color: colors.textPrimary,
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
-    color: "#8E8D8A",
+    color: colors.textMuted,
     marginBottom: 24,
   },
   form: {
     gap: 16,
-  },
-  input: {
-    height: 52,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    fontSize: 15,
-    color: "#000000",
   },
   forgotPassword: {
     alignSelf: "flex-end",
     marginTop: -4,
   },
   forgotPasswordText: {
-    color: "#E57373",
+    color: colors.dangerAlt,
     fontSize: 13,
   },
   signInButton: {
-    height: 52,
-    backgroundColor: "#2089DC",
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
     marginTop: 8,
-  },
-  signInButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "600",
   },
   signupContainer: {
     flexDirection: "row",
@@ -154,11 +118,11 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   signupText: {
-    color: "#8E8D8A",
+    color: colors.textMuted,
     fontSize: 14,
   },
   link: {
-    color: "#2089DC",
+    color: colors.primaryAlt,
     fontWeight: "600",
     fontSize: 14,
   },
@@ -170,23 +134,23 @@ const styles = StyleSheet.create({
   line: {
     flex: 1,
     height: 1,
-    backgroundColor: "#D0D0D0",
+    backgroundColor: colors.divider,
   },
   dividerText: {
     marginHorizontal: 16,
-    color: "#8E8D8A",
+    color: colors.textMuted,
     fontSize: 14,
   },
   sectionHeader: {
     textAlign: "center",
-    color: "#8E8D8A",
+    color: colors.textMuted,
     fontSize: 14,
     marginBottom: 16,
     fontWeight: "500",
   },
   socialButton: {
     height: 52,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     borderRadius: 8,
     flexDirection: "row",
     alignItems: "center",
@@ -196,7 +160,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   socialButtonText: {
-    color: "#2C3E50",
+    color: colors.textHeading,
     fontSize: 15,
     fontWeight: "500",
   },
