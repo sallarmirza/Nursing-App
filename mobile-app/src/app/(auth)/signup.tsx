@@ -1,3 +1,5 @@
+// app/(auth)/singup
+
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import {

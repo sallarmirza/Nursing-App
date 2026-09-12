@@ -1,4 +1,7 @@
+// app/(auth)/login
+
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import {
   StyleSheet,
   Text,
@@ -34,8 +37,19 @@ export default function LoginScreen() {
             <Text style={styles.forgotPasswordText}>Forgot password?</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.signInButton}>
+          <TouchableOpacity
+            style={styles.signInButton}
+            onPress={() => router.replace("/(tabs)")}
+          >
             <Text style={styles.signInButtonText}>Sign in</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Signup Link */}
+        <View style={styles.signupContainer}>
+          <Text style={styles.signupText}>Don't have an account? </Text>
+          <TouchableOpacity onPress={() => router.push("/(auth)/signup")}>
+            <Text style={styles.link}>Sign Up</Text>
           </TouchableOpacity>
         </View>
 
@@ -133,6 +147,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
+  signupContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 24,
+  },
+  signupText: {
+    color: "#8E8D8A",
+    fontSize: 14,
+  },
+  link: {
+    color: "#2089DC",
+    fontWeight: "600",
+    fontSize: 14,
+  },
   dividerContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -141,7 +170,7 @@ const styles = StyleSheet.create({
   line: {
     flex: 1,
     height: 1,
-    backgroundColor: "#000000",
+    backgroundColor: "#D0D0D0",
   },
   dividerText: {
     marginHorizontal: 16,
