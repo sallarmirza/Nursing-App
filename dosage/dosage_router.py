@@ -11,6 +11,7 @@ router = APIRouter()
 
 @router.post("/calculate")
 def calculate_dosage(data: DosageCalculatorRegister):
+    """without adding patient"""
     try:
         return dosage_cal.calculate_simple_dosage(data)
     except ValueError as e:
@@ -23,6 +24,7 @@ def calculate_medication_dosage_for_patient(
     patient_id: str,
     data: DosageCalculatorRegister,
 ):
+    """dosage after selecting the patient"""
     try:
         return dosage_cal.calculate_dosage_for_patient(nurse_id, patient_id, data)
     except ValueError as e:
