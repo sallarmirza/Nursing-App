@@ -2,6 +2,7 @@
 import { router } from "expo-router";
 import { useState } from "react";
 import {
+  ActivityIndicator,
   ScrollView,
   StyleSheet,
   Text,
@@ -14,24 +15,53 @@ import { FormInput } from "../../components/common/FormInput";
 import { PrimaryButton } from "../../components/common/PrimaryButton";
 import { ScreenHeader } from "../../components/common/ScreenHeader";
 import { colors } from "../../theme/colors";
+import { useCreatePatient } from "../../hooks/patients/useCreatePatient";
+
+// Splits "John Michael Smith" into first="John", last="Michael Smith"
+function splitName(fullName: string): { first: string; last: string } {
+  const parts = fullName.trim().split(/\s+/);
+  return {
+    first: parts[0] || "",
+    last: parts.slice(1).join(" ") || parts[0] || "",
+  };
+}
 
 export default function AddNewPatientScreen() {
   const [name, setName] = useState("");
-  const [patientId, setPatientId] = useState("");
+  const [patientId, setPatientId] = useState(""); // display-only, backend generates its own
   const [gender, setGender] = useState<"Male" | "Female" | "Other" | "">("");
   const [weight, setWeight] = useState("");
   const [height, setHeight] = useState("");
   const [bloodGroup, setBloodGroup] = useState("");
-  const [bedNo, setBedNo] = useState("");
+  const [ward, setWard] = useState("");
 
+  // Vitals — kept in UI, not yet wired to backend
   const [bp, setBp] = useState("");
   const [hr, setHr] = useState("");
   const [rr, setRr] = useState("");
   const [spo2, setSpo2] = useState("");
   const [temp, setTemp] = useState("");
 
-  const handleSave = () => {
-    router.back();
+  const { createPatient, isLoading, error } = useCreatePatient();
+
+  const handleSave = async () => {
+    if (!name || !gender) return;
+
+    const { first, last } = splitName(name);
+
+    const newPatientId = await createPatient({
+      patient_first_name: first,
+      patient_last_name: last,
+      gender,
+      patient_weight: weight ? parseFloat(weight) : undefined,
+      patient_height: height ? parseFloat(height) : undefined,
+      patient_blood_group: bloodGroup || undefined,
+      patient_ward: ward || undefined,
+    });
+
+    if (newPatientId) {
+      router.back();
+    }
   };
 
   return (
@@ -54,6 +84,7 @@ export default function AddNewPatientScreen() {
           placeholder="Enter Patient ID"
           value={patientId}
           onChangeText={setPatientId}
+          editable={false}
         />
 
         <View style={styles.formGroup}>
@@ -107,16 +138,16 @@ export default function AddNewPatientScreen() {
 
         <FormInput
           label="Blood Group"
-          placeholder="Enter Blood Group"
+          placeholder="e.g. A+, O-, AB+"
           value={bloodGroup}
           onChangeText={setBloodGroup}
         />
 
         <FormInput
-          label="Bed No.*"
-          placeholder="Enter Bed No.."
-          value={bedNo}
-          onChangeText={setBedNo}
+          label="Ward*"
+          placeholder="Enter Ward"
+          value={ward}
+          onChangeText={setWard}
         />
 
         <View style={styles.formGroup}>
@@ -168,11 +199,15 @@ export default function AddNewPatientScreen() {
           </View>
         </View>
 
+        {error && <Text style={styles.errorText}>{error}</Text>}
+
         <PrimaryButton
-          label="Save"
+          label={isLoading ? "Saving..." : "Save"}
           onPress={handleSave}
+          disabled={isLoading}
           style={styles.saveButton}
         />
+        {isLoading && <ActivityIndicator size="small" color={colors.primary} />}
       </ScrollView>
     </SafeAreaView>
   );
@@ -255,5 +290,9 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     marginTop: 12,
+  },
+  errorText: {
+    color: colors.dangerAlt,
+    fontSize: 13,
   },
 });
