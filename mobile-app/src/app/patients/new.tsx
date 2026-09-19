@@ -1,4 +1,4 @@
-// app/(tabs)/patients/newimport { router } from "expo-router";
+// app/patients/new
 import { router } from "expo-router";
 import { useState } from "react";
 import {

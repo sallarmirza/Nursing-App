@@ -1,12 +1,27 @@
 // app/(auth)/signup
 import { Ionicons } from "@expo/vector-icons";
-import { Link } from "expo-router";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Link, router } from "expo-router";
+import { useState } from "react";
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { FormInput } from "../../components/common/FormInput";
 import { PrimaryButton } from "../../components/common/PrimaryButton";
 import { colors } from "../../theme/colors";
+import useSignup from "../../hooks/auth/useSignup";
 
 export default function SignupScreen() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { signup, isLoading, error } = useSignup();
+
+  const handleSignup = async () => {
+    if (!email || !password) return;
+
+    const nurseId = await signup(email, password);
+    if (nurseId) {
+      router.push("/(auth)/staff-profile");
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>
@@ -14,15 +29,29 @@ export default function SignupScreen() {
         <Text style={styles.subtitle}>Sign up to join DNA Account</Text>
 
         <View style={styles.form}>
-          <FormInput placeholder="Full Name" />
           <FormInput
             placeholder="Email"
             keyboardType="email-address"
             autoCapitalize="none"
+            value={email}
+            onChangeText={setEmail}
           />
-          <FormInput placeholder="Password" secureTextEntry />
+          <FormInput
+            placeholder="Password"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
 
-          <PrimaryButton label="Sign up" style={styles.signUpButton} />
+          {error && <Text style={styles.errorText}>{error}</Text>}
+
+          <PrimaryButton
+            label={isLoading ? "Signing up..." : "Sign up"}
+            onPress={handleSignup}
+            disabled={isLoading}
+            style={styles.signUpButton}
+          />
+          {isLoading && <ActivityIndicator size="small" color={colors.primaryAlt} />}
         </View>
 
         <View style={styles.dividerContainer}>
@@ -79,6 +108,10 @@ const styles = StyleSheet.create({
   },
   signUpButton: {
     marginTop: 8,
+  },
+  errorText: {
+    color: colors.dangerAlt ?? "red",
+    fontSize: 13,
   },
   dividerContainer: {
     flexDirection: "row",

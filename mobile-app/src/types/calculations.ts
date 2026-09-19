@@ -17,3 +17,17 @@ export interface DosageCalculatorResponse {
   concentration: string;
   volume_to_administer_ml: number;
 }
+
+export interface DripCalculatorRequest {
+  total_volume: number;
+  time_duration_min: number;
+  drop_factor: number;
+}
+
+
+export interface DripCalculatorResponse {
+  total_volume_ml: number;
+  time_duration_min: number;
+  drop_factor: number;
+  drop_rate_gtt_min: number;
+}
