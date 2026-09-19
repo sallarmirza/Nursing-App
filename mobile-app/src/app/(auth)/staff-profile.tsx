@@ -1,12 +1,19 @@
 // app/(auth)/staff-profile
 import { router } from "expo-router";
 import { useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FormInput } from "../../components/common/FormInput";
 import { PersonAvatar } from "../../components/common/PersonAvatar";
 import { PrimaryButton } from "../../components/common/PrimaryButton";
 import { colors } from "../../theme/colors";
+import { useProfileSetup } from "../../hooks/auth/useProfileSetup";
+
+// Extracts the leading number from strings like "5 Years"
+function parseExperienceYears(input: string): number {
+  const match = input.match(/^(\d+(\.\d+)?)/);
+  return match ? parseFloat(match[1]) : 0;
+}
 
 export default function StaffProfileScreen() {
   const [isEditing, setIsEditing] = useState(true);
@@ -17,9 +24,25 @@ export default function StaffProfileScreen() {
   const [hospital, setHospital] = useState("Ibadat International Hospital");
   const [experience, setExperience] = useState("5 Years");
 
-  const handleSave = () => {
-    setIsEditing(false);
-    router.replace("/(tabs)/dashboard");
+  const { setupProfile, isLoading, error } = useProfileSetup();
+
+  const handleSave = async () => {
+    if (!name) return;
+
+    const experienceYears = parseExperienceYears(experience);
+
+    const success = await setupProfile(
+      name,
+      qualification,
+      designation,
+      hospital,
+      experienceYears
+    );
+
+    if (success) {
+      setIsEditing(false);
+      router.replace("/(tabs)/dashboard");
+    }
   };
 
   const handleEdit = () => {
@@ -77,8 +100,15 @@ export default function StaffProfileScreen() {
           onChangeText={setExperience}
         />
 
+        {error && <Text style={styles.errorText}>{error}</Text>}
+
         <View style={styles.buttonGroup}>
-          <PrimaryButton label="Save" onPress={handleSave} />
+          <PrimaryButton
+            label={isLoading ? "Saving..." : "Save"}
+            onPress={handleSave}
+            disabled={isLoading}
+          />
+          {isLoading && <ActivityIndicator size="small" color={colors.primaryAlt} />}
           <PrimaryButton label="Edit" variant="outline" onPress={handleEdit} />
         </View>
       </ScrollView>
@@ -111,5 +141,9 @@ const styles = StyleSheet.create({
   buttonGroup: {
     gap: 12,
     marginTop: 16,
+  },
+  errorText: {
+    color: colors.dangerAlt,
+    fontSize: 13,
   },
 });
