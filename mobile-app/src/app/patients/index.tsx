@@ -1,6 +1,9 @@
 // app/(tabs)/patients/index
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback } from "react";
 import {
+  ActivityIndicator,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -10,31 +13,31 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PersonAvatar } from "../../components/common/PersonAvatar";
 import { ScreenHeader } from "../../components/common/ScreenHeader";
-import { StatusBadge } from "../../components/common/StatusBadge";
 import { colors } from "../../theme/colors";
+import usePatientList from "../../hooks/patients/usePatientList";
 
-interface Patient {
-  id: string;
-  name: string;
-  age: number;
-  gender: string;
-  status: "Stable" | "Critical" | "Discharged";
+function calculateAge(dateOfBirth: string | null): number | null {
+  if (!dateOfBirth) return null;
+  const dob = new Date(dateOfBirth);
+  const today = new Date();
+  let age = today.getFullYear() - dob.getFullYear();
+  const monthDiff = today.getMonth() - dob.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+    age--;
+  }
+  return age;
 }
 
-const PATIENTS_DATA: Patient[] = [
-  { id: "1", name: "Maria Khan", age: 35, gender: "Female", status: "Stable" },
-  { id: "2", name: "Ahmed Raza", age: 35, gender: "Male", status: "Critical" },
-  { id: "3", name: "Ali Khan", age: 31, gender: "Male", status: "Discharged" },
-];
-
-const STATUS_TONE: Record<Patient["status"], "success" | "danger" | "neutral"> =
-  {
-    Stable: "success",
-    Critical: "danger",
-    Discharged: "neutral",
-  };
-
 export default function PatientsRecordScreen() {
+  const { patients, isLoading, error, fetchPatients } = usePatientList();
+
+  // Refetch every time this screen comes into focus (e.g. after adding a patient)
+  useFocusEffect(
+    useCallback(() => {
+      fetchPatients();
+    }, [fetchPatients])
+  );
+
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
       <ScreenHeader title="Patients Record" />
@@ -42,6 +45,9 @@ export default function PatientsRecordScreen() {
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={isLoading} onRefresh={fetchPatients} />
+        }
       >
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>My Active Patients</Text>
@@ -53,35 +59,47 @@ export default function PatientsRecordScreen() {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.listContainer}>
-          {PATIENTS_DATA.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              style={styles.patientCard}
-              activeOpacity={0.7}
-              onPress={() =>
-                router.push({
-                  pathname: "/patients/[id]" as any,
-                  params: { id: item.id },
-                })
-              }
-            >
-              <View style={styles.patientInfo}>
-                <PersonAvatar size={36} />
-                <View>
-                  <Text style={styles.patientName}>{item.name}</Text>
-                  <Text style={styles.patientSubtext}>
-                    {item.age} years, {item.gender}
-                  </Text>
-                </View>
-              </View>
+        {isLoading && patients.length === 0 && (
+          <ActivityIndicator size="small" color={colors.primary} />
+        )}
 
-              <StatusBadge
-                label={item.status}
-                tone={STATUS_TONE[item.status]}
-              />
-            </TouchableOpacity>
-          ))}
+        {error && <Text style={styles.errorText}>{error}</Text>}
+
+        {!isLoading && !error && patients.length === 0 && (
+          <Text style={styles.emptyText}>No patients yet.</Text>
+        )}
+
+        <View style={styles.listContainer}>
+          {patients.map((item) => {
+            const age = calculateAge(item.date_of_birth);
+            return (
+              <TouchableOpacity
+                key={item.patient_id}
+                style={styles.patientCard}
+                activeOpacity={0.7}
+                onPress={() =>
+                  router.push({
+                    pathname: "/patients/[id]" as any,
+                    params: { id: item.patient_id },
+                  })
+                }
+              >
+                <View style={styles.patientInfo}>
+                  <PersonAvatar size={36} />
+                  <View>
+                    <Text style={styles.patientName}>
+                      {item.patient_name}
+                    </Text>
+                    <Text style={styles.patientSubtext}>
+                      {age !== null
+                        ? `${age} years, ${item.patient_gender}`
+                        : item.patient_gender}
+                    </Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -146,5 +164,16 @@ const styles = StyleSheet.create({
   patientSubtext: {
     fontSize: 13,
     color: colors.textSecondary,
+  },
+  errorText: {
+    color: colors.dangerAlt,
+    fontSize: 13,
+    marginBottom: 12,
+  },
+  emptyText: {
+    color: colors.textSecondary,
+    fontSize: 14,
+    textAlign: "center",
+    marginTop: 20,
   },
 });

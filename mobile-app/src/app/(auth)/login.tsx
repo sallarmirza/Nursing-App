@@ -1,12 +1,27 @@
 // app/(auth)/login
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useState } from "react";
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { FormInput } from "../../components/common/FormInput";
 import { PrimaryButton } from "../../components/common/PrimaryButton";
 import { colors } from "../../theme/colors";
+import { useLogin } from "../../hooks/auth/useLogin";
 
 export default function LoginScreen() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { login, isLoading, error } = useLogin();
+
+  const handleLogin = async () => {
+    if (!email || !password) return;
+
+    const success = await login(email, password);
+    if (success) {
+      router.replace("/(tabs)");
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>
@@ -18,18 +33,29 @@ export default function LoginScreen() {
             placeholder="Email"
             keyboardType="email-address"
             autoCapitalize="none"
+            value={email}
+            onChangeText={setEmail}
           />
-          <FormInput placeholder="Password" secureTextEntry />
+          <FormInput
+            placeholder="Password"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
 
           <TouchableOpacity style={styles.forgotPassword}>
             <Text style={styles.forgotPasswordText}>Forgot password?</Text>
           </TouchableOpacity>
 
+          {error && <Text style={styles.errorText}>{error}</Text>}
+
           <PrimaryButton
-            label="Sign in"
-            onPress={() => router.replace("/(tabs)")}
+            label={isLoading ? "Signing in..." : "Sign in"}
+            onPress={handleLogin}
+            disabled={isLoading}
             style={styles.signInButton}
           />
+          {isLoading && <ActivityIndicator size="small" color={colors.primaryAlt} />}
         </View>
 
         <View style={styles.signupContainer}>
@@ -105,6 +131,10 @@ const styles = StyleSheet.create({
     marginTop: -4,
   },
   forgotPasswordText: {
+    color: colors.dangerAlt,
+    fontSize: 13,
+  },
+  errorText: {
     color: colors.dangerAlt,
     fontSize: 13,
   },
