@@ -4,6 +4,7 @@ import Slider from "@react-native-community/slider";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import {
+  ActivityIndicator,
   ScrollView,
   StyleSheet,
   Text,
@@ -15,8 +16,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { PersonAvatar } from "../../components/common/PersonAvatar";
 import { PrimaryButton } from "../../components/common/PrimaryButton";
 import { ScreenHeader } from "../../components/common/ScreenHeader";
-import { StatusBadge } from "../../components/common/StatusBadge";
 import { colors } from "../../theme/colors";
+import useCreateNote from "../../hooks/notes/useCreateNote";
+import useRecordVitals from "../../hooks/vitals/useRecordVitals";
 
 export default function NursingAssessmentScreen() {
   const params = useLocalSearchParams<{
@@ -29,13 +31,16 @@ export default function NursingAssessmentScreen() {
     useState<string>("Responds to Voice");
   const [gcs, setGcs] = useState<string>("");
   const [painScale, setPainScale] = useState<number>(4);
+  const [formError, setFormError] = useState<string | null>(null);
 
+  // Vitals — saved to backend with source "Nursing Notes"
   const [bp, setBp] = useState("");
   const [hr, setHr] = useState("");
   const [rr, setRr] = useState("");
   const [spO2, setSpO2] = useState("");
   const [temp, setTemp] = useState("");
 
+  // Interventions — saved with the assessment note
   const [interventions, setInterventions] = useState<{
     [key: string]: boolean;
   }>({
@@ -48,6 +53,17 @@ export default function NursingAssessmentScreen() {
     "Position Changed": true,
     "Blood Sample Collected": false,
   });
+
+  const { createNote, isLoading: noteLoading, error: noteError } =
+    useCreateNote();
+  const {
+    recordVitals,
+    isLoading: vitalsLoading,
+    error: vitalsError,
+  } = useRecordVitals();
+
+  const isBusy = noteLoading || vitalsLoading;
+  const displayError = formError || vitalsError || noteError;
 
   const conditionOptions = [
     "Stable",
@@ -66,14 +82,49 @@ export default function NursingAssessmentScreen() {
     setInterventions((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const handleProceed = () => {
-    router.push({
-      pathname: "/notes/sbar",
-      params: {
-        patientId: params.patientId || "123XYZ",
-        name: params.patientName || "Maria Khan",
-      },
+  const handleProceed = async () => {
+    setFormError(null);
+
+    if (!params.patientId) {
+      setFormError("No patient selected. Open this screen from a patient record.");
+      return;
+    }
+
+    const gcsNum = parseInt(gcs, 10);
+    if (!gcsNum || gcsNum < 3 || gcsNum > 15) {
+      setFormError("GCS must be a number between 3 and 15");
+      return;
+    }
+
+    // Vitals first: a retry after a failed note only repeats a reading,
+    // whereas retrying after a failed vitals save would duplicate a note.
+    const vitalsSaved = await recordVitals(params.patientId, "Nursing Notes", {
+      bp,
+      hr,
+      rr,
+      spO2,
+      temp,
     });
+    if (!vitalsSaved) return;
+
+    const noteId = await createNote(params.patientId, {
+      patient_condition: condition,
+      conscious_level: consciousness,
+      glasgow_coma_score: gcsNum,
+      pain_scale: Math.round(painScale),
+      nursing_interventions: interventions,
+    });
+
+    if (noteId) {
+      router.push({
+        pathname: "/notes/sbar",
+        params: {
+          patientId: params.patientId,
+          patientName: params.patientName || "",
+          noteId,
+        },
+      });
+    }
   };
 
   return (
@@ -89,15 +140,11 @@ export default function NursingAssessmentScreen() {
             <PersonAvatar size={36} />
             <View>
               <Text style={styles.patientName}>
-                {params.patientName || "Maria Khan"}
+                {params.patientName || "Patient"}
               </Text>
-              <Text style={styles.patientMeta}>35 years, Female</Text>
-              <Text style={styles.patientSubMeta}>
-                ID: 123XYZ | 35 Years, F | 65kg
-              </Text>
+              <Text style={styles.patientMeta}>ID: {params.patientId}</Text>
             </View>
           </View>
-          <StatusBadge label="Stable" tone="success" />
         </View>
 
         <View style={styles.section}>
@@ -195,7 +242,7 @@ export default function NursingAssessmentScreen() {
           <View style={styles.vitalsGridTop}>
             <TextInput
               style={styles.vitalInput}
-              placeholder="BP"
+              placeholder="BP (120/80)"
               placeholderTextColor={colors.placeholder}
               value={bp}
               onChangeText={setBp}
@@ -204,6 +251,7 @@ export default function NursingAssessmentScreen() {
               style={styles.vitalInput}
               placeholder="HR"
               placeholderTextColor={colors.placeholder}
+              keyboardType="numeric"
               value={hr}
               onChangeText={setHr}
             />
@@ -211,6 +259,7 @@ export default function NursingAssessmentScreen() {
               style={styles.vitalInput}
               placeholder="RR"
               placeholderTextColor={colors.placeholder}
+              keyboardType="numeric"
               value={rr}
               onChangeText={setRr}
             />
@@ -220,6 +269,7 @@ export default function NursingAssessmentScreen() {
               style={styles.vitalInputHalf}
               placeholder="SpO2"
               placeholderTextColor={colors.placeholder}
+              keyboardType="numeric"
               value={spO2}
               onChangeText={setSpO2}
             />
@@ -227,6 +277,7 @@ export default function NursingAssessmentScreen() {
               style={styles.vitalInputHalf}
               placeholder="Temp (°F)"
               placeholderTextColor={colors.placeholder}
+              keyboardType="numeric"
               value={temp}
               onChangeText={setTemp}
             />
@@ -254,11 +305,15 @@ export default function NursingAssessmentScreen() {
           </View>
         </View>
 
+        {displayError && <Text style={styles.errorText}>{displayError}</Text>}
+
         <PrimaryButton
-          label="Proceed to Notes"
+          label={isBusy ? "Saving..." : "Proceed to Notes"}
           onPress={handleProceed}
+          disabled={isBusy}
           style={styles.proceedButton}
         />
+        {isBusy && <ActivityIndicator size="small" color={colors.primary} />}
       </ScrollView>
     </SafeAreaView>
   );
@@ -295,11 +350,6 @@ const styles = StyleSheet.create({
   patientMeta: {
     fontSize: 12,
     color: colors.textSecondary,
-  },
-  patientSubMeta: {
-    fontSize: 10,
-    color: colors.textFaint,
-    marginTop: 2,
   },
   section: {
     gap: 8,
@@ -424,5 +474,9 @@ const styles = StyleSheet.create({
   },
   proceedButton: {
     marginTop: 12,
+  },
+  errorText: {
+    color: colors.dangerAlt,
+    fontSize: 13,
   },
 });

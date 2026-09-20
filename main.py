@@ -10,6 +10,7 @@ from vitals.vitals_router import router as vitals_router
 from medication.medication_router import router as med_router
 from storage import DBManager
 from fastapi.middleware.cors import CORSMiddleware
+from summary.summary_router import router as dashboard_router
 
 db = DBManager()
 
@@ -47,7 +48,7 @@ app.include_router(notes_router,prefix="/notes",tags=["Notes"])
 app.include_router(sbar_router,prefix="/sbar",tags=["Sbar"])
 app.include_router(vitals_router,prefix='/vitals',tags=['Vitals'])
 app.include_router(med_router)
-
+app.include_router(dashboard_router, prefix="/dashboard", tags=["Dashboard"])
 @app.get("/health")
 def check_health():
     return {

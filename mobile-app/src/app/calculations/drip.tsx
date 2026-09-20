@@ -1,5 +1,6 @@
 // app/calculations/drip
 import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -33,6 +34,11 @@ function parseDropFactor(option: string): number | null {
 }
 
 export default function IVDripRateScreen() {
+  const params = useLocalSearchParams<{
+    patientId?: string;
+    patientName?: string;
+  }>();
+
   const [volume, setVolume] = useState("");
   const [time, setTime] = useState("");
   const [selectedDropFactor, setSelectedDropFactor] = useState(
@@ -41,7 +47,23 @@ export default function IVDripRateScreen() {
   const [customDropFactor, setCustomDropFactor] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const { result, isLoading, error, calculate, reset } = useDripCalculator();
+  const {
+    result,
+    isLoading,
+    error,
+    calculate,
+    reset,
+    saveToRecord,
+    isSaving,
+    saveError,
+    savedId,
+  } = useDripCalculator();
+
+  const isPatientMode = !!params.patientId;
+
+  const headerTitle = params.patientName
+    ? `IV Drip Rate for ${params.patientName}`
+    : "IV Drip Rate";
 
   const handleCalculate = () => {
     const volumeNum = parseFloat(volume);
@@ -64,6 +86,11 @@ export default function IVDripRateScreen() {
     });
   };
 
+  const handleSave = () => {
+    if (!params.patientId) return;
+    saveToRecord(params.patientId);
+  };
+
   const equivalentMlPerHour =
     result && result.time_duration_min > 0
       ? Math.round(
@@ -73,7 +100,7 @@ export default function IVDripRateScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
-      <ScreenHeader title="IV Drip Rate" />
+      <ScreenHeader title={headerTitle} />
 
       <ScrollView
         contentContainerStyle={styles.container}
@@ -196,6 +223,44 @@ export default function IVDripRateScreen() {
             </View>
           </View>
         )}
+
+        {result && isPatientMode && (
+          <View style={styles.saveSection}>
+            {savedId ? (
+              <View style={styles.savedRow}>
+                <Ionicons
+                  name="checkmark-circle"
+                  size={18}
+                  color={colors.success}
+                />
+                <Text style={styles.savedText}>
+                  Saved to {params.patientName || "patient"}'s record
+                </Text>
+              </View>
+            ) : (
+              <PrimaryButton
+                label={isSaving ? "Saving..." : "Save to Record"}
+                onPress={handleSave}
+                disabled={isSaving}
+              />
+            )}
+
+            {isSaving && (
+              <ActivityIndicator size="small" color={colors.primary} />
+            )}
+
+            {saveError && (
+              <View style={styles.errorCard}>
+                <Ionicons
+                  name="alert-circle"
+                  size={16}
+                  color={colors.dangerAlt}
+                />
+                <Text style={styles.errorText}>{saveError}</Text>
+              </View>
+            )}
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -209,6 +274,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     gap: 16,
+    paddingBottom: 40,
   },
   formGroup: {
     gap: 6,
@@ -285,6 +351,23 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.textHeading,
     fontWeight: "500",
+  },
+  saveSection: {
+    gap: 10,
+  },
+  savedRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    padding: 12,
+    backgroundColor: colors.white,
+    borderRadius: 8,
+  },
+  savedText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: colors.success,
   },
   errorCard: {
     flexDirection: "row",

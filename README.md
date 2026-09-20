@@ -1,165 +1,71 @@
-# Digital Nursing Assistant — Backend
+# Digital Nursing Assistant
 
-FastAPI backend for a digital nursing assistant application that helps healthcare staff manage patients, nursing records, and clinical calculations.
+A nursing application for managing nurses, patients, clinical records, nursing notes, SBAR handovers, vitals, medications, and dosage or IV drip calculations.
 
 ## Features
 
-* Nurse account and profile management
-* Patient management and nurse assignment
-* Medication dosage calculations
-* IV drip rate calculations
-* Nursing notes and patient observations
-* SBAR-based shift handovers
-* Calculation history and patient records
-* RESTful API with automatic Swagger documentation
+- Nurse registration, login, and profile management
+- Patient registration, assignment, profiles, and clinical records
+- Vital-sign recording and patient monitoring
+- Nursing assessments and nursing note history
+- SOAP notes for structured clinical documentation
+- SBAR handovers with situation, background, assessment, and recommendation
+- Patient medication management
+- Medication dosage and IV drip-rate calculators
+- Dashboard views for patients, notes, medications, and clinical activity
 
-## Tech Stack
+## Backend Architecture
 
-* **Python**
-* **FastAPI**
-* **SQLAlchemy**
-* **Pydantic**
-* **SQLite**
-* **Uvicorn**
-
-## Project Structure
+The backend is a Python FastAPI service. `main.py` registers feature routers, which delegate business logic to services. Pydantic schemas validate data, while SQLAlchemy models and `storage.py` manage SQLite persistence.
 
 ```text
 Nursing-App/
-├── main.py
-├── db_model.py
-├── storage.py
-├── requirements.txt
-│
-├── nurse/
-│   ├── nurse_router.py
-│   ├── nurse_service.py
-│   └── nurse_helper.py
-│
-├── patient/
-│   ├── patient_router.py
-│   └── patient_service.py
-│
-├── calculations/
-│   ├── calculations_router.py
-│   └── calculations_service.py
-│
-└── schema/
-    ├── nurse_schema.py
-    └── register_schema.py
+├── main.py                 # FastAPI application and router registration
+├── db_model.py             # SQLAlchemy database models
+├── storage.py              # Database engine and sessions
+├── nurse/                  # Nurse registration, login, and profiles
+├── patient/                # Patient records and assignments
+├── dosage/                 # Medication dosage calculations
+├── drip/                   # IV drip calculations
+├── medication/             # Patient medications
+├── nursing_notes/          # Nursing notes and SOAP records
+├── sbar/                   # SBAR handovers
+├── vitals/                 # Patient vital signs
+└── schema/                 # Pydantic request and response schemas
 ```
 
-## Getting Started
-
-### Prerequisites
-
-* Python 3.8+
-* pip
-
-### 1. Clone the repository
-
-```bash
-git clone <repository-url>
-cd Nursing-App
-```
-
-### 2. Create a virtual environment
-
-```bash
-python -m venv venv
-```
-
-Activate it:
-
-**Windows**
-
-```bash
-venv\Scripts\activate
-```
-
-**macOS / Linux**
-
-```bash
-source venv/bin/activate
-```
-
-### 3. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Configure environment variables
-
-Create a `.env` file in the project root:
-
-```env
-DATABASE_URL=sqlite:///./nursing_app.db
-```
-
-### 5. Initialize the database
-
-```bash
-python -c "from storage import DBManager; db = DBManager(); db.initialize_db()"
-```
-
-### 6. Run the application
-
-```bash
-uvicorn main:app --reload
-```
-
-The API will be available at:
+Each backend feature folder contains a router and service layer. The request flow is:
 
 ```text
-http://localhost:8000
+Client -> FastAPI router -> Feature service -> SQLAlchemy / SQLite
 ```
 
-## API Documentation
+## Frontend Architecture
 
-FastAPI automatically provides interactive API documentation:
-
-* **Swagger UI:** `http://localhost:8000/docs`
-* **ReDoc:** `http://localhost:8000/redoc`
-
-## API Modules
-
-| Module        | Description                             |
-| ------------- | --------------------------------------- |
-| Nurse         | Account and profile management          |
-| Patient       | Patient records and assignments         |
-| Calculations  | Dosage and IV drip calculations         |
-| Nursing Notes | Patient observations and clinical notes |
-| SBAR          | Structured shift handovers              |
-
-## Architecture
-
-The backend follows a layered structure:
+The project includes a Streamlit dashboard and a deployed TypeScript Expo mobile app. The mobile app uses Expo Router for file-based navigation, React Context for authentication, Axios services for API communication, and feature hooks for data fetching and actions.
 
 ```text
-Client
-  ↓
-FastAPI Routers
-  ↓
-Services
-  ↓
-SQLAlchemy / Database
+dashboard/
+├── app.py                  # Streamlit dashboard entry point
+├── api/client.py           # Dashboard API client
+└── pages/                  # Dashboard feature pages
+
+mobile-app/
+├── app.json                # Expo application configuration
+├── package.json            # Frontend dependencies and scripts
+└── src/
+    ├── app/                # Expo Router screens and route layouts
+    │   ├── (auth)/         # Login, signup, and staff profile
+    │   ├── (tabs)/         # Dashboard, patients, notes, and profile tabs
+    │   ├── calculations/   # Dosage and IV drip screens
+    │   ├── notes/          # Assessment, history, SBAR, and SOAP screens
+    │   ├── patients/       # Patient list, details, and creation screens
+    │   └── _layout.tsx     # Root navigation and authentication provider
+    ├── components/common/  # Reusable UI components
+    ├── context/            # Authentication state and session storage
+    ├── hooks/              # Feature data-fetching and mutation hooks
+    ├── services/           # Axios client and feature API services
+    ├── theme/              # Shared colors and styling values
+    ├── types/              # TypeScript data models
+    └── utils/              # Shared frontend utilities
 ```
-
-Routers handle HTTP requests, services contain business logic, and the database layer manages persistence.
-
-## Configuration
-
-The application uses environment variables for configuration.
-
-Example:
-
-```env
-DATABASE_URL=sqlite:///./nursing_app.db
-```
-
-For production deployments, a production database such as PostgreSQL can be configured through `DATABASE_URL`.
-
-## License
-
-License information will be added later.

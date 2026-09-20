@@ -1,40 +1,50 @@
 // app/notes/soap
-import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import {
+  ActivityIndicator,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PersonAvatar } from "../../components/common/PersonAvatar";
 import { PrimaryButton } from "../../components/common/PrimaryButton";
 import { ScreenHeader } from "../../components/common/ScreenHeader";
-import { StatusBadge } from "../../components/common/StatusBadge";
 import { colors } from "../../theme/colors";
+import useRegisterSoap from "../../hooks/notes/useRegisterSoap";
 
 export default function SoapNotesScreen() {
   const params = useLocalSearchParams<{
     patientId?: string;
     patientName?: string;
+    noteId?: string;
   }>();
 
-  const [subjective, setSubjective] = useState(
-    "Patient reports abdominal pain and nausea...",
-  );
-  const [objective, setObjective] = useState(
-    "BP, HR, RR, SpO2, physical examination findings...",
-  );
-  const [assessment, setAssessment] = useState(
-    "Nursing assessment of the patient's condition...",
-  );
-  const [plan, setPlan] = useState(
-    "Continue monitoring, administer medication, reassess pain in 30 minutes...",
-  );
+  const [subjective, setSubjective] = useState("");
+  const [objective, setObjective] = useState("");
+  const [assessment, setAssessment] = useState("");
+  const [plan, setPlan] = useState("");
+
+  const { registerSoap, isLoading, error } = useRegisterSoap();
+
+  const handleSave = async () => {
+    if (!params.patientId || !params.noteId) return;
+    if (!subjective || !objective || !assessment || !plan) return;
+
+    const success = await registerSoap(params.patientId, params.noteId, {
+      Subjective: subjective,
+      Objective: objective,
+      Assessment: assessment,
+      Plan: plan,
+    });
+
+    if (success) {
+      router.replace("/(tabs)/dashboard");
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
@@ -49,15 +59,11 @@ export default function SoapNotesScreen() {
             <PersonAvatar size={36} />
             <View>
               <Text style={styles.patientName}>
-                {params.patientName || "Maria Khan"}
+                {params.patientName || "Patient"}
               </Text>
-              <Text style={styles.patientMeta}>35 years, Female</Text>
-              <Text style={styles.patientSubMeta}>
-                ID: 123XYZ | 35 Years, F | 65kg
-              </Text>
+              <Text style={styles.patientMeta}>ID: {params.patientId}</Text>
             </View>
           </View>
-          <StatusBadge label="Stable" tone="success" />
         </View>
 
         <Text style={styles.soapHeaderTitle}>SOAP Notes</Text>
@@ -118,35 +124,17 @@ export default function SoapNotesScreen() {
           />
         </View>
 
+        {error && <Text style={styles.errorText}>{error}</Text>}
+
         <View style={styles.actionStack}>
-          <PrimaryButton label="Draft" />
-          <PrimaryButton label="Download with SBAR" />
-          <PrimaryButton label="Download Nursing Notes Only" />
-
-          <View style={styles.iconActionsRow}>
-            <TouchableOpacity style={styles.iconActionButton}>
-              <Ionicons
-                name="share-social-outline"
-                size={20}
-                color={colors.textHeading}
-              />
-              <Text style={styles.iconActionText}>Share</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.iconActionButton}>
-              <Ionicons
-                name="copy-outline"
-                size={20}
-                color={colors.textHeading}
-              />
-              <Text style={styles.iconActionText}>View</Text>
-            </TouchableOpacity>
-          </View>
-
           <PrimaryButton
-            label="Proceed to Dashboard"
-            onPress={() => router.replace("/(tabs)/dashboard")}
+            label={isLoading ? "Saving..." : "Save SOAP Note"}
+            onPress={handleSave}
+            disabled={isLoading}
           />
+          {isLoading && (
+            <ActivityIndicator size="small" color={colors.primary} />
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -185,11 +173,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.textSecondary,
   },
-  patientSubMeta: {
-    fontSize: 10,
-    color: colors.textFaint,
-    marginTop: 2,
-  },
   soapHeaderTitle: {
     fontSize: 16,
     fontWeight: "700",
@@ -219,19 +202,8 @@ const styles = StyleSheet.create({
     gap: 10,
     marginTop: 12,
   },
-  iconActionsRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 32,
-    marginVertical: 4,
-  },
-  iconActionButton: {
-    alignItems: "center",
-    gap: 2,
-  },
-  iconActionText: {
-    fontSize: 11,
-    color: colors.textSecondary,
-    fontWeight: "500",
+  errorText: {
+    color: colors.dangerAlt,
+    fontSize: 13,
   },
 });

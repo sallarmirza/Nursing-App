@@ -1,10 +1,11 @@
+# nursing_notes/notes_service.py
 from storage import DBManager
 from schema.note_schema import NursingNoteRegister, SoapRegister, NursingNotesResponse
 from datetime import datetime
 import uuid
 from typing import Any
 
-from db_model import NursingNote
+from db_model import NursingNote, Patient
 
 
 class Notes:
@@ -18,11 +19,30 @@ class Notes:
 
         return f"NOTE-{year}-{unique}"
 
+    @staticmethod
+    def _assert_patient_assigned(session, nurse_id: str, patient_id: str) -> None:
+        """Raise ValueError unless the patient exists and is assigned to this nurse."""
+        patient = (
+            session.query(Patient)
+            .filter(
+                Patient.patient_id == patient_id,
+                Patient.assigned_nurse_id == nurse_id,
+            )
+            .first()
+        )
+
+        if patient is None:
+            raise ValueError(
+                "Patient does not exist or is not assigned to this nurse"
+            )
+
     def create_notes(self, nurse_id: str, patient_id: str, data: NursingNoteRegister) -> dict[str, str]:
         """create notes by nurse for the patient"""
         session = self.db.get_session()
 
         try:
+            self._assert_patient_assigned(session, nurse_id, patient_id)
+
             note_id = self.create_note_id()
 
             note = NursingNote(
@@ -33,6 +53,7 @@ class Notes:
                 conscious_level=data.conscious_level,
                 glasgow_coma_score=data.glasgow_coma_score,
                 pain_scale=data.pain_scale,
+                nursing_interventions=data.nursing_interventions or {},
                 soap_history=[],
             )
 
@@ -106,9 +127,9 @@ class Notes:
 
         finally:
             session.close()
-    
+
     def show_nursing_notes(self, nurse_id: str, patient_id: str) -> dict[str, Any]:
-        
+
         """Show all nursing notes for a patient."""
         session = self.db.get_session()
         try:
@@ -131,6 +152,7 @@ class Notes:
                     "conscious_level": n.conscious_level,
                     "glasgow_coma_score": n.glasgow_coma_score,
                     "pain_scale": n.pain_scale,
+                    "nursing_interventions": n.nursing_interventions or {},
                     "soap_history": n.soap_history,
                     "notes_created_at": n.notes_created_at,
                 }
@@ -145,7 +167,7 @@ class Notes:
 
         finally:
             session.close()
-            
+
     def delete_notes(self, nurse_id: str, patient_id: str, note_id: str) -> dict[str, Any]:
         """Deleting notes for patient by nurse"""
         session = self.db.get_session()

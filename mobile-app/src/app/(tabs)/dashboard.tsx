@@ -1,7 +1,8 @@
 // app/(tabs)/dashboard
-// app/(tabs)/dashboard
 import { router } from "expo-router";
 import {
+  ActivityIndicator,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -11,7 +12,9 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { PersonAvatar } from "../../components/common/PersonAvatar";
 import { ToolCard } from "../../components/common/ToolCard";
+import useDashboard from "../../hooks/useDashboard";
 import { colors } from "../../theme/colors";
+import { VitalsStatus } from "../../types/dashboard";
 
 const TOOLS = [
   {
@@ -40,27 +43,51 @@ const TOOLS = [
   },
 ] as const;
 
-const PATIENTS = [
-  { id: "1", name: "Mr. Ahmed Ali Khan", status: "Vitals Updated" },
-  { id: "2", name: "Mrs. Fatima Sana", status: "Pending Medication" },
-  { id: "3", name: "Mrs. Nida Farooq", status: "Vitals Overdue", alert: true },
-  {
-    id: "4",
-    name: "Mr. Altaf Ahmed",
-    status: "Medication Overdue",
-    alert: true,
-  },
-  { id: "5", name: "Mr. Daniyal Ali", status: "IV Bag Low", warning: true },
-];
+// Assumed shift boundaries: 06-14 morning, 14-22 evening, otherwise night
+function getShiftLabel(now: Date): string {
+  const hour = now.getHours();
+  if (hour >= 6 && hour < 14) return "Morning Shift";
+  if (hour >= 14 && hour < 22) return "Evening Shift";
+  return "Night Shift";
+}
 
-function getStatusColor(patient: (typeof PATIENTS)[number]) {
-  if (patient.alert) return colors.dangerAlt;
-  if (patient.warning) return colors.warning;
-  return colors.textMuted;
+function formatDate(now: Date): string {
+  return now.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function getStatusLabel(status: VitalsStatus): string {
+  switch (status) {
+    case "updated":
+      return "Vitals Updated";
+    case "overdue":
+      return "Vitals Overdue";
+    case "none":
+      return "No Vitals Yet";
+  }
+}
+
+function getStatusColor(status: VitalsStatus): string {
+  switch (status) {
+    case "updated":
+      return colors.textMuted;
+    case "overdue":
+      return colors.dangerAlt;
+    case "none":
+      return colors.warning;
+  }
 }
 
 export default function DashboardScreen() {
   const insets = useSafeAreaInsets();
+  const { data, isLoading, isRefreshing, error, refresh } = useDashboard();
+
+  const now = new Date();
+  const patients = data?.patients ?? [];
+  const greeting = data?.nurse_name ? `Welcome ${data.nurse_name}!` : "Welcome!";
 
   return (
     <View style={[styles.mainContainer, { paddingTop: insets.top }]}>
@@ -70,11 +97,16 @@ export default function DashboardScreen() {
           { paddingBottom: insets.bottom + 80 },
         ]}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={isRefreshing} onRefresh={refresh} />
+        }
       >
         <View style={styles.header}>
           <View>
-            <Text style={styles.greeting}>Welcome Sarah!</Text>
-            <Text style={styles.shiftText}>Morning Shift, July 15, 2026</Text>
+            <Text style={styles.greeting}>{greeting}</Text>
+            <Text style={styles.shiftText}>
+              {getShiftLabel(now)}, {formatDate(now)}
+            </Text>
           </View>
           <TouchableOpacity onPress={() => router.push("/(tabs)/profile")}>
             <PersonAvatar size={40} />
@@ -99,33 +131,55 @@ export default function DashboardScreen() {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.patientsCard}>
-          {PATIENTS.map((patient, index) => (
-            <TouchableOpacity
-              key={patient.id}
-              style={[
-                styles.patientRow,
-                index < PATIENTS.length - 1 && styles.patientRowBorder,
-              ]}
-              onPress={() =>
-                router.push({
-                  pathname: "/patients/[id]" as any,
-                  params: { id: patient.id },
-                })
-              }
-            >
-              <View style={styles.patientInfo}>
-                <PersonAvatar size={32} />
-                <Text style={styles.patientName}>{patient.name}</Text>
-              </View>
-              <Text
-                style={[styles.statusText, { color: getStatusColor(patient) }]}
-              >
-                {patient.status}
-              </Text>
+        {error && (
+          <View style={styles.errorCard}>
+            <Text style={styles.errorText}>{error}</Text>
+            <TouchableOpacity onPress={refresh}>
+              <Text style={styles.retryText}>Retry</Text>
             </TouchableOpacity>
-          ))}
-        </View>
+          </View>
+        )}
+
+        {isLoading && <ActivityIndicator size="small" color={colors.textMuted} />}
+
+        {!isLoading && !error && patients.length === 0 && (
+          <Text style={styles.emptyText}>No patients assigned yet.</Text>
+        )}
+
+        {patients.length > 0 && (
+          <View style={styles.patientsCard}>
+            {patients.map((patient, index) => (
+              <TouchableOpacity
+                key={patient.patient_id}
+                style={[
+                  styles.patientRow,
+                  index < patients.length - 1 && styles.patientRowBorder,
+                ]}
+                onPress={() =>
+                  router.push({
+                    pathname: "/patients/[id]" as any,
+                    params: { id: patient.patient_id },
+                  })
+                }
+              >
+                <View style={styles.patientInfo}>
+                  <PersonAvatar size={32} />
+                  <Text style={styles.patientName} numberOfLines={1}>
+                    {patient.patient_name}
+                  </Text>
+                </View>
+                <Text
+                  style={[
+                    styles.statusText,
+                    { color: getStatusColor(patient.vitals_status) },
+                  ]}
+                >
+                  {getStatusLabel(patient.vitals_status)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -176,6 +230,32 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: colors.textPrimary,
   },
+  errorCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+    padding: 12,
+    backgroundColor: colors.white,
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  errorText: {
+    fontSize: 12,
+    color: colors.dangerAlt,
+    flex: 1,
+  },
+  retryText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: colors.textPrimary,
+  },
+  emptyText: {
+    fontSize: 13,
+    color: colors.textMuted,
+    textAlign: "center",
+    marginTop: 8,
+  },
   patientsCard: {
     backgroundColor: colors.white,
     borderRadius: 16,
@@ -196,14 +276,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
+    flex: 1,
   },
   patientName: {
     fontSize: 14,
     fontWeight: "600",
     color: colors.textHeading,
+    flexShrink: 1,
   },
   statusText: {
     fontSize: 12,
     fontWeight: "500",
+    marginLeft: 8,
   },
 });
