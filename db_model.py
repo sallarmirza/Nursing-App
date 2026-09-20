@@ -1,3 +1,4 @@
+# db_model.py
 from sqlalchemy import Column,INTEGER,String,Float,ForeignKey,DateTime,TEXT,JSON,DATE,func
 from sqlalchemy.orm import declarative_base
 from datetime import datetime
@@ -64,6 +65,7 @@ class NursingNote(Base):
     conscious_level = Column(String(36))
     glasgow_coma_score = Column(INTEGER)
     pain_scale = Column(INTEGER)
+    nursing_interventions = Column(JSON, default=dict)
     soap_history = Column(JSON, default=list)
     notes_created_at = Column(DateTime,server_default=func.current_timestamp())
 
@@ -117,6 +119,3 @@ class CurrentMedication(Base):
     dose_unit = Column(String(20))
     frequency = Column(String(50))
     med_start_date = Column(DateTime, server_default=func.current_timestamp())
-    
-    
-    

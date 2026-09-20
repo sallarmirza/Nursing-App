@@ -30,7 +30,19 @@ export default function DosageCalculatorScreen() {
   const [concentrationValue, setConcentrationValue] = useState("24");
   const [concentrationUnit, setConcentrationUnit] = useState("mg/mL");
 
-  const { result, isLoading, error, calculate, reset } = useDosageCalculator();
+  const {
+    result,
+    isLoading,
+    error,
+    calculate,
+    reset,
+    saveToRecord,
+    isSaving,
+    saveError,
+    isSaved,
+  } = useDosageCalculator();
+
+  const isPatientMode = !!params.patientId;
 
   const headerTitle = params.patientName
     ? `Calculating Dose for ${params.patientName}`
@@ -54,6 +66,11 @@ export default function DosageCalculatorScreen() {
       concentration_value: concentrationValueNum,
       concentration_unit: concentrationUnit,
     });
+  };
+
+  const handleSave = () => {
+    if (!params.patientId) return;
+    saveToRecord(params.patientId);
   };
 
   return (
@@ -142,6 +159,40 @@ export default function DosageCalculatorScreen() {
             </View>
           </View>
         )}
+
+        {result && isPatientMode && (
+          <View style={styles.saveSection}>
+            {isSaved ? (
+              <View style={styles.savedRow}>
+                <Ionicons
+                  name="checkmark-circle"
+                  size={18}
+                  color={colors.success}
+                />
+                <Text style={styles.savedText}>
+                  Saved to {params.patientName || "patient"}'s record
+                </Text>
+              </View>
+            ) : (
+              <PrimaryButton
+                label={isSaving ? "Saving..." : "Save to Record"}
+                onPress={handleSave}
+                disabled={isSaving}
+              />
+            )}
+
+            {isSaving && (
+              <ActivityIndicator size="small" color={colors.primary} />
+            )}
+
+            {saveError && (
+              <View style={styles.errorCard}>
+                <Ionicons name="alert-circle" size={16} color={colors.danger} />
+                <Text style={styles.errorText}>{saveError}</Text>
+              </View>
+            )}
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -190,6 +241,23 @@ const styles = StyleSheet.create({
   warningText: {
     fontSize: 12,
     color: colors.textHeading,
+  },
+  saveSection: {
+    gap: 10,
+  },
+  savedRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    padding: 12,
+    backgroundColor: colors.white,
+    borderRadius: 8,
+  },
+  savedText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: colors.success,
   },
   errorCard: {
     flexDirection: "row",

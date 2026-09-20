@@ -1,48 +1,165 @@
 // app/notes/sbar
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
   Modal,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
-  View
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PersonAvatar } from "../../components/common/PersonAvatar";
 import { PrimaryButton } from "../../components/common/PrimaryButton";
 import { ScreenHeader } from "../../components/common/ScreenHeader";
-import { StatusBadge } from "../../components/common/StatusBadge";
+import {
+  hasSbarContent,
+  useSbarHandover,
+} from "../../hooks/notes/useSbarHandover";
+import useMedications from "../../hooks/medications/useMedications";
+import useRecordVitals from "../../hooks/vitals/useRecordVitals";
 import { colors } from "../../theme/colors";
+import { SbarIvMedication } from "../../types/sbar";
 
 export default function SbarHandoverScreen() {
-  const [modalVisible, setModalVisible] = useState(false);
+  const params = useLocalSearchParams<{
+    patientId?: string;
+    patientName?: string;
+    noteId?: string;
+  }>();
 
-  const [situation, setSituation] = useState(
-    "Problem: Sudden Drop in BP (90/50) & Patient is restless, etc....",
-  );
-  const [background, setBackground] = useState(
-    "Admission Diagnosis, Past Medical History, Recent Procedures/Labs, Current Medications etc",
-  );
+  const [modalVisible, setModalVisible] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+
+  const [situation, setSituation] = useState("");
+  const [background, setBackground] = useState("");
+  const [assessment, setAssessment] = useState("");
+  const [recommendation, setRecommendation] = useState("");
   const [spo2, setSpo2] = useState("");
   const [temp, setTemp] = useState("");
 
-  const [med1Name, setMed1Name] = useState("");
-  const [med1Dose, setMed1Dose] = useState("");
-  const [med2Name, setMed2Name] = useState("");
-  const [med2Dose, setMed2Dose] = useState("");
+  // Add-medication inputs
+  const [medName, setMedName] = useState("");
+  const [medDose, setMedDose] = useState("");
+  const [medUnit, setMedUnit] = useState("");
+  const [medFrequency, setMedFrequency] = useState("");
 
-  const [ivMedName, setIvMedName] = useState("");
-  const [ivMedDose, setIvMedDose] = useState("");
+  const { isLoading: sbarLoading, error: sbarError, submit } =
+    useSbarHandover();
+  const {
+    recordVitals,
+    isLoading: vitalsLoading,
+    error: vitalsError,
+  } = useRecordVitals();
+  const {
+    medications,
+    isLoading: medsLoading,
+    isMutating: medsMutating,
+    error: medsError,
+    addMedication,
+    removeMedication,
+  } = useMedications(params.patientId);
 
-  const handleSubmit = () => {
-    setModalVisible(true);
+  const isBusy = sbarLoading || vitalsLoading || medsMutating;
+  const displayError = formError || vitalsError || sbarError;
+  const patientName = params.patientName || "Patient";
+
+  const handleAddMedication = async () => {
+    const added = await addMedication({
+      medName,
+      dose: medDose,
+      doseUnit: medUnit,
+      frequency: medFrequency,
+    });
+
+    if (added) {
+      setMedName("");
+      setMedDose("");
+      setMedUnit("");
+      setMedFrequency("");
+    }
   };
 
-  const handleNavigateDashboard = () => {
+  const handleRemoveMedication = (medId: string, name: string) => {
+    Alert.alert(
+      "Remove medication",
+      `Remove ${name} from ${patientName}'s medication list?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Remove",
+          style: "destructive",
+          onPress: () => {
+            removeMedication(medId);
+          },
+        },
+      ]
+    );
+  };
+
+  const handleSubmit = async () => {
+    setFormError(null);
+
+    if (!params.patientId) {
+      setFormError("No patient selected. Open this screen from a patient record.");
+      return;
+    }
+
+    // Snapshot of the medication list as it stands at handover time
+    const medicationSnapshot: SbarIvMedication[] = medications.map((m) => ({
+      name: m.med_name,
+      dose:
+        m.dose !== null ? `${m.dose} ${m.dose_unit ?? ""}`.trim() : "",
+      frequency: m.frequency ?? undefined,
+    }));
+
+    const form = {
+      situation,
+      background,
+      assessment,
+      recommendation,
+      medications: medicationSnapshot,
+    };
+
+    // Validate first so a failed SBAR never leaves a stray vitals reading
+    if (!hasSbarContent(form)) {
+      setFormError("Fill in at least one SBAR section before submitting");
+      return;
+    }
+
+    const vitalsSaved = await recordVitals(params.patientId, "SBAR", {
+      bp: "",
+      hr: "",
+      rr: "",
+      spO2: spo2,
+      temp,
+    });
+    if (!vitalsSaved) return;
+
+    const success = await submit(params.patientId, form);
+    if (success) setModalVisible(true);
+  };
+
+  const handleContinue = () => {
     setModalVisible(false);
+
+    if (params.noteId) {
+      router.replace({
+        pathname: "/notes/soap",
+        params: {
+          patientId: params.patientId,
+          patientName: params.patientName || "",
+          noteId: params.noteId,
+        },
+      });
+      return;
+    }
+
     router.replace("/(tabs)/dashboard");
   };
 
@@ -53,17 +170,16 @@ export default function SbarHandoverScreen() {
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         <View style={styles.patientCard}>
           <PersonAvatar size={36} />
           <View style={styles.patientDetails}>
-            <Text style={styles.patientName}>Maria Khan</Text>
-            <Text style={styles.patientSubtext}>35 years, Female</Text>
-            <Text style={styles.patientMeta}>
-              ID: 123XYZ | 35 Years, F | 65kg
-            </Text>
+            <Text style={styles.patientName}>{patientName}</Text>
+            {params.patientId ? (
+              <Text style={styles.patientMeta}>ID: {params.patientId}</Text>
+            ) : null}
           </View>
-          <StatusBadge label="Stable" tone="success" />
         </View>
 
         <View style={styles.formGroup}>
@@ -72,9 +188,10 @@ export default function SbarHandoverScreen() {
             style={[styles.input, styles.textArea]}
             multiline
             numberOfLines={3}
+            placeholder="Problem: e.g. sudden drop in BP, patient restless..."
+            placeholderTextColor={colors.placeholder}
             value={situation}
             onChangeText={setSituation}
-            placeholderTextColor={colors.placeholder}
           />
         </View>
 
@@ -84,9 +201,10 @@ export default function SbarHandoverScreen() {
             style={[styles.input, styles.textArea]}
             multiline
             numberOfLines={3}
+            placeholder="Admission diagnosis, past history, recent procedures/labs..."
+            placeholderTextColor={colors.placeholder}
             value={background}
             onChangeText={setBackground}
-            placeholderTextColor={colors.placeholder}
           />
         </View>
 
@@ -95,6 +213,7 @@ export default function SbarHandoverScreen() {
             style={styles.vitalInput}
             placeholder="SpO2"
             placeholderTextColor={colors.placeholder}
+            keyboardType="numeric"
             value={spo2}
             onChangeText={setSpo2}
           />
@@ -102,76 +221,141 @@ export default function SbarHandoverScreen() {
             style={styles.vitalInput}
             placeholder="Temp (°F)"
             placeholderTextColor={colors.placeholder}
+            keyboardType="numeric"
             value={temp}
             onChangeText={setTemp}
           />
         </View>
 
         <View style={styles.formGroup}>
-          <Text style={styles.label}>Current Medications</Text>
+          <Text style={styles.label}>Assessment</Text>
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            multiline
+            numberOfLines={3}
+            placeholder="Your assessment of the current problem..."
+            placeholderTextColor={colors.placeholder}
+            value={assessment}
+            onChangeText={setAssessment}
+          />
+        </View>
 
-          <View style={styles.medRow}>
-            <TextInput
-              style={styles.medNameInput}
-              placeholder="Name"
-              placeholderTextColor={colors.placeholder}
-              value={med1Name}
-              onChangeText={setMed1Name}
-            />
-            <View style={styles.divider} />
-            <TextInput
-              style={styles.medDoseInput}
-              placeholder="Dose"
-              placeholderTextColor={colors.placeholder}
-              value={med1Dose}
-              onChangeText={setMed1Dose}
-            />
-          </View>
-
-          <View style={styles.medRow}>
-            <TextInput
-              style={styles.medNameInput}
-              placeholder="Name"
-              placeholderTextColor={colors.placeholder}
-              value={med2Name}
-              onChangeText={setMed2Name}
-            />
-            <View style={styles.divider} />
-            <TextInput
-              style={styles.medDoseInput}
-              placeholder="Dose"
-              placeholderTextColor={colors.placeholder}
-              value={med2Dose}
-              onChangeText={setMed2Dose}
-            />
-          </View>
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Recommendation</Text>
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            multiline
+            numberOfLines={3}
+            placeholder="What needs to happen next..."
+            placeholderTextColor={colors.placeholder}
+            value={recommendation}
+            onChangeText={setRecommendation}
+          />
         </View>
 
         <View style={styles.formGroup}>
           <Text style={styles.label}>Current IV Medications</Text>
 
+          {medsLoading && (
+            <ActivityIndicator size="small" color={colors.primary} />
+          )}
+
+          {!medsLoading && params.patientId && medications.length === 0 && (
+            <Text style={styles.emptyText}>No medications recorded yet.</Text>
+          )}
+
+          {medications.map((med) => (
+            <View key={med.med_id} style={styles.medListRow}>
+              <View style={styles.medListInfo}>
+                <Text style={styles.medListName}>{med.med_name}</Text>
+                <Text style={styles.medListMeta}>
+                  {med.dose !== null ? `${med.dose} ${med.dose_unit ?? ""}` : ""}
+                  {med.frequency ? ` · ${med.frequency}` : ""}
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => handleRemoveMedication(med.med_id, med.med_name)}
+                disabled={medsMutating}
+                hitSlop={8}
+              >
+                <Ionicons name="trash-outline" size={20} color={colors.danger} />
+              </TouchableOpacity>
+            </View>
+          ))}
+
           <View style={styles.medRow}>
             <TextInput
               style={styles.medNameInput}
               placeholder="Name"
               placeholderTextColor={colors.placeholder}
-              value={ivMedName}
-              onChangeText={setIvMedName}
+              maxLength={255}
+              value={medName}
+              onChangeText={setMedName}
             />
             <View style={styles.divider} />
             <TextInput
               style={styles.medDoseInput}
               placeholder="Dose"
               placeholderTextColor={colors.placeholder}
-              value={ivMedDose}
-              onChangeText={setIvMedDose}
+              keyboardType="numeric"
+              value={medDose}
+              onChangeText={setMedDose}
             />
           </View>
+
+          <View style={styles.medRow}>
+            <TextInput
+              style={styles.medNameInput}
+              placeholder="Unit (e.g. mg)"
+              placeholderTextColor={colors.placeholder}
+              maxLength={20}
+              value={medUnit}
+              onChangeText={setMedUnit}
+            />
+            <View style={styles.divider} />
+            <TextInput
+              style={styles.medDoseInput}
+              placeholder="Frequency"
+              placeholderTextColor={colors.placeholder}
+              maxLength={50}
+              value={medFrequency}
+              onChangeText={setMedFrequency}
+            />
+          </View>
+
+          {medsError && (
+            <View style={styles.errorCard}>
+              <Ionicons name="alert-circle" size={16} color={colors.danger} />
+              <Text style={styles.errorText}>{medsError}</Text>
+            </View>
+          )}
+
+          <TouchableOpacity
+            style={[styles.addMedButton, medsMutating && styles.addMedDisabled]}
+            onPress={handleAddMedication}
+            disabled={medsMutating || !params.patientId}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="add" size={18} color={colors.white} />
+            <Text style={styles.addMedText}>
+              {medsMutating ? "Saving..." : "Add Medication"}
+            </Text>
+          </TouchableOpacity>
         </View>
 
+        {displayError && (
+          <View style={styles.errorCard}>
+            <Ionicons name="alert-circle" size={16} color={colors.danger} />
+            <Text style={styles.errorText}>{displayError}</Text>
+          </View>
+        )}
+
+        {isBusy && <ActivityIndicator size="small" color={colors.primary} />}
+
         <PrimaryButton
-          label="Submit Handover"
+          label={isBusy ? "Submitting..." : "Submit Handover"}
           onPress={handleSubmit}
+          disabled={isBusy}
           style={styles.submitButton}
         />
       </ScrollView>
@@ -186,7 +370,7 @@ export default function SbarHandoverScreen() {
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>Handover Submitted</Text>
             <Text style={styles.modalSubtitle}>
-              Report for Maria Khan has been Successfully Recorded
+              Report for {patientName} has been Successfully Recorded
             </Text>
 
             <View style={styles.checkCircle}>
@@ -194,8 +378,8 @@ export default function SbarHandoverScreen() {
             </View>
 
             <PrimaryButton
-              label="Dashboard"
-              onPress={handleNavigateDashboard}
+              label={params.noteId ? "Continue to SOAP Notes" : "Dashboard"}
+              onPress={handleContinue}
             />
           </View>
         </View>
@@ -229,10 +413,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "700",
     color: colors.textPrimary,
-  },
-  patientSubtext: {
-    fontSize: 12,
-    color: colors.textSecondary,
   },
   patientMeta: {
     fontSize: 10,
@@ -272,6 +452,31 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.textPrimary,
   },
+  emptyText: {
+    fontSize: 12,
+    color: colors.textSecondary,
+  },
+  medListRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: colors.white,
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    gap: 10,
+  },
+  medListInfo: {
+    flex: 1,
+  },
+  medListName: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: colors.textPrimary,
+  },
+  medListMeta: {
+    fontSize: 12,
+    color: colors.textSecondary,
+  },
   medRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -279,7 +484,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     height: 44,
     paddingHorizontal: 14,
-    marginBottom: 8,
+    marginBottom: 2,
   },
   medNameInput: {
     flex: 1,
@@ -296,6 +501,37 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     color: colors.textPrimary,
+  },
+  addMedButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    height: 40,
+    borderRadius: 8,
+    backgroundColor: colors.primary,
+    marginTop: 4,
+  },
+  addMedDisabled: {
+    opacity: 0.6,
+  },
+  addMedText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: colors.white,
+  },
+  errorCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    padding: 12,
+    backgroundColor: colors.white,
+    borderRadius: 8,
+  },
+  errorText: {
+    fontSize: 12,
+    color: colors.danger,
+    flex: 1,
   },
   submitButton: {
     marginTop: 8,
