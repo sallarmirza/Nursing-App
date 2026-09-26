@@ -4,7 +4,6 @@ import { useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   View,
@@ -47,86 +46,152 @@ export default function SoapNotesScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+    <SafeAreaView
+      className="flex-1"
+      style={{ backgroundColor: colors.backgroundAlt }}
+      edges={["top", "left", "right"]}
+    >
       <ScreenHeader title="Nursing Notes" />
 
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerClassName="p-6 gap-4 pb-10"
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.patientCard}>
-          <View style={styles.patientLeft}>
-            <PersonAvatar size={36} />
-            <View>
-              <Text style={styles.patientName}>
-                {params.patientName || "Patient"}
-              </Text>
-              <Text style={styles.patientMeta}>ID: {params.patientId}</Text>
-            </View>
+        <View
+          className="rounded-xl p-4 flex-row items-center gap-3"
+          style={{ backgroundColor: colors.white }}
+        >
+          <PersonAvatar size={44} />
+          <View className="flex-1">
+            <Text
+              className="text-[17px] font-bold"
+              style={{ color: colors.textHeading }}
+            >
+              {params.patientName || "Patient"}
+            </Text>
+            <Text
+              className="text-[13px] mt-0.5"
+              style={{ color: colors.textSecondary }}
+            >
+              ID: {params.patientId}
+            </Text>
           </View>
         </View>
 
-        <Text style={styles.soapHeaderTitle}>SOAP Notes</Text>
+        <Text
+          className="text-xl font-bold text-center my-1"
+          style={{ color: colors.textHeading }}
+        >
+          SOAP Notes
+        </Text>
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Subjective</Text>
+        <View className="gap-2">
+          <Text
+            className="text-[17px] font-bold"
+            style={{ color: colors.textHeading }}
+          >
+            Subjective
+          </Text>
           <TextInput
-            style={styles.textArea}
+            className="rounded-xl p-4 text-[15px] min-h-[90px] border"
+            style={{
+              backgroundColor: colors.white,
+              color: colors.textPrimary,
+              borderColor: colors.border,
+              textAlignVertical: "top",
+            }}
             multiline
             numberOfLines={3}
             value={subjective}
             onChangeText={setSubjective}
             placeholder="Patient reports abdominal pain and nausea..."
-            placeholderTextColor={colors.placeholder}
+            placeholderTextColor="#9CA3AF"
             textAlignVertical="top"
           />
         </View>
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Objective</Text>
+        <View className="gap-2">
+          <Text
+            className="text-[17px] font-bold"
+            style={{ color: colors.textHeading }}
+          >
+            Objective
+          </Text>
           <TextInput
-            style={styles.textArea}
+            className="rounded-xl p-4 text-[15px] min-h-[90px] border"
+            style={{
+              backgroundColor: colors.white,
+              color: colors.textPrimary,
+              borderColor: colors.border,
+              textAlignVertical: "top",
+            }}
             multiline
             numberOfLines={3}
             value={objective}
             onChangeText={setObjective}
             placeholder="BP, HR, RR, SpO2, physical examination findings..."
-            placeholderTextColor={colors.placeholder}
+            placeholderTextColor="#9CA3AF"
             textAlignVertical="top"
           />
         </View>
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Assessment</Text>
+        <View className="gap-2">
+          <Text
+            className="text-[17px] font-bold"
+            style={{ color: colors.textHeading }}
+          >
+            Assessment
+          </Text>
           <TextInput
-            style={styles.textArea}
+            className="rounded-xl p-4 text-[15px] min-h-[90px] border"
+            style={{
+              backgroundColor: colors.white,
+              color: colors.textPrimary,
+              borderColor: colors.border,
+              textAlignVertical: "top",
+            }}
             multiline
             numberOfLines={3}
             value={assessment}
             onChangeText={setAssessment}
             placeholder="Nursing assessment of the patient's condition..."
-            placeholderTextColor={colors.placeholder}
+            placeholderTextColor="#9CA3AF"
             textAlignVertical="top"
           />
         </View>
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Plan</Text>
+        <View className="gap-2">
+          <Text
+            className="text-[17px] font-bold"
+            style={{ color: colors.textHeading }}
+          >
+            Plan
+          </Text>
           <TextInput
-            style={styles.textArea}
+            className="rounded-xl p-4 text-[15px] min-h-[90px] border"
+            style={{
+              backgroundColor: colors.white,
+              color: colors.textPrimary,
+              borderColor: colors.border,
+              textAlignVertical: "top",
+            }}
             multiline
             numberOfLines={3}
             value={plan}
             onChangeText={setPlan}
             placeholder="Continue monitoring, administer medication, reassess pain in 30 minutes..."
-            placeholderTextColor={colors.placeholder}
+            placeholderTextColor="#9CA3AF"
             textAlignVertical="top"
           />
         </View>
 
-        {error && <Text style={styles.errorText}>{error}</Text>}
+        {error && (
+          <Text className="text-[14px]" style={{ color: colors.dangerAlt }}>
+            {error}
+          </Text>
+        )}
 
-        <View style={styles.actionStack}>
+        <View className="gap-3 mt-4">
           <PrimaryButton
             label={isLoading ? "Saving..." : "Save SOAP Note"}
             onPress={handleSave}
@@ -140,70 +205,3 @@ export default function SoapNotesScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.backgroundAlt,
-  },
-  container: {
-    padding: 20,
-    gap: 14,
-    paddingBottom: 40,
-  },
-  patientCard: {
-    backgroundColor: colors.white,
-    borderRadius: 12,
-    padding: 14,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-  },
-  patientLeft: {
-    flexDirection: "row",
-    gap: 12,
-    alignItems: "center",
-  },
-  patientName: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: colors.textHeading,
-  },
-  patientMeta: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  soapHeaderTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: colors.textHeading,
-    textAlign: "center",
-    marginVertical: 2,
-  },
-  formGroup: {
-    gap: 6,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: colors.textHeading,
-  },
-  textArea: {
-    backgroundColor: colors.white,
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 13,
-    color: colors.textSecondary,
-    borderWidth: 1,
-    borderColor: colors.border,
-    minHeight: 70,
-  },
-  actionStack: {
-    gap: 10,
-    marginTop: 12,
-  },
-  errorText: {
-    color: colors.dangerAlt,
-    fontSize: 13,
-  },
-});

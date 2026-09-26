@@ -5,7 +5,6 @@ import { useCallback } from "react";
 import {
   ActivityIndicator,
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -41,9 +40,13 @@ export default function PatientProfileScreen() {
 
   if (isLoading && !patient) {
     return (
-      <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+      <SafeAreaView 
+        className="flex-1" 
+        style={{ backgroundColor: colors.backgroundAlt }} 
+        edges={["top", "left", "right"]}
+      >
         <ScreenHeader title="Patient Profile" showBack={true} />
-        <View style={styles.centered}>
+        <View className="flex-1 justify-center items-center">
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </SafeAreaView>
@@ -52,10 +55,14 @@ export default function PatientProfileScreen() {
 
   if (error || !patient) {
     return (
-      <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+      <SafeAreaView 
+        className="flex-1" 
+        style={{ backgroundColor: colors.backgroundAlt }} 
+        edges={["top", "left", "right"]}
+      >
         <ScreenHeader title="Patient Profile" showBack={true} />
-        <View style={styles.centered}>
-          <Text style={styles.errorText}>
+        <View className="flex-1 justify-center items-center p-5">
+          <Text className="text-sm text-center" style={{ color: colors.danger }}>
             {error || "Patient not found"}
           </Text>
         </View>
@@ -66,7 +73,11 @@ export default function PatientProfileScreen() {
   const age = calculateAge(patient.date_of_birth);
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+    <SafeAreaView 
+      className="flex-1" 
+      style={{ backgroundColor: colors.backgroundAlt }} 
+      edges={["top", "left", "right"]}
+    >
       <ScreenHeader
         title="Patient Profile"
         showBack={true}
@@ -78,151 +89,138 @@ export default function PatientProfileScreen() {
       />
 
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerClassName="p-5 gap-4 pb-10"
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.profileCard}>
+        <View className="bg-white rounded-xl p-5 items-center gap-1.5">
           <PersonAvatar size={64} />
-          <Text style={styles.patientName}>{patient.patient_name}</Text>
-          <Text style={styles.patientMeta}>
+          <Text className="text-lg font-bold" style={{ color: colors.textHeading }}>
+            {patient.patient_name}
+          </Text>
+          <Text className="text-[13px]" style={{ color: colors.textSecondary }}>
             {age !== null ? `${age} years, ` : ""}
             {patient.patient_gender} | ID: {patient.patient_id}
           </Text>
         </View>
 
-        <View style={styles.infoGrid}>
-          <View style={styles.infoTile}>
-            <Text style={styles.infoTileLabel}>Weight</Text>
-            <Text style={styles.infoTileValue}>
+        <View className="flex-row gap-2.5">
+          <View className="flex-1 bg-white p-3 rounded-lg items-center">
+            <Text className="text-[11px]" style={{ color: colors.textSecondary }}>
+              Weight
+            </Text>
+            <Text className="text-[15px] font-bold mt-0.5" style={{ color: colors.textHeading }}>
               {patient.patient_weight ? `${patient.patient_weight} kg` : "—"}
             </Text>
           </View>
-          <View style={styles.infoTile}>
-            <Text style={styles.infoTileLabel}>Height</Text>
-            <Text style={styles.infoTileValue}>
+          <View className="flex-1 bg-white p-3 rounded-lg items-center">
+            <Text className="text-[11px]" style={{ color: colors.textSecondary }}>
+              Height
+            </Text>
+            <Text className="text-[15px] font-bold mt-0.5" style={{ color: colors.textHeading }}>
               {patient.patient_height ? `${patient.patient_height} cm` : "—"}
             </Text>
           </View>
-          <View style={styles.infoTile}>
-            <Text style={styles.infoTileLabel}>Blood Type</Text>
-            <Text style={styles.infoTileValue}>
+          <View className="flex-1 bg-white p-3 rounded-lg items-center">
+            <Text className="text-[11px]" style={{ color: colors.textSecondary }}>
+              Blood Type
+            </Text>
+            <Text className="text-[15px] font-bold mt-0.5" style={{ color: colors.textHeading }}>
               {patient.patient_blood_group || "—"}
             </Text>
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Records</Text>
-          <View style={styles.detailsCard}>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Ward</Text>
-              <Text style={styles.detailValue}>
+        <View className="gap-2">
+          <Text className="text-[14px] font-bold" style={{ color: colors.textHeading }}>
+            Records
+          </Text>
+          <View className="bg-white rounded-xl p-3.5">
+            <View className="flex-row justify-between py-2">
+              <Text className="text-[13px]" style={{ color: colors.textSecondary }}>
+                Ward
+              </Text>
+              <Text className="text-[13px] font-semibold" style={{ color: colors.textHeading }}>
                 {patient.patient_ward || "—"}
               </Text>
             </View>
-            <View style={styles.divider} />
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Vitals Recorded</Text>
-              <Text style={styles.detailValue}>{patient.vitals.length}</Text>
+            <View className="h-[1px]" style={{ backgroundColor: colors.borderLight }} />
+
+            <View className="flex-row justify-between py-2">
+              <Text className="text-[13px]" style={{ color: colors.textSecondary }}>
+                Vitals Recorded
+              </Text>
+              <Text className="text-[13px] font-semibold" style={{ color: colors.textHeading }}>
+                {patient.vitals.length}
+              </Text>
             </View>
-            <View style={styles.divider} />
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Nursing Notes</Text>
-              <Text style={styles.detailValue}>
+            <View className="h-[1px]" style={{ backgroundColor: colors.borderLight }} />
+
+            <View className="flex-row justify-between py-2">
+              <Text className="text-[13px]" style={{ color: colors.textSecondary }}>
+                Nursing Notes
+              </Text>
+              <Text className="text-[13px] font-semibold" style={{ color: colors.textHeading }}>
                 {patient.nursing_notes.length}
               </Text>
             </View>
-            <View style={styles.divider} />
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Medications</Text>
-              <Text style={styles.detailValue}>
+            <View className="h-[1px]" style={{ backgroundColor: colors.borderLight }} />
+
+            <View className="flex-row justify-between py-2">
+              <Text className="text-[13px]" style={{ color: colors.textSecondary }}>
+                Medications
+              </Text>
+              <Text className="text-[13px] font-semibold" style={{ color: colors.textHeading }}>
                 {patient.medications.length}
               </Text>
             </View>
-            <View style={styles.divider} />
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>SBAR Handovers</Text>
-              <Text style={styles.detailValue}>
+            <View className="h-[1px]" style={{ backgroundColor: colors.borderLight }} />
+
+            <View className="flex-row justify-between py-2">
+              <Text className="text-[13px]" style={{ color: colors.textSecondary }}>
+                SBAR Handovers
+              </Text>
+              <Text className="text-[13px] font-semibold" style={{ color: colors.textHeading }}>
                 {patient.sbar_handovers.length}
               </Text>
             </View>
-            <View style={styles.divider} />
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Dosage Calculations</Text>
-              <Text style={styles.detailValue}>
+            <View className="h-[1px]" style={{ backgroundColor: colors.borderLight }} />
+
+            <View className="flex-row justify-between py-2">
+              <Text className="text-[13px]" style={{ color: colors.textSecondary }}>
+                Dosage Calculations
+              </Text>
+              <Text className="text-[13px] font-semibold" style={{ color: colors.textHeading }}>
                 {patient.dosage_calculations.length}
               </Text>
             </View>
-            <View style={styles.divider} />
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Drip Calculations</Text>
-              <Text style={styles.detailValue}>
+            <View className="h-[1px]" style={{ backgroundColor: colors.borderLight }} />
+
+            <View className="flex-row justify-between py-2">
+              <Text className="text-[13px]" style={{ color: colors.textSecondary }}>
+                Drip Calculations
+              </Text>
+              <Text className="text-[13px] font-semibold" style={{ color: colors.textHeading }}>
                 {patient.drip_calculations.length}
               </Text>
             </View>
           </View>
         </View>
 
-        <PrimaryButton
-          label="Create Nursing Assessment"
-          onPress={() =>
-            router.push({
-              pathname: "/notes/assessment",
-              params: {
-                patientId: patient.patient_id,
-                patientName: patient.patient_name,
-              },
-            })
-          }
-        />
+        <View className="mt-2">
+          <PrimaryButton
+            label="Create Nursing Assessment"
+            onPress={() =>
+              router.push({
+                pathname: "/notes/assessment",
+                params: {
+                  patientId: patient.patient_id,
+                  patientName: patient.patient_name,
+                },
+              })
+            }
+          />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: colors.backgroundAlt },
-  container: { padding: 20, gap: 16, paddingBottom: 40 },
-  centered: { flex: 1, justifyContent: "center", alignItems: "center" },
-  profileCard: {
-    backgroundColor: colors.white,
-    borderRadius: 12,
-    padding: 20,
-    alignItems: "center",
-    gap: 6,
-  },
-  patientName: { fontSize: 18, fontWeight: "700", color: colors.textHeading },
-  patientMeta: { fontSize: 13, color: colors.textSecondary },
-  infoGrid: { flexDirection: "row", gap: 10 },
-  infoTile: {
-    flex: 1,
-    backgroundColor: colors.white,
-    padding: 12,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  infoTileLabel: { fontSize: 11, color: colors.textSecondary },
-  infoTileValue: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: colors.textHeading,
-    marginTop: 2,
-  },
-  section: { gap: 8 },
-  sectionTitle: { fontSize: 14, fontWeight: "700", color: colors.textHeading },
-  detailsCard: { backgroundColor: colors.white, borderRadius: 12, padding: 14 },
-  detailRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 8,
-  },
-  detailLabel: { fontSize: 13, color: colors.textSecondary },
-  detailValue: { fontSize: 13, fontWeight: "600", color: colors.textHeading },
-  divider: { height: 1, backgroundColor: colors.borderLight },
-  errorText: {
-    color: colors.dangerAlt,
-    fontSize: 14,
-    textAlign: "center",
-    paddingHorizontal: 20,
-  },
-});

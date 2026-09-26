@@ -1,6 +1,6 @@
 // app/(tabs)/profile
 import { router } from "expo-router";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PersonAvatar } from "../../components/common/PersonAvatar";
 import { PrimaryButton } from "../../components/common/PrimaryButton";
@@ -26,30 +26,35 @@ const DETAILS: { label: string; value: string }[] = [
 
 export default function ProfileScreen() {
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+    <SafeAreaView className="flex-1 bg-gray-50" edges={["top", "left", "right"]}>
       <ScreenHeader title="Profile" />
 
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerClassName="p-5 gap-5 pb-10"
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.profileHeader}>
+        <View className="items-center gap-1 mt-2">
           <PersonAvatar size={72} />
-          <Text style={styles.name}>{NURSE.name}</Text>
-          <Text style={styles.designation}>{NURSE.designation}</Text>
+          <Text className="text-xl font-bold text-gray-900 mt-2">
+            {NURSE.name}
+          </Text>
+          <Text className="text-sm text-gray-500">{NURSE.designation}</Text>
         </View>
 
-        <View style={styles.detailsCard}>
+        <View className="bg-white rounded-xl px-4">
           {DETAILS.map((item, index) => (
             <View
               key={item.label}
-              style={[
-                styles.detailRow,
-                index < DETAILS.length - 1 && styles.detailRowBorder,
-              ]}
+              className={`py-3.5 ${
+                index < DETAILS.length - 1 ? "border-b border-gray-200" : ""
+              }`}
             >
-              <Text style={styles.detailLabel}>{item.label}</Text>
-              <Text style={styles.detailValue}>{item.value}</Text>
+              <Text className="text-xs text-gray-500 mb-0.5">
+                {item.label}
+              </Text>
+              <Text className="text-[15px] font-semibold text-gray-900">
+                {item.value}
+              </Text>
             </View>
           ))}
         </View>
@@ -58,70 +63,15 @@ export default function ProfileScreen() {
           label="Edit Profile"
           variant="outline"
           onPress={() => router.push("/(auth)/staff-profile")}
-          style={styles.editButton}
+          style={{ marginTop: 4 }}
         />
 
         <PrimaryButton
           label="Log Out"
           onPress={() => router.replace("/(auth)/login")}
-          style={styles.logoutButton}
+          style={{ backgroundColor: colors.dangerAlt }}
         />
       </ScrollView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.backgroundAlt,
-  },
-  container: {
-    padding: 20,
-    gap: 20,
-    paddingBottom: 40,
-  },
-  profileHeader: {
-    alignItems: "center",
-    gap: 4,
-    marginTop: 8,
-  },
-  name: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: colors.textPrimary,
-    marginTop: 8,
-  },
-  designation: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-  detailsCard: {
-    backgroundColor: colors.white,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-  },
-  detailRow: {
-    paddingVertical: 14,
-  },
-  detailRowBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  detailLabel: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginBottom: 2,
-  },
-  detailValue: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: colors.textHeading,
-  },
-  editButton: {
-    marginTop: 4,
-  },
-  logoutButton: {
-    backgroundColor: colors.dangerAlt,
-  },
-});

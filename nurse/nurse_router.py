@@ -10,7 +10,7 @@ router = APIRouter()
 db = DBManager()
 nurse_service = NurseService(db)
 
-
+# not to be used now , might come helpful later
 @router.get("/all")
 def show_all_nurses():
     """List all nurses."""

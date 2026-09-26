@@ -1,16 +1,19 @@
 // app/(auth)/staff-profile
 import { router } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FormInput } from "../../components/common/FormInput";
-import { PersonAvatar } from "../../components/common/PersonAvatar";
 import { PrimaryButton } from "../../components/common/PrimaryButton";
 import { colors } from "../../theme/colors";
 import { useProfileSetup } from "../../hooks/auth/useProfileSetup";
 
-// Extracts the leading number from strings like "5 Years"
+const QUALIFICATION_OPTIONS = ["BSN", "RN", "MSN", "Diploma in Nursing", "Post-RN BSN"];
+const DESIGNATION_OPTIONS = ["Staff Nurse", "Charge Nurse", "Head Nurse", "Nursing Supervisor"];
+const EXPERIENCE_OPTIONS = ["1 Year", "2 Years", "3 Years", "4 Years", "5 Years", "6 Years", "7 Years", "8 Years", "9 Years", "10+ Years"];
+
 function parseExperienceYears(input: string): number {
+  if (!input) return 0;
   const match = input.match(/^(\d+(\.\d+)?)/);
   return match ? parseFloat(match[1]) : 0;
 }
@@ -20,9 +23,11 @@ export default function StaffProfileScreen() {
 
   const [name, setName] = useState("");
   const [qualification, setQualification] = useState("");
-  const [designation, setDesignation] = useState("Staff Nurse...");
-  const [hospital, setHospital] = useState("Ibadat International Hospital");
-  const [experience, setExperience] = useState("5 Years");
+  const [designation, setDesignation] = useState("");
+  const [institute, setInstitute] = useState("");
+  const [experience, setExperience] = useState("");
+
+  const [activeDropdown, setActiveDropdown] = useState<"qualification" | "designation" | "experience" | null>(null);
 
   const { setupProfile, isLoading, error } = useProfileSetup();
 
@@ -35,7 +40,7 @@ export default function StaffProfileScreen() {
       name,
       qualification,
       designation,
-      hospital,
+      institute,
       experienceYears
     );
 
@@ -49,101 +54,156 @@ export default function StaffProfileScreen() {
     setIsEditing(true);
   };
 
+  const toggleDropdown = (dropdown: "qualification" | "designation" | "experience") => {
+    if (!isEditing) return;
+    setActiveDropdown(activeDropdown === dropdown ? null : dropdown);
+  };
+
+  const renderInlineDropdown = (
+    options: string[],
+    selectedValue: string,
+    onSelect: (val: string) => void
+  ) => (
+    <View
+      className="mt-1 rounded-lg overflow-hidden"
+      style={{
+        backgroundColor: colors.background,
+        borderWidth: 1,
+        borderColor: colors.border,
+        maxHeight: 220
+      }}
+    >
+      <ScrollView nestedScrollEnabled={true} showsVerticalScrollIndicator={true}>
+        {options.map((item, index) => (
+          <TouchableOpacity
+            key={index}
+            className="p-4"
+            style={{
+              backgroundColor: selectedValue === item ? colors.backgroundAlt : "transparent",
+              borderBottomWidth: index === options.length - 1 ? 0 : 1,
+              borderBottomColor: colors.border,
+            }}
+            onPress={() => {
+              onSelect(item);
+              setActiveDropdown(null);
+            }}
+          >
+            <Text
+              className="text-[15px] font-medium"
+              style={{ color: selectedValue === item ? colors.primaryAlt : colors.textPrimary }}
+            >
+              {item}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </View>
+  );
+
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+    <SafeAreaView
+      className="flex-1"
+      style={{ backgroundColor: colors.backgroundAlt }}
+      edges={["top", "left", "right"]}
+    >
       <ScrollView
-        contentContainerStyle={styles.container}
+        className="p-6"
+        contentContainerStyle={{ gap: 16, paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.headerRow}>
-          <Text style={styles.headerTitle}>Staff Profile</Text>
-          <PersonAvatar size={32} />
+        <View className="mt-3 mb-2">
+          <Text
+            className="text-xl font-bold"
+            style={{ color: colors.textPrimary }}
+          >
+            Staff Profile
+          </Text>
         </View>
 
         <FormInput
-          label="Name"
-          placeholder="Enter your name"
+          label="Full Name"
+          placeholder="Write your full name"
+          placeholderTextColor="#9CA3AF"
           editable={isEditing}
           value={name}
           onChangeText={setName}
         />
 
-        <FormInput
-          label="Qualification"
-          placeholder="Enter your Qualification"
-          editable={isEditing}
-          value={qualification}
-          onChangeText={setQualification}
-        />
+        <View>
+          <TouchableOpacity activeOpacity={isEditing ? 0.7 : 1} onPress={() => toggleDropdown("qualification")}>
+            <View pointerEvents="none">
+              <FormInput
+                label="Qualification"
+                placeholder="Select your Qualification"
+                placeholderTextColor="#9CA3AF"
+                editable={false}
+                value={qualification}
+                onChangeText={setQualification}
+              />
+            </View>
+          </TouchableOpacity>
+          {activeDropdown === "qualification" && renderInlineDropdown(QUALIFICATION_OPTIONS, qualification, setQualification)}
+        </View>
+
+        <View>
+          <TouchableOpacity activeOpacity={isEditing ? 0.7 : 1} onPress={() => toggleDropdown("designation")}>
+            <View pointerEvents="none">
+              <FormInput
+                label="Designation"
+                placeholder="Select your Designation"
+                placeholderTextColor="#9CA3AF"
+                editable={false}
+                value={designation}
+                onChangeText={setDesignation}
+              />
+            </View>
+          </TouchableOpacity>
+          {activeDropdown === "designation" && renderInlineDropdown(DESIGNATION_OPTIONS, designation, setDesignation)}
+        </View>
 
         <FormInput
-          label="Designation"
-          placeholder="Staff Nurse..."
+          label="Institute"
+          placeholder="Enter Institute Name"
+          placeholderTextColor="#9CA3AF"
           editable={isEditing}
-          value={designation}
-          onChangeText={setDesignation}
+          value={institute}
+          onChangeText={setInstitute}
         />
 
-        <FormInput
-          label="Hospital"
-          placeholder="Ibadat International Hospital"
-          editable={isEditing}
-          value={hospital}
-          onChangeText={setHospital}
-        />
+        <View>
+          <TouchableOpacity activeOpacity={isEditing ? 0.7 : 1} onPress={() => toggleDropdown("experience")}>
+            <View pointerEvents="none">
+              <FormInput
+                label="Experience"
+                placeholder="Select Years of Experience"
+                placeholderTextColor="#9CA3AF"
+                editable={false}
+                value={experience}
+                onChangeText={setExperience}
+              />
+            </View>
+          </TouchableOpacity>
+          {activeDropdown === "experience" && renderInlineDropdown(EXPERIENCE_OPTIONS, experience, setExperience)}
+        </View>
 
-        <FormInput
-          label="Experience"
-          placeholder="5 Years"
-          editable={isEditing}
-          value={experience}
-          onChangeText={setExperience}
-        />
+        {error && (
+          <Text className="text-[14px]" style={{ color: colors.dangerAlt }}>
+            {error}
+          </Text>
+        )}
 
-        {error && <Text style={styles.errorText}>{error}</Text>}
-
-        <View style={styles.buttonGroup}>
+        <View className="gap-3 mt-4">
           <PrimaryButton
             label={isLoading ? "Saving..." : "Save"}
             onPress={handleSave}
             disabled={isLoading}
           />
-          {isLoading && <ActivityIndicator size="small" color={colors.primaryAlt} />}
+          {isLoading && (
+            <ActivityIndicator size="small" color={colors.primaryAlt} />
+          )}
           <PrimaryButton label="Edit" variant="outline" onPress={handleEdit} />
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.backgroundAlt,
-  },
-  container: {
-    padding: 24,
-    gap: 16,
-    paddingBottom: 40,
-  },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: 12,
-    marginBottom: 8,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: colors.textPrimary,
-  },
-  buttonGroup: {
-    gap: 12,
-    marginTop: 16,
-  },
-  errorText: {
-    color: colors.dangerAlt,
-    fontSize: 13,
-  },
-});

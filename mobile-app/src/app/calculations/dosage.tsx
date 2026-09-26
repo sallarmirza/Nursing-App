@@ -4,9 +4,11 @@ import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
-  StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -16,6 +18,38 @@ import { ScreenHeader } from "../../components/common/ScreenHeader";
 import { colors } from "../../theme/colors";
 import { useDosageCalculator } from "../../hooks/calculations/useDosageCalculator";
 
+// Reusable unit selector component (mobile-friendly alternative to dropdowns)
+const UnitSelector = ({ 
+  options, 
+  selected, 
+  onSelect 
+}: { 
+  options: string[], 
+  selected: string, 
+  onSelect: (val: string) => void 
+}) => (
+  <View className="flex-row flex-wrap gap-2 mt-1 mb-2">
+    {options.map((opt) => (
+      <TouchableOpacity
+        key={opt}
+        onPress={() => onSelect(opt)}
+        className="px-4 py-2 rounded-lg border"
+        style={{
+          backgroundColor: selected === opt ? colors.primary : colors.white,
+          borderColor: selected === opt ? colors.primary : '#E5E7EB',
+        }}
+      >
+        <Text
+          className="text-[13px] font-medium"
+          style={{ color: selected === opt ? colors.white : colors.textSecondary }}
+        >
+          {opt}
+        </Text>
+      </TouchableOpacity>
+    ))}
+  </View>
+);
+
 export default function DosageCalculatorScreen() {
   const params = useLocalSearchParams<{
     patientId?: string;
@@ -24,10 +58,12 @@ export default function DosageCalculatorScreen() {
   }>();
 
   const [weight, setWeight] = useState(params.patientWeight || "");
-  const [medication, setMedication] = useState("Cefotaxime");
-  const [dosePerKg, setDosePerKg] = useState("10");
+  const [medication, setMedication] = useState("");
+  const [dosePerKg, setDosePerKg] = useState("");
+  
+  // Pre-selected common defaults for units
   const [doseUnit, setDoseUnit] = useState("mg");
-  const [concentrationValue, setConcentrationValue] = useState("24");
+  const [concentrationValue, setConcentrationValue] = useState("");
   const [concentrationUnit, setConcentrationUnit] = useState("mg/mL");
 
   const {
@@ -43,7 +79,6 @@ export default function DosageCalculatorScreen() {
   } = useDosageCalculator();
 
   const isPatientMode = !!params.patientId;
-
   const headerTitle = params.patientName
     ? `Calculating Dose for ${params.patientName}`
     : "Dosage Calculator";
@@ -60,7 +95,7 @@ export default function DosageCalculatorScreen() {
 
     calculate({
       patient_weight: weightNum,
-      medication,
+      medication: medication || "Unknown Medication",
       dose_per_kg: dosePerKgNum,
       dose_unit: doseUnit,
       concentration_value: concentrationValueNum,
@@ -74,202 +109,151 @@ export default function DosageCalculatorScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+    <SafeAreaView 
+      className="flex-1" 
+      style={{ backgroundColor: colors.backgroundAlt }} 
+      edges={["top", "left", "right"]}
+    >
       <ScreenHeader title={headerTitle} />
 
-      <ScrollView contentContainerStyle={styles.container}>
-        <FormInput
-          label="Patient Weight (kg)"
-          placeholder="Enter weight in kgs"
-          keyboardType="numeric"
-          value={weight}
-          onChangeText={setWeight}
-        />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        className="flex-1"
+      >
+        <ScrollView 
+          contentContainerClassName="p-5 gap-4 pb-10"
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <FormInput
+            label="Patient Weight (kg)"
+            placeholder="75"
+            keyboardType="numeric"
+            value={weight}
+            onChangeText={setWeight}
+          />
 
-        <FormInput
-          label="Medication"
-          value={medication}
-          onChangeText={setMedication}
-        />
+          <FormInput
+            label="Medication Name"
+            placeholder="Paracetamol"
+            value={medication}
+            onChangeText={setMedication}
+          />
 
-        <FormInput
-          label="Dose per Kg"
-          placeholder="e.g. 10"
-          keyboardType="numeric"
-          value={dosePerKg}
-          onChangeText={setDosePerKg}
-        />
-
-        <FormInput
-          label="Dose Unit"
-          placeholder="e.g. mg"
-          value={doseUnit}
-          onChangeText={setDoseUnit}
-        />
-
-        <FormInput
-          label="Available Concentration"
-          placeholder="e.g. 24"
-          keyboardType="numeric"
-          value={concentrationValue}
-          onChangeText={setConcentrationValue}
-        />
-
-        <FormInput
-          label="Concentration Unit"
-          placeholder="e.g. mg/mL"
-          value={concentrationUnit}
-          onChangeText={setConcentrationUnit}
-        />
-
-        <PrimaryButton
-          label={isLoading ? "Calculating..." : "Calculate Dosage"}
-          onPress={handleCalculate}
-          disabled={isLoading}
-          style={styles.calcButton}
-        />
-
-        {isLoading && (
-          <ActivityIndicator size="small" color={colors.primary} />
-        )}
-
-        {error && (
-          <View style={styles.errorCard}>
-            <Ionicons name="alert-circle" size={16} color={colors.danger} />
-            <Text style={styles.errorText}>{error}</Text>
+          <View>
+            <FormInput
+              label="Dose per Kg"
+              placeholder="15"
+              keyboardType="numeric"
+              value={dosePerKg}
+              onChangeText={setDosePerKg}
+            />
+            <Text className="text-xs mt-2 mb-1" style={{ color: colors.textSecondary }}>Select Dose Unit:</Text>
+            <UnitSelector 
+              options={["mg", "mcg", "g", "Units"]} 
+              selected={doseUnit} 
+              onSelect={setDoseUnit} 
+            />
           </View>
-        )}
 
-        {result && (
-          <View style={styles.resultCard}>
-            <Text style={styles.resultLabel}>Administer</Text>
-            <Text style={styles.resultValue}>
-              {result.volume_to_administer_ml} mL
-            </Text>
-            <Text style={styles.resultSubtext}>
-              {result.required_dose} {result.dose_unit} required based on{" "}
-              {result.patient_weight_kg} kg & {result.concentration}
-            </Text>
+          <View>
+            <FormInput
+              label="Available Concentration"
+              placeholder="250"
+              keyboardType="numeric"
+              value={concentrationValue}
+              onChangeText={setConcentrationValue}
+            />
+            <Text className="text-xs mt-2 mb-1" style={{ color: colors.textSecondary }}>Select Concentration Unit:</Text>
+            <UnitSelector 
+              options={["mg/mL", "mcg/mL", "g/L", "Units/mL"]} 
+              selected={concentrationUnit} 
+              onSelect={setConcentrationUnit} 
+            />
+          </View>
 
-            <View style={styles.warningRow}>
-              <Ionicons name="alert-circle" size={16} color={colors.danger} />
-              <Text style={styles.warningText}>
-                Verify concentration & check dose
+          <View className="mt-4">
+            <PrimaryButton
+              label={isLoading ? "Calculating..." : "Calculate Dosage"}
+              onPress={handleCalculate}
+              disabled={isLoading}
+            />
+          </View>
+
+          {isLoading && (
+            <ActivityIndicator size="small" color={colors.primary} className="mt-2" />
+          )}
+
+          {error && (
+            <View 
+              className="flex-row items-center gap-1.5 p-3 rounded-lg mt-2" 
+              style={{ backgroundColor: colors.white, borderWidth: 1, borderColor: colors.danger + '40' }}
+            >
+              <Ionicons name="alert-circle" size={18} color={colors.danger} />
+              <Text className="text-[13px] flex-1" style={{ color: colors.danger }}>
+                {error}
               </Text>
             </View>
-          </View>
-        )}
+          )}
 
-        {result && isPatientMode && (
-          <View style={styles.saveSection}>
-            {isSaved ? (
-              <View style={styles.savedRow}>
-                <Ionicons
-                  name="checkmark-circle"
-                  size={18}
-                  color={colors.success}
-                />
-                <Text style={styles.savedText}>
-                  Saved to {params.patientName || "patient"}'s record
+          {result && (
+            <View className="rounded-xl p-5 mt-2 gap-1.5" style={{ backgroundColor: colors.white }}>
+              <Text className="text-[15px] font-bold uppercase tracking-wide" style={{ color: colors.success }}>
+                Administer
+              </Text>
+              <Text className="text-3xl font-bold mb-1" style={{ color: colors.primary }}>
+                {result.volume_to_administer_ml} mL
+              </Text>
+              <Text className="text-[13px]" style={{ color: colors.textSecondary }}>
+                {result.required_dose} {result.dose_unit} required based on{" "}
+                {result.patient_weight_kg} kg & {result.concentration}
+              </Text>
+
+              <View className="flex-row items-center gap-1.5 mt-3 p-3 rounded-lg bg-yellow-50 border border-yellow-200">
+                <Ionicons name="warning" size={16} color="#D97706" />
+                <Text className="text-xs flex-1" style={{ color: "#92400E" }}>
+                  Verify concentration & double-check calculations before administration.
                 </Text>
               </View>
-            ) : (
-              <PrimaryButton
-                label={isSaving ? "Saving..." : "Save to Record"}
-                onPress={handleSave}
-                disabled={isSaving}
-              />
-            )}
+            </View>
+          )}
 
-            {isSaving && (
-              <ActivityIndicator size="small" color={colors.primary} />
-            )}
+          {result && isPatientMode && (
+            <View className="gap-2.5 mt-2 mb-8">
+              {isSaved ? (
+                <View className="flex-row items-center justify-center gap-2 p-3.5 rounded-lg" style={{ backgroundColor: colors.white, borderWidth: 1, borderColor: colors.success + '40' }}>
+                  <Ionicons name="checkmark-circle" size={20} color={colors.success} />
+                  <Text className="text-[14px] font-semibold" style={{ color: colors.success }}>
+                    Saved to {params.patientName || "patient"}'s record
+                  </Text>
+                </View>
+              ) : (
+                <PrimaryButton
+                  label={isSaving ? "Saving..." : "Save to Record"}
+                  onPress={handleSave}
+                  disabled={isSaving}
+                />
+              )}
 
-            {saveError && (
-              <View style={styles.errorCard}>
-                <Ionicons name="alert-circle" size={16} color={colors.danger} />
-                <Text style={styles.errorText}>{saveError}</Text>
-              </View>
-            )}
-          </View>
-        )}
-      </ScrollView>
+              {isSaving && (
+                <ActivityIndicator size="small" color={colors.primary} />
+              )}
+
+              {saveError && (
+                <View 
+                  className="flex-row items-center gap-1.5 p-3 rounded-lg" 
+                  style={{ backgroundColor: colors.white, borderWidth: 1, borderColor: colors.danger + '40' }}
+                >
+                  <Ionicons name="alert-circle" size={16} color={colors.danger} />
+                  <Text className="text-xs flex-1" style={{ color: colors.danger }}>
+                    {saveError}
+                  </Text>
+                </View>
+              )}
+            </View>
+          )}
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.backgroundAlt,
-  },
-  container: {
-    padding: 20,
-    gap: 16,
-    paddingBottom: 40,
-  },
-  calcButton: {
-    marginTop: 8,
-  },
-  resultCard: {
-    backgroundColor: colors.white,
-    borderRadius: 12,
-    padding: 16,
-    marginTop: 8,
-    gap: 6,
-  },
-  resultLabel: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: colors.success,
-  },
-  resultValue: {
-    fontSize: 26,
-    fontWeight: "700",
-    color: colors.primary,
-  },
-  resultSubtext: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  warningRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    marginTop: 6,
-  },
-  warningText: {
-    fontSize: 12,
-    color: colors.textHeading,
-  },
-  saveSection: {
-    gap: 10,
-  },
-  savedRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    padding: 12,
-    backgroundColor: colors.white,
-    borderRadius: 8,
-  },
-  savedText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: colors.success,
-  },
-  errorCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    padding: 12,
-    backgroundColor: colors.backgroundAlt,
-    borderRadius: 8,
-  },
-  errorText: {
-    fontSize: 12,
-    color: colors.danger,
-    flex: 1,
-  },
-});
