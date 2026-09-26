@@ -7,7 +7,6 @@ import {
   Alert,
   Modal,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -43,7 +42,6 @@ export default function SbarHandoverScreen() {
   const [spo2, setSpo2] = useState("");
   const [temp, setTemp] = useState("");
 
-  // Add-medication inputs
   const [medName, setMedName] = useState("");
   const [medDose, setMedDose] = useState("");
   const [medUnit, setMedUnit] = useState("");
@@ -110,7 +108,6 @@ export default function SbarHandoverScreen() {
       return;
     }
 
-    // Snapshot of the medication list as it stands at handover time
     const medicationSnapshot: SbarIvMedication[] = medications.map((m) => ({
       name: m.med_name,
       dose:
@@ -126,7 +123,6 @@ export default function SbarHandoverScreen() {
       medications: medicationSnapshot,
     };
 
-    // Validate first so a failed SBAR never leaves a stray vitals reading
     if (!hasSbarContent(form)) {
       setFormError("Fill in at least one SBAR section before submitting");
       return;
@@ -164,111 +160,195 @@ export default function SbarHandoverScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+    <SafeAreaView
+      className="flex-1"
+      style={{ backgroundColor: colors.backgroundAlt }}
+      edges={["top", "left", "right"]}
+    >
       <ScreenHeader title="Patients Record" />
 
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerClassName="p-6 gap-5 pb-10"
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.patientCard}>
-          <PersonAvatar size={36} />
-          <View style={styles.patientDetails}>
-            <Text style={styles.patientName}>{patientName}</Text>
+        <View
+          className="rounded-xl p-4 flex-row items-center gap-3"
+          style={{ backgroundColor: colors.white }}
+        >
+          <PersonAvatar size={44} />
+          <View className="flex-1">
+            <Text
+              className="text-[17px] font-bold"
+              style={{ color: colors.textPrimary }}
+            >
+              {patientName}
+            </Text>
             {params.patientId ? (
-              <Text style={styles.patientMeta}>ID: {params.patientId}</Text>
+              <Text
+                className="text-[13px] mt-0.5"
+                style={{ color: colors.textFaint }}
+              >
+                ID: {params.patientId}
+              </Text>
             ) : null}
           </View>
         </View>
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Situation</Text>
+        <View className="gap-2">
+          <Text
+            className="text-[17px] font-bold"
+            style={{ color: colors.textHeading }}
+          >
+            Situation
+          </Text>
           <TextInput
-            style={[styles.input, styles.textArea]}
+            className="rounded-xl px-4 py-3 text-[15px] min-h-[90px]"
+            style={{
+              backgroundColor: colors.white,
+              color: colors.textPrimary,
+              textAlignVertical: "top",
+            }}
             multiline
             numberOfLines={3}
             placeholder="Problem: e.g. sudden drop in BP, patient restless..."
-            placeholderTextColor={colors.placeholder}
+            placeholderTextColor="#9CA3AF"
             value={situation}
             onChangeText={setSituation}
           />
         </View>
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Background</Text>
+        <View className="gap-2">
+          <Text
+            className="text-[17px] font-bold"
+            style={{ color: colors.textHeading }}
+          >
+            Background
+          </Text>
           <TextInput
-            style={[styles.input, styles.textArea]}
+            className="rounded-xl px-4 py-3 text-[15px] min-h-[90px]"
+            style={{
+              backgroundColor: colors.white,
+              color: colors.textPrimary,
+              textAlignVertical: "top",
+            }}
             multiline
             numberOfLines={3}
             placeholder="Admission diagnosis, past history, recent procedures/labs..."
-            placeholderTextColor={colors.placeholder}
+            placeholderTextColor="#9CA3AF"
             value={background}
             onChangeText={setBackground}
           />
         </View>
 
-        <View style={styles.vitalsRow}>
+        <View className="flex-row justify-center gap-3">
           <TextInput
-            style={styles.vitalInput}
+            className="w-[42%] h-[52px] rounded-xl text-center text-[15px]"
+            style={{
+              backgroundColor: colors.white,
+              color: colors.textPrimary,
+            }}
             placeholder="SpO2"
-            placeholderTextColor={colors.placeholder}
+            placeholderTextColor="#9CA3AF"
             keyboardType="numeric"
             value={spo2}
             onChangeText={setSpo2}
           />
           <TextInput
-            style={styles.vitalInput}
+            className="w-[42%] h-[52px] rounded-xl text-center text-[15px]"
+            style={{
+              backgroundColor: colors.white,
+              color: colors.textPrimary,
+            }}
             placeholder="Temp (°F)"
-            placeholderTextColor={colors.placeholder}
+            placeholderTextColor="#9CA3AF"
             keyboardType="numeric"
             value={temp}
             onChangeText={setTemp}
           />
         </View>
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Assessment</Text>
+        <View className="gap-2">
+          <Text
+            className="text-[17px] font-bold"
+            style={{ color: colors.textHeading }}
+          >
+            Assessment
+          </Text>
           <TextInput
-            style={[styles.input, styles.textArea]}
+            className="rounded-xl px-4 py-3 text-[15px] min-h-[90px]"
+            style={{
+              backgroundColor: colors.white,
+              color: colors.textPrimary,
+              textAlignVertical: "top",
+            }}
             multiline
             numberOfLines={3}
             placeholder="Your assessment of the current problem..."
-            placeholderTextColor={colors.placeholder}
+            placeholderTextColor="#9CA3AF"
             value={assessment}
             onChangeText={setAssessment}
           />
         </View>
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Recommendation</Text>
+        <View className="gap-2">
+          <Text
+            className="text-[17px] font-bold"
+            style={{ color: colors.textHeading }}
+          >
+            Recommendation
+          </Text>
           <TextInput
-            style={[styles.input, styles.textArea]}
+            className="rounded-xl px-4 py-3 text-[15px] min-h-[90px]"
+            style={{
+              backgroundColor: colors.white,
+              color: colors.textPrimary,
+              textAlignVertical: "top",
+            }}
             multiline
             numberOfLines={3}
             placeholder="What needs to happen next..."
-            placeholderTextColor={colors.placeholder}
+            placeholderTextColor="#9CA3AF"
             value={recommendation}
             onChangeText={setRecommendation}
           />
         </View>
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Current IV Medications</Text>
+        <View className="gap-2">
+          <Text
+            className="text-[17px] font-bold"
+            style={{ color: colors.textHeading }}
+          >
+            Current IV Medications
+          </Text>
 
           {medsLoading && (
             <ActivityIndicator size="small" color={colors.primary} />
           )}
 
           {!medsLoading && params.patientId && medications.length === 0 && (
-            <Text style={styles.emptyText}>No medications recorded yet.</Text>
+            <Text className="text-[14px]" style={{ color: colors.textSecondary }}>
+              No medications recorded yet.
+            </Text>
           )}
 
           {medications.map((med) => (
-            <View key={med.med_id} style={styles.medListRow}>
-              <View style={styles.medListInfo}>
-                <Text style={styles.medListName}>{med.med_name}</Text>
-                <Text style={styles.medListMeta}>
+            <View
+              key={med.med_id}
+              className="flex-row items-center rounded-xl px-4 py-3 gap-3"
+              style={{ backgroundColor: colors.white }}
+            >
+              <View className="flex-1">
+                <Text
+                  className="text-[16px] font-semibold"
+                  style={{ color: colors.textPrimary }}
+                >
+                  {med.med_name}
+                </Text>
+                <Text
+                  className="text-[13px] mt-0.5"
+                  style={{ color: colors.textSecondary }}
+                >
                   {med.dose !== null ? `${med.dose} ${med.dose_unit ?? ""}` : ""}
                   {med.frequency ? ` · ${med.frequency}` : ""}
                 </Text>
@@ -278,45 +358,61 @@ export default function SbarHandoverScreen() {
                 disabled={medsMutating}
                 hitSlop={8}
               >
-                <Ionicons name="trash-outline" size={20} color={colors.danger} />
+                <Ionicons name="trash-outline" size={22} color={colors.danger} />
               </TouchableOpacity>
             </View>
           ))}
 
-          <View style={styles.medRow}>
+          <View
+            className="flex-row items-center rounded-xl h-[52px] px-4 mb-0.5"
+            style={{ backgroundColor: colors.white }}
+          >
             <TextInput
-              style={styles.medNameInput}
+              className="flex-1 text-[15px]"
+              style={{ color: colors.textPrimary }}
               placeholder="Name"
-              placeholderTextColor={colors.placeholder}
+              placeholderTextColor="#9CA3AF"
               maxLength={255}
               value={medName}
               onChangeText={setMedName}
             />
-            <View style={styles.divider} />
+            <View
+              className="w-px h-[60%] mx-3"
+              style={{ backgroundColor: colors.border }}
+            />
             <TextInput
-              style={styles.medDoseInput}
+              className="flex-1 text-[15px]"
+              style={{ color: colors.textPrimary }}
               placeholder="Dose"
-              placeholderTextColor={colors.placeholder}
+              placeholderTextColor="#9CA3AF"
               keyboardType="numeric"
               value={medDose}
               onChangeText={setMedDose}
             />
           </View>
 
-          <View style={styles.medRow}>
+          <View
+            className="flex-row items-center rounded-xl h-[52px] px-4 mb-0.5"
+            style={{ backgroundColor: colors.white }}
+          >
             <TextInput
-              style={styles.medNameInput}
+              className="flex-1 text-[15px]"
+              style={{ color: colors.textPrimary }}
               placeholder="Unit (e.g. mg)"
-              placeholderTextColor={colors.placeholder}
+              placeholderTextColor="#9CA3AF"
               maxLength={20}
               value={medUnit}
               onChangeText={setMedUnit}
             />
-            <View style={styles.divider} />
+            <View
+              className="w-px h-[60%] mx-3"
+              style={{ backgroundColor: colors.border }}
+            />
             <TextInput
-              style={styles.medDoseInput}
+              className="flex-1 text-[15px]"
+              style={{ color: colors.textPrimary }}
               placeholder="Frequency"
-              placeholderTextColor={colors.placeholder}
+              placeholderTextColor="#9CA3AF"
               maxLength={50}
               value={medFrequency}
               onChangeText={setMedFrequency}
@@ -324,29 +420,46 @@ export default function SbarHandoverScreen() {
           </View>
 
           {medsError && (
-            <View style={styles.errorCard}>
-              <Ionicons name="alert-circle" size={16} color={colors.danger} />
-              <Text style={styles.errorText}>{medsError}</Text>
+            <View
+              className="flex-row items-center gap-2 p-3.5 rounded-xl"
+              style={{ backgroundColor: colors.white }}
+            >
+              <Ionicons name="alert-circle" size={18} color={colors.danger} />
+              <Text className="text-[14px] flex-1" style={{ color: colors.danger }}>
+                {medsError}
+              </Text>
             </View>
           )}
 
           <TouchableOpacity
-            style={[styles.addMedButton, medsMutating && styles.addMedDisabled]}
+            className="flex-row items-center justify-center gap-2 h-[50px] rounded-xl mt-1"
+            style={[
+              { backgroundColor: colors.primary },
+              medsMutating && { opacity: 0.6 },
+            ]}
             onPress={handleAddMedication}
             disabled={medsMutating || !params.patientId}
             activeOpacity={0.8}
           >
-            <Ionicons name="add" size={18} color={colors.white} />
-            <Text style={styles.addMedText}>
+            <Ionicons name="add" size={20} color={colors.white} />
+            <Text
+              className="text-[15px] font-semibold"
+              style={{ color: colors.white }}
+            >
               {medsMutating ? "Saving..." : "Add Medication"}
             </Text>
           </TouchableOpacity>
         </View>
 
         {displayError && (
-          <View style={styles.errorCard}>
-            <Ionicons name="alert-circle" size={16} color={colors.danger} />
-            <Text style={styles.errorText}>{displayError}</Text>
+          <View
+            className="flex-row items-center gap-2 p-3.5 rounded-xl"
+            style={{ backgroundColor: colors.white }}
+          >
+            <Ionicons name="alert-circle" size={18} color={colors.danger} />
+            <Text className="text-[14px] flex-1" style={{ color: colors.danger }}>
+              {displayError}
+            </Text>
           </View>
         )}
 
@@ -356,7 +469,7 @@ export default function SbarHandoverScreen() {
           label={isBusy ? "Submitting..." : "Submit Handover"}
           onPress={handleSubmit}
           disabled={isBusy}
-          style={styles.submitButton}
+          style={{ marginTop: 8 }}
         />
       </ScrollView>
 
@@ -366,14 +479,31 @@ export default function SbarHandoverScreen() {
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>Handover Submitted</Text>
-            <Text style={styles.modalSubtitle}>
+        <View
+          className="flex-1 justify-center items-center px-6"
+          style={{ backgroundColor: colors.overlay }}
+        >
+          <View
+            className="w-full rounded-2xl p-6 items-center gap-2"
+            style={{ backgroundColor: colors.white }}
+          >
+            <Text
+              className="text-[22px] font-bold text-center"
+              style={{ color: colors.textPrimary }}
+            >
+              Handover Submitted
+            </Text>
+            <Text
+              className="text-[15px] text-center leading-[22px] mb-5"
+              style={{ color: colors.textSecondary }}
+            >
               Report for {patientName} has been Successfully Recorded
             </Text>
 
-            <View style={styles.checkCircle}>
+            <View
+              className="w-20 h-20 rounded-full items-center justify-center mb-5"
+              style={{ backgroundColor: colors.successAlt }}
+            >
               <Ionicons name="checkmark" size={48} color={colors.white} />
             </View>
 
@@ -387,190 +517,3 @@ export default function SbarHandoverScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.backgroundAlt,
-  },
-  container: {
-    padding: 20,
-    gap: 16,
-    paddingBottom: 40,
-  },
-  patientCard: {
-    backgroundColor: colors.white,
-    borderRadius: 8,
-    padding: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  patientDetails: {
-    flex: 1,
-  },
-  patientName: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: colors.textPrimary,
-  },
-  patientMeta: {
-    fontSize: 10,
-    color: colors.textFaint,
-  },
-  formGroup: {
-    gap: 6,
-  },
-  label: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: colors.textHeading,
-  },
-  input: {
-    backgroundColor: colors.white,
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    fontSize: 13,
-    color: colors.textSecondary,
-  },
-  textArea: {
-    minHeight: 64,
-    textAlignVertical: "top",
-  },
-  vitalsRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 12,
-  },
-  vitalInput: {
-    width: "42%",
-    height: 44,
-    backgroundColor: colors.white,
-    borderRadius: 8,
-    textAlign: "center",
-    fontSize: 14,
-    color: colors.textPrimary,
-  },
-  emptyText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  medListRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.white,
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    gap: 10,
-  },
-  medListInfo: {
-    flex: 1,
-  },
-  medListName: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: colors.textPrimary,
-  },
-  medListMeta: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  medRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.white,
-    borderRadius: 8,
-    height: 44,
-    paddingHorizontal: 14,
-    marginBottom: 2,
-  },
-  medNameInput: {
-    flex: 1,
-    fontSize: 14,
-    color: colors.textPrimary,
-  },
-  divider: {
-    width: 1,
-    height: "60%",
-    backgroundColor: colors.border,
-    marginHorizontal: 12,
-  },
-  medDoseInput: {
-    flex: 1,
-    fontSize: 14,
-    color: colors.textPrimary,
-  },
-  addMedButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    height: 40,
-    borderRadius: 8,
-    backgroundColor: colors.primary,
-    marginTop: 4,
-  },
-  addMedDisabled: {
-    opacity: 0.6,
-  },
-  addMedText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: colors.white,
-  },
-  errorCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    padding: 12,
-    backgroundColor: colors.white,
-    borderRadius: 8,
-  },
-  errorText: {
-    fontSize: 12,
-    color: colors.danger,
-    flex: 1,
-  },
-  submitButton: {
-    marginTop: 8,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: colors.overlay,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 24,
-  },
-  modalCard: {
-    width: "100%",
-    backgroundColor: colors.white,
-    borderRadius: 16,
-    padding: 24,
-    alignItems: "center",
-    gap: 4,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: colors.textPrimary,
-    textAlign: "center",
-  },
-  modalSubtitle: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    textAlign: "center",
-    lineHeight: 18,
-    marginBottom: 16,
-  },
-  checkCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.successAlt,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 20,
-  },
-});

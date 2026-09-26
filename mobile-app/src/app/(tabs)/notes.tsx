@@ -1,18 +1,11 @@
 // app/(tabs)/notes
 import { router } from "expo-router";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PersonAvatar } from "../../components/common/PersonAvatar";
 import { PrimaryButton } from "../../components/common/PrimaryButton";
 import { ScreenHeader } from "../../components/common/ScreenHeader";
 import { StatusBadge } from "../../components/common/StatusBadge";
-import { colors } from "../../theme/colors";
 
 interface PatientNote {
   id: string;
@@ -51,26 +44,32 @@ const NOTES_LIST: PatientNote[] = [
 
 export default function NursingNotesScreen() {
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+    <SafeAreaView
+      className="flex-1 bg-gray-50"
+      edges={["top", "left", "right"]}
+    >
       <ScreenHeader
         title="Nursing Notes"
         rightElement={<PersonAvatar size={36} />}
       />
 
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerClassName="p-5 gap-4 pb-10"
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.headerSubtitle}>Morning Shift, July 15, 2026</Text>
+        <Text className="-mt-2 text-[13px] text-gray-500">
+          Morning Shift, July 15, 2026
+        </Text>
 
-        <View style={styles.cardContainer}>
+        <View className="rounded-2xl bg-white px-4 py-2">
           {NOTES_LIST.map((item, index) => (
             <TouchableOpacity
               key={item.id}
-              style={[
-                styles.patientRow,
-                index < NOTES_LIST.length - 1 && styles.rowBorder,
-              ]}
+              className={`flex-row items-center justify-between py-3.5 ${
+                index < NOTES_LIST.length - 1
+                  ? "border-b border-gray-200"
+                  : ""
+              }`}
               onPress={() =>
                 router.push({
                   pathname: "/notes/sbar",
@@ -78,17 +77,21 @@ export default function NursingNotesScreen() {
                 })
               }
             >
-              <View style={styles.leftContent}>
+              <View className="flex-row items-center gap-3">
                 <PersonAvatar size={28} />
-                <Text style={styles.patientName}>{item.name}</Text>
+                <Text className="text-sm font-semibold text-gray-900">
+                  {item.name}
+                </Text>
               </View>
               <StatusBadge label={item.status} tone={item.tone} />
             </TouchableOpacity>
           ))}
         </View>
 
-        <TouchableOpacity style={styles.seeAllButton}>
-          <Text style={styles.seeAllText}>See all</Text>
+        <TouchableOpacity className="self-end py-1">
+          <Text className="text-[13px] font-semibold text-gray-800">
+            See all
+          </Text>
         </TouchableOpacity>
 
         <PrimaryButton
@@ -99,55 +102,3 @@ export default function NursingNotesScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.backgroundAlt,
-  },
-  container: {
-    padding: 20,
-    gap: 16,
-    paddingBottom: 40,
-  },
-  headerSubtitle: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    marginTop: -8,
-  },
-  cardContainer: {
-    backgroundColor: colors.white,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  patientRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 14,
-  },
-  rowBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  leftContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  patientName: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: colors.textHeading,
-  },
-  seeAllButton: {
-    alignSelf: "flex-end",
-    paddingVertical: 4,
-  },
-  seeAllText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: colors.textPrimary,
-  },
-});

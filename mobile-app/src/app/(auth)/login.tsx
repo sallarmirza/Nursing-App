@@ -2,7 +2,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import { FormInput } from "../../components/common/FormInput";
 import { PrimaryButton } from "../../components/common/PrimaryButton";
 import { colors } from "../../theme/colors";
@@ -23,12 +23,19 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>Welcome</Text>
-        <Text style={styles.subtitle}>Sign in to your DNA Account</Text>
+    <View 
+      className="flex-1 justify-center" 
+      style={{ backgroundColor: colors.background }}
+    >
+      <View className="px-6">
+        <Text className="text-[28px] font-semibold mb-1" style={{ color: colors.textPrimary }}>
+          Welcome
+        </Text>
+        <Text className="text-sm mb-6" style={{ color: colors.textMuted }}>
+          Sign in to your DNA Account
+        </Text>
 
-        <View style={styles.form}>
+        <View className="gap-4">
           <FormInput
             placeholder="Email"
             keyboardType="email-address"
@@ -43,155 +50,88 @@ export default function LoginScreen() {
             onChangeText={setPassword}
           />
 
-          <TouchableOpacity style={styles.forgotPassword}>
-            <Text style={styles.forgotPasswordText}>Forgot password?</Text>
+          <TouchableOpacity className="self-end -mt-1">
+            <Text className="text-[13px]" style={{ color: colors.dangerAlt }}>
+              Forgot password?
+            </Text>
           </TouchableOpacity>
 
-          {error && <Text style={styles.errorText}>{error}</Text>}
+          {error && (
+            <Text className="text-[13px]" style={{ color: colors.dangerAlt }}>
+              {error}
+            </Text>
+          )}
 
           <PrimaryButton
             label={isLoading ? "Signing in..." : "Sign in"}
             onPress={handleLogin}
             disabled={isLoading}
-            style={styles.signInButton}
+            style={{ marginTop: 8 }}
           />
           {isLoading && <ActivityIndicator size="small" color={colors.primaryAlt} />}
         </View>
 
-        <View style={styles.signupContainer}>
-          <Text style={styles.signupText}>Don't have an account? </Text>
+        <View className="flex-row justify-center items-center mt-6">
+          <Text className="text-sm" style={{ color: colors.textMuted }}>
+            Don't have an account?{" "}
+          </Text>
           <TouchableOpacity onPress={() => router.push("/(auth)/signup")}>
-            <Text style={styles.link}>Sign Up</Text>
+            <Text className="text-sm font-semibold" style={{ color: colors.primaryAlt }}>
+              Sign Up
+            </Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.dividerContainer}>
-          <View style={styles.line} />
-          <Text style={styles.dividerText}>or</Text>
-          <View style={styles.line} />
+        <View className="flex-row items-center my-5">
+          <View className="flex-1 h-[1px]" style={{ backgroundColor: colors.divider }} />
+          <Text className="text-sm mx-4" style={{ color: colors.textMuted }}>
+            or
+          </Text>
+          <View className="flex-1 h-[1px]" style={{ backgroundColor: colors.divider }} />
         </View>
 
-        <Text style={styles.sectionHeader}>Continue with</Text>
+        <Text className="text-center text-sm font-medium mb-4" style={{ color: colors.textMuted }}>
+          Continue with
+        </Text>
 
-        <TouchableOpacity style={styles.socialButton}>
+        <TouchableOpacity 
+          className="h-[52px] rounded-lg flex-row items-center px-4" 
+          style={{ backgroundColor: colors.white }}
+        >
           <Ionicons
             name="logo-google"
             size={20}
             color="#EA4335"
-            style={styles.buttonIcon}
+            style={{ marginRight: 12 }}
           />
-          <Text style={styles.socialButtonText}>Google</Text>
+          <Text className="text-[15px] font-medium" style={{ color: colors.textHeading }}>
+            Google
+          </Text>
         </TouchableOpacity>
 
-        <View style={styles.dividerContainer}>
-          <View style={styles.line} />
-          <Text style={styles.dividerText}>login with</Text>
-          <View style={styles.line} />
+        <View className="flex-row items-center my-5">
+          <View className="flex-1 h-[1px]" style={{ backgroundColor: colors.divider }} />
+          <Text className="text-sm mx-4" style={{ color: colors.textMuted }}>
+            login with
+          </Text>
+          <View className="flex-1 h-[1px]" style={{ backgroundColor: colors.divider }} />
         </View>
 
-        <TouchableOpacity style={styles.socialButton}>
+        <TouchableOpacity 
+          className="h-[52px] rounded-lg flex-row items-center px-4" 
+          style={{ backgroundColor: colors.white }}
+        >
           <Ionicons
             name="phone-portrait-outline"
             size={20}
             color={colors.primaryAlt}
-            style={styles.buttonIcon}
+            style={{ marginRight: 12 }}
           />
-          <Text style={styles.socialButtonText}>Continue with Mobile</Text>
+          <Text className="text-[15px] font-medium" style={{ color: colors.textHeading }}>
+            Continue with Mobile
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    justifyContent: "center",
-  },
-  content: {
-    paddingHorizontal: 24,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "600",
-    color: colors.textPrimary,
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: colors.textMuted,
-    marginBottom: 24,
-  },
-  form: {
-    gap: 16,
-  },
-  forgotPassword: {
-    alignSelf: "flex-end",
-    marginTop: -4,
-  },
-  forgotPasswordText: {
-    color: colors.dangerAlt,
-    fontSize: 13,
-  },
-  errorText: {
-    color: colors.dangerAlt,
-    fontSize: 13,
-  },
-  signInButton: {
-    marginTop: 8,
-  },
-  signupContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 24,
-  },
-  signupText: {
-    color: colors.textMuted,
-    fontSize: 14,
-  },
-  link: {
-    color: colors.primaryAlt,
-    fontWeight: "600",
-    fontSize: 14,
-  },
-  dividerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 20,
-  },
-  line: {
-    flex: 1,
-    height: 1,
-    backgroundColor: colors.divider,
-  },
-  dividerText: {
-    marginHorizontal: 16,
-    color: colors.textMuted,
-    fontSize: 14,
-  },
-  sectionHeader: {
-    textAlign: "center",
-    color: colors.textMuted,
-    fontSize: 14,
-    marginBottom: 16,
-    fontWeight: "500",
-  },
-  socialButton: {
-    height: 52,
-    backgroundColor: colors.white,
-    borderRadius: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-  },
-  buttonIcon: {
-    marginRight: 12,
-  },
-  socialButtonText: {
-    color: colors.textHeading,
-    fontSize: 15,
-    fontWeight: "500",
-  },
-});

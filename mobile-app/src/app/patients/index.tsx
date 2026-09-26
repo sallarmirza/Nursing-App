@@ -5,7 +5,6 @@ import {
   ActivityIndicator,
   RefreshControl,
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -39,23 +38,35 @@ export default function PatientsRecordScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+    <SafeAreaView
+      className="flex-1"
+      style={{ backgroundColor: colors.backgroundAlt }}
+      edges={["top", "left", "right"]}
+    >
       <ScreenHeader title="Patients Record" />
 
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerClassName="px-5 pt-5 pb-10"
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={isLoading} onRefresh={fetchPatients} />
         }
       >
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>My Active Patients</Text>
+        <View className="flex-row items-center justify-between mb-4">
+          <Text
+            className="text-[15px] font-bold"
+            style={{ color: colors.textHeading }}
+          >
+            My Active Patients
+          </Text>
           <TouchableOpacity
-            style={styles.addButton}
+            className="py-[6px] px-3 rounded-md"
+            style={{ backgroundColor: colors.primary }}
             onPress={() => router.push("/patients/new" as any)}
           >
-            <Text style={styles.addButtonText}>+ Add New</Text>
+            <Text className="text-white text-[13px] font-semibold">
+              + Add New
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -63,19 +74,31 @@ export default function PatientsRecordScreen() {
           <ActivityIndicator size="small" color={colors.primary} />
         )}
 
-        {error && <Text style={styles.errorText}>{error}</Text>}
-
-        {!isLoading && !error && patients.length === 0 && (
-          <Text style={styles.emptyText}>No patients yet.</Text>
+        {error && (
+          <Text
+            className="text-[13px] mb-3"
+            style={{ color: colors.dangerAlt }}
+          >
+            {error}
+          </Text>
         )}
 
-        <View style={styles.listContainer}>
+        {!isLoading && !error && patients.length === 0 && (
+          <Text
+            className="text-sm text-center mt-5"
+            style={{ color: colors.textSecondary }}
+          >
+            No patients yet.
+          </Text>
+        )}
+
+        <View className="gap-3">
           {patients.map((item) => {
             const age = calculateAge(item.date_of_birth);
             return (
               <TouchableOpacity
                 key={item.patient_id}
-                style={styles.patientCard}
+                className="bg-white rounded-xl px-4 py-[14px] flex-row items-center justify-between"
                 activeOpacity={0.7}
                 onPress={() =>
                   router.push({
@@ -84,13 +107,19 @@ export default function PatientsRecordScreen() {
                   })
                 }
               >
-                <View style={styles.patientInfo}>
+                <View className="flex-row items-center gap-3">
                   <PersonAvatar size={36} />
                   <View>
-                    <Text style={styles.patientName}>
+                    <Text
+                      className="text-base font-bold mb-[2px]"
+                      style={{ color: colors.textHeading }}
+                    >
                       {item.patient_name}
                     </Text>
-                    <Text style={styles.patientSubtext}>
+                    <Text
+                      className="text-[13px]"
+                      style={{ color: colors.textSecondary }}
+                    >
                       {age !== null
                         ? `${age} years, ${item.patient_gender}`
                         : item.patient_gender}
@@ -105,75 +134,3 @@ export default function PatientsRecordScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.backgroundAlt,
-  },
-  container: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 40,
-  },
-  sectionHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: colors.textHeading,
-  },
-  addButton: {
-    backgroundColor: colors.primary,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-  },
-  addButtonText: {
-    color: colors.white,
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  listContainer: {
-    gap: 12,
-  },
-  patientCard: {
-    backgroundColor: colors.white,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  patientInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  patientName: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: colors.textHeading,
-    marginBottom: 2,
-  },
-  patientSubtext: {
-    fontSize: 13,
-    color: colors.textSecondary,
-  },
-  errorText: {
-    color: colors.dangerAlt,
-    fontSize: 13,
-    marginBottom: 12,
-  },
-  emptyText: {
-    color: colors.textSecondary,
-    fontSize: 14,
-    textAlign: "center",
-    marginTop: 20,
-  },
-});

@@ -4,8 +4,9 @@ import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -42,7 +43,7 @@ export default function IVDripRateScreen() {
   const [volume, setVolume] = useState("");
   const [time, setTime] = useState("");
   const [selectedDropFactor, setSelectedDropFactor] = useState(
-    "15 gtt/ml (Standard)",
+    "15 gtt/ml (Standard)"
   );
   const [customDropFactor, setCustomDropFactor] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -94,293 +95,208 @@ export default function IVDripRateScreen() {
   const equivalentMlPerHour =
     result && result.time_duration_min > 0
       ? Math.round(
-          result.total_volume_ml / (result.time_duration_min / 60),
+          result.total_volume_ml / (result.time_duration_min / 60)
         )
       : null;
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+    <SafeAreaView
+      className="flex-1"
+      style={{ backgroundColor: colors.backgroundAlt }}
+      edges={["top", "left", "right"]}
+    >
       <ScreenHeader title={headerTitle} />
 
-      <ScrollView
-        contentContainerStyle={styles.container}
-        showsVerticalScrollIndicator={false}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        className="flex-1"
       >
-        <FormInput
-          label="Total Volume"
-          placeholder="Volume in ml"
-          keyboardType="numeric"
-          value={volume}
-          onChangeText={setVolume}
-        />
-
-        <FormInput
-          label="Total Time"
-          placeholder="Time in hours"
-          keyboardType="numeric"
-          value={time}
-          onChangeText={setTime}
-        />
-
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Drop Factor</Text>
-          <View style={styles.dropdownCard}>
-            <TouchableOpacity
-              style={styles.dropdownHeader}
-              activeOpacity={0.7}
-              onPress={() => setIsDropdownOpen((prev) => !prev)}
-            >
-              <Text style={styles.selectedOptionText}>
-                {selectedDropFactor}
-              </Text>
-              <Ionicons
-                name={isDropdownOpen ? "chevron-up" : "chevron-down"}
-                size={18}
-                color={colors.textSecondary}
-              />
-            </TouchableOpacity>
-
-            {isDropdownOpen && (
-              <View style={styles.dropdownList}>
-                {DROP_FACTOR_OPTIONS.map((option, index) => (
-                  <TouchableOpacity
-                    key={option}
-                    style={[
-                      styles.dropdownOption,
-                      index < DROP_FACTOR_OPTIONS.length - 1 &&
-                        styles.dropdownOptionBorder,
-                    ]}
-                    onPress={() => {
-                      setSelectedDropFactor(option);
-                      setIsDropdownOpen(false);
-                    }}
-                  >
-                    <Text
-                      style={[
-                        styles.optionText,
-                        option === selectedDropFactor &&
-                          styles.activeOptionText,
-                      ]}
-                    >
-                      {option}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-          </View>
-        </View>
-
-        {selectedDropFactor === CUSTOM_OPTION && (
+        <ScrollView
+          contentContainerClassName="p-5 gap-4 pb-10"
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
           <FormInput
-            label="Custom Drop Factor (gtt/ml)"
-            placeholder="e.g. 12"
+            label="Total Volume (mL)"
+            placeholder="1000"
             keyboardType="numeric"
-            value={customDropFactor}
-            onChangeText={setCustomDropFactor}
+            value={volume}
+            onChangeText={setVolume}
           />
-        )}
 
-        <PrimaryButton
-          label={isLoading ? "Calculating..." : "Calculate Rate"}
-          onPress={handleCalculate}
-          disabled={isLoading}
-          style={styles.calculateButton}
-        />
+          <FormInput
+            label="Total Time (hours)"
+            placeholder="8"
+            keyboardType="numeric"
+            value={time}
+            onChangeText={setTime}
+          />
 
-        {isLoading && (
-          <ActivityIndicator size="small" color={colors.primary} />
-        )}
-
-        {error && (
-          <View style={styles.errorCard}>
-            <Ionicons name="alert-circle" size={16} color={colors.dangerAlt} />
-            <Text style={styles.errorText}>{error}</Text>
-          </View>
-        )}
-
-        {result && (
-          <View style={styles.resultCard}>
-            <Text style={styles.infusionLabel}>Infusion Rate</Text>
-            <Text style={styles.rateValue}>
-              {result.drop_rate_gtt_min} gtt/min
+          <View>
+            <Text
+              className="text-[15px] font-semibold mb-1.5"
+              style={{ color: colors.textHeading }}
+            >
+              Drop Factor
             </Text>
-            {equivalentMlPerHour !== null && (
-              <Text style={styles.equivalentText}>
-                Equivalent to {equivalentMlPerHour} ml/hour
-              </Text>
-            )}
+            <View
+              className="rounded-lg bg-white overflow-hidden"
+              style={{ borderWidth: 1, borderColor: "#E5E7EB" }}
+            >
+              <TouchableOpacity
+                className="flex-row items-center justify-between p-3.5"
+                activeOpacity={0.7}
+                onPress={() => setIsDropdownOpen((prev) => !prev)}
+              >
+                <Text className="text-[15px]" style={{ color: colors.textHeading }}>
+                  {selectedDropFactor}
+                </Text>
+                <Ionicons
+                  name={isDropdownOpen ? "chevron-up" : "chevron-down"}
+                  size={18}
+                  color={colors.textSecondary}
+                />
+              </TouchableOpacity>
 
-            <View style={styles.alertContainer}>
-              <Ionicons
-                name="alert-circle"
-                size={18}
-                color={colors.dangerAlt}
-              />
-              <Text style={styles.alertText}>
-                Check drop factor in tubing package
-              </Text>
+              {isDropdownOpen && (
+                <View className="border-t border-gray-100">
+                  {DROP_FACTOR_OPTIONS.map((option) => (
+                    <TouchableOpacity
+                      key={option}
+                      className="p-3.5 border-b border-gray-50"
+                      onPress={() => {
+                        setSelectedDropFactor(option);
+                        setIsDropdownOpen(false);
+                      }}
+                    >
+                      <Text
+                        className={`text-[14px] ${
+                          option === selectedDropFactor ? "font-semibold" : ""
+                        }`}
+                        style={{
+                          color:
+                            option === selectedDropFactor
+                              ? colors.primary
+                              : colors.textSecondary,
+                        }}
+                      >
+                        {option}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
             </View>
           </View>
-        )}
 
-        {result && isPatientMode && (
-          <View style={styles.saveSection}>
-            {savedId ? (
-              <View style={styles.savedRow}>
-                <Ionicons
-                  name="checkmark-circle"
-                  size={18}
-                  color={colors.success}
-                />
-                <Text style={styles.savedText}>
-                  Saved to {params.patientName || "patient"}'s record
+          {selectedDropFactor === CUSTOM_OPTION && (
+            <FormInput
+              label="Custom Drop Factor (gtt/ml)"
+              placeholder="12"
+              keyboardType="numeric"
+              value={customDropFactor}
+              onChangeText={setCustomDropFactor}
+            />
+          )}
+
+          <View className="mt-2">
+            <PrimaryButton
+              label={isLoading ? "Calculating..." : "Calculate Rate"}
+              onPress={handleCalculate}
+              disabled={isLoading}
+            />
+          </View>
+
+          {isLoading && (
+            <ActivityIndicator size="small" color={colors.primary} className="mt-2" />
+          )}
+
+          {error && (
+            <View
+              className="flex-row items-center gap-1.5 p-3 rounded-lg mt-2"
+              style={{
+                backgroundColor: colors.white,
+                borderWidth: 1,
+                borderColor: colors.danger + "40",
+              }}
+            >
+              <Ionicons name="alert-circle" size={18} color={colors.danger} />
+              <Text className="text-[13px] flex-1" style={{ color: colors.danger }}>
+                {error}
+              </Text>
+            </View>
+          )}
+
+          {result && (
+            <View className="rounded-xl p-5 mt-2 gap-1.5" style={{ backgroundColor: colors.white }}>
+              <Text className="text-[15px] font-bold uppercase tracking-wide" style={{ color: colors.success }}>
+                Infusion Rate
+              </Text>
+              <Text className="text-3xl font-bold mb-1" style={{ color: colors.primary }}>
+                {result.drop_rate_gtt_min} gtt/min
+              </Text>
+              {equivalentMlPerHour !== null && (
+                <Text className="text-[13px]" style={{ color: colors.textSecondary }}>
+                  Equivalent to {equivalentMlPerHour} mL/hour
+                </Text>
+              )}
+
+              <View className="flex-row items-center gap-1.5 mt-3 p-3 rounded-lg bg-yellow-50 border border-yellow-200">
+                <Ionicons name="warning" size={16} color="#D97706" />
+                <Text className="text-xs flex-1" style={{ color: "#92400E" }}>
+                  Check drop factor specified on the IV tubing packaging before starting.
                 </Text>
               </View>
-            ) : (
-              <PrimaryButton
-                label={isSaving ? "Saving..." : "Save to Record"}
-                onPress={handleSave}
-                disabled={isSaving}
-              />
-            )}
+            </View>
+          )}
 
-            {isSaving && (
-              <ActivityIndicator size="small" color={colors.primary} />
-            )}
-
-            {saveError && (
-              <View style={styles.errorCard}>
-                <Ionicons
-                  name="alert-circle"
-                  size={16}
-                  color={colors.dangerAlt}
+          {result && isPatientMode && (
+            <View className="gap-2.5 mt-2 mb-8">
+              {savedId ? (
+                <View
+                  className="flex-row items-center justify-center gap-2 p-3.5 rounded-lg"
+                  style={{
+                    backgroundColor: colors.white,
+                    borderWidth: 1,
+                    borderColor: colors.success + "40",
+                  }}
+                >
+                  <Ionicons name="checkmark-circle" size={20} color={colors.success} />
+                  <Text className="text-[14px] font-semibold" style={{ color: colors.success }}>
+                    Saved to {params.patientName || "patient"}'s record
+                  </Text>
+                </View>
+              ) : (
+                <PrimaryButton
+                  label={isSaving ? "Saving..." : "Save to Record"}
+                  onPress={handleSave}
+                  disabled={isSaving}
                 />
-                <Text style={styles.errorText}>{saveError}</Text>
-              </View>
-            )}
-          </View>
-        )}
-      </ScrollView>
+              )}
+
+              {isSaving && (
+                <ActivityIndicator size="small" color={colors.primary} />
+              )}
+
+              {saveError && (
+                <View
+                  className="flex-row items-center gap-1.5 p-3 rounded-lg"
+                  style={{
+                    backgroundColor: colors.white,
+                    borderWidth: 1,
+                    borderColor: colors.danger + "40",
+                  }}
+                >
+                  <Ionicons name="alert-circle" size={16} color={colors.danger} />
+                  <Text className="text-xs flex-1" style={{ color: colors.danger }}>
+                    {saveError}
+                  </Text>
+                </View>
+              )}
+            </View>
+          )}
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.backgroundAlt,
-  },
-  container: {
-    padding: 20,
-    gap: 16,
-    paddingBottom: 40,
-  },
-  formGroup: {
-    gap: 6,
-  },
-  label: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: colors.textHeading,
-  },
-  dropdownCard: {
-    backgroundColor: colors.white,
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  dropdownHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  selectedOptionText: {
-    fontSize: 15,
-    color: colors.placeholder,
-  },
-  dropdownList: {
-    marginTop: 8,
-  },
-  dropdownOption: {
-    paddingVertical: 8,
-  },
-  dropdownOptionBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
-  },
-  optionText: {
-    fontSize: 14,
-    color: colors.placeholder,
-  },
-  activeOptionText: {
-    fontWeight: "600",
-  },
-  calculateButton: {
-    marginTop: 12,
-  },
-  resultCard: {
-    backgroundColor: colors.white,
-    borderRadius: 12,
-    padding: 20,
-    marginTop: 8,
-  },
-  infusionLabel: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: colors.success,
-    marginBottom: 4,
-  },
-  rateValue: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: colors.primary,
-    marginBottom: 4,
-  },
-  equivalentText: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    marginBottom: 16,
-  },
-  alertContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  alertText: {
-    fontSize: 13,
-    color: colors.textHeading,
-    fontWeight: "500",
-  },
-  saveSection: {
-    gap: 10,
-  },
-  savedRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    padding: 12,
-    backgroundColor: colors.white,
-    borderRadius: 8,
-  },
-  savedText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: colors.success,
-  },
-  errorCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    padding: 12,
-    backgroundColor: colors.white,
-    borderRadius: 8,
-    marginTop: 4,
-  },
-  errorText: {
-    fontSize: 13,
-    color: colors.dangerAlt,
-    flex: 1,
-  },
-});

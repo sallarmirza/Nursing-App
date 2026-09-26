@@ -6,7 +6,6 @@ import { useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -33,14 +32,12 @@ export default function NursingAssessmentScreen() {
   const [painScale, setPainScale] = useState<number>(4);
   const [formError, setFormError] = useState<string | null>(null);
 
-  // Vitals — saved to backend with source "Nursing Notes"
   const [bp, setBp] = useState("");
   const [hr, setHr] = useState("");
   const [rr, setRr] = useState("");
   const [spO2, setSpO2] = useState("");
   const [temp, setTemp] = useState("");
 
-  // Interventions — saved with the assessment note
   const [interventions, setInterventions] = useState<{
     [key: string]: boolean;
   }>({
@@ -96,8 +93,6 @@ export default function NursingAssessmentScreen() {
       return;
     }
 
-    // Vitals first: a retry after a failed note only repeats a reading,
-    // whereas retrying after a failed vitals save would duplicate a note.
     const vitalsSaved = await recordVitals(params.patientId, "Nursing Notes", {
       bp,
       hr,
@@ -128,103 +123,168 @@ export default function NursingAssessmentScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+    <SafeAreaView
+      className="flex-1"
+      style={{ backgroundColor: colors.backgroundAlt }}
+      edges={["top", "left", "right"]}
+    >
       <ScreenHeader title="Nursing Notes" />
 
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerClassName="p-6 gap-5 pb-10"
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.patientCard}>
-          <View style={styles.patientLeft}>
-            <PersonAvatar size={36} />
-            <View>
-              <Text style={styles.patientName}>
-                {params.patientName || "Patient"}
-              </Text>
-              <Text style={styles.patientMeta}>ID: {params.patientId}</Text>
-            </View>
+        <View
+          className="rounded-xl p-4 flex-row items-center gap-3"
+          style={{ backgroundColor: colors.white }}
+        >
+          <PersonAvatar size={44} />
+          <View className="flex-1">
+            <Text
+              className="text-[17px] font-bold"
+              style={{ color: colors.textHeading }}
+            >
+              {params.patientName || "Patient"}
+            </Text>
+            <Text
+              className="text-[13px] mt-0.5"
+              style={{ color: colors.textSecondary }}
+            >
+              ID: {params.patientId}
+            </Text>
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Patient Condition</Text>
-          <View style={styles.grid2x2}>
-            {conditionOptions.map((item) => (
-              <TouchableOpacity
-                key={item}
-                style={[
-                  styles.toggleChip,
-                  condition === item && styles.activeChip,
-                ]}
-                onPress={() => setCondition(item)}
-              >
-                <Text
-                  style={[
-                    styles.chipText,
-                    condition === item && styles.activeChipText,
-                  ]}
+        <View className="gap-2">
+          <Text
+            className="text-[17px] font-bold"
+            style={{ color: colors.textHeading }}
+          >
+            Patient Condition
+          </Text>
+          <View className="flex-row flex-wrap gap-2">
+            {conditionOptions.map((item) => {
+              const isActive = condition === item;
+              return (
+                <TouchableOpacity
+                  key={item}
+                  className="w-[48.5%] h-[52px] rounded-xl items-center justify-center px-2"
+                  style={{
+                    backgroundColor: isActive ? colors.primary : colors.white,
+                  }}
+                  onPress={() => setCondition(item)}
                 >
-                  {item}
-                </Text>
-              </TouchableOpacity>
-            ))}
+                  <Text
+                    className={`text-[15px] text-center ${
+                      isActive ? "font-semibold" : "font-medium"
+                    }`}
+                    style={{
+                      color: isActive ? colors.white : colors.textSecondary,
+                    }}
+                  >
+                    {item}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Level of Consciousness</Text>
-          <View style={styles.grid2x2}>
-            {consciousnessOptions.map((item) => (
-              <TouchableOpacity
-                key={item}
-                style={[
-                  styles.toggleChip,
-                  consciousness === item && styles.activeChip,
-                ]}
-                onPress={() => setConsciousness(item)}
-              >
-                <Text
-                  style={[
-                    styles.chipText,
-                    consciousness === item && styles.activeChipText,
-                  ]}
+        <View className="gap-2">
+          <Text
+            className="text-[17px] font-bold"
+            style={{ color: colors.textHeading }}
+          >
+            Level of Consciousness
+          </Text>
+          <View className="flex-row flex-wrap gap-2">
+            {consciousnessOptions.map((item) => {
+              const isActive = consciousness === item;
+              return (
+                <TouchableOpacity
+                  key={item}
+                  className="w-[48.5%] h-[52px] rounded-xl items-center justify-center px-2"
+                  style={{
+                    backgroundColor: isActive ? colors.primary : colors.white,
+                  }}
+                  onPress={() => setConsciousness(item)}
                 >
-                  {item}
-                </Text>
-              </TouchableOpacity>
-            ))}
+                  <Text
+                    className={`text-[15px] text-center ${
+                      isActive ? "font-semibold" : "font-medium"
+                    }`}
+                    style={{
+                      color: isActive ? colors.white : colors.textSecondary,
+                    }}
+                  >
+                    {item}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>GCS</Text>
-          <View style={styles.gcsInputRow}>
+        <View className="gap-2">
+          <Text
+            className="text-[17px] font-bold"
+            style={{ color: colors.textHeading }}
+          >
+            GCS
+          </Text>
+          <View
+            className="flex-row items-center rounded-xl w-[150px] h-[52px] px-4 justify-center"
+            style={{ backgroundColor: colors.white }}
+          >
             <TextInput
-              style={styles.gcsInput}
+              className="text-[16px] text-center w-[36px]"
+              style={{ color: colors.textHeading }}
               placeholder="--"
-              placeholderTextColor={colors.textFaint}
+              placeholderTextColor="#9CA3AF"
               keyboardType="numeric"
               maxLength={2}
               value={gcs}
               onChangeText={setGcs}
             />
-            <Text style={styles.gcsDenominator}>/ 15</Text>
+            <Text
+              className="text-[16px] font-semibold ml-2"
+              style={{ color: colors.textHeading }}
+            >
+              / 15
+            </Text>
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Pain Scale</Text>
-          <View style={styles.sliderContainer}>
-            <View style={styles.sliderHeader}>
-              <Text style={styles.sliderMinMax}>0</Text>
-              <Text style={styles.sliderValueText}>
+        <View className="gap-2">
+          <Text
+            className="text-[17px] font-bold"
+            style={{ color: colors.textHeading }}
+          >
+            Pain Scale
+          </Text>
+          <View className="gap-1">
+            <View className="flex-row justify-between px-1">
+              <Text
+                className="text-[13px] font-semibold"
+                style={{ color: colors.textSecondary }}
+              >
+                0
+              </Text>
+              <Text
+                className="text-[15px] font-bold"
+                style={{ color: colors.textHeading }}
+              >
                 {Math.round(painScale)}
               </Text>
-              <Text style={styles.sliderMinMax}>10</Text>
+              <Text
+                className="text-[13px] font-semibold"
+                style={{ color: colors.textSecondary }}
+              >
+                10
+              </Text>
             </View>
             <Slider
-              style={styles.slider}
+              style={{ width: "100%", height: 40 }}
               minimumValue={0}
               maximumValue={10}
               step={1}
@@ -237,46 +297,56 @@ export default function NursingAssessmentScreen() {
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Vitals</Text>
-          <View style={styles.vitalsGridTop}>
+        <View className="gap-2">
+          <Text
+            className="text-[17px] font-bold"
+            style={{ color: colors.textHeading }}
+          >
+            Vitals
+          </Text>
+          <View className="flex-row gap-2">
             <TextInput
-              style={styles.vitalInput}
+              className="flex-1 h-[52px] rounded-xl text-center text-[15px]"
+              style={{ backgroundColor: colors.white, color: colors.textPrimary }}
               placeholder="BP (120/80)"
-              placeholderTextColor={colors.placeholder}
+              placeholderTextColor="#9CA3AF"
               value={bp}
               onChangeText={setBp}
             />
             <TextInput
-              style={styles.vitalInput}
+              className="flex-1 h-[52px] rounded-xl text-center text-[15px]"
+              style={{ backgroundColor: colors.white, color: colors.textPrimary }}
               placeholder="HR"
-              placeholderTextColor={colors.placeholder}
+              placeholderTextColor="#9CA3AF"
               keyboardType="numeric"
               value={hr}
               onChangeText={setHr}
             />
             <TextInput
-              style={styles.vitalInput}
+              className="flex-1 h-[52px] rounded-xl text-center text-[15px]"
+              style={{ backgroundColor: colors.white, color: colors.textPrimary }}
               placeholder="RR"
-              placeholderTextColor={colors.placeholder}
+              placeholderTextColor="#9CA3AF"
               keyboardType="numeric"
               value={rr}
               onChangeText={setRr}
             />
           </View>
-          <View style={styles.vitalsGridBottom}>
+          <View className="flex-row gap-2 justify-center mt-2">
             <TextInput
-              style={styles.vitalInputHalf}
+              className="w-[48.5%] h-[52px] rounded-xl text-center text-[15px]"
+              style={{ backgroundColor: colors.white, color: colors.textPrimary }}
               placeholder="SpO2"
-              placeholderTextColor={colors.placeholder}
+              placeholderTextColor="#9CA3AF"
               keyboardType="numeric"
               value={spO2}
               onChangeText={setSpO2}
             />
             <TextInput
-              style={styles.vitalInputHalf}
+              className="w-[48.5%] h-[52px] rounded-xl text-center text-[15px]"
+              style={{ backgroundColor: colors.white, color: colors.textPrimary }}
               placeholder="Temp (°F)"
-              placeholderTextColor={colors.placeholder}
+              placeholderTextColor="#9CA3AF"
               keyboardType="numeric"
               value={temp}
               onChangeText={setTemp}
@@ -284,199 +354,51 @@ export default function NursingAssessmentScreen() {
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Nursing Interventions</Text>
-          <View style={styles.interventionsList}>
+        <View className="gap-2">
+          <Text
+            className="text-[17px] font-bold"
+            style={{ color: colors.textHeading }}
+          >
+            Nursing Interventions
+          </Text>
+          <View className="gap-3 mt-1">
             {Object.entries(interventions).map(([key, checked]) => (
               <TouchableOpacity
                 key={key}
-                style={styles.checkboxRow}
+                className="flex-row items-center gap-3"
                 onPress={() => toggleIntervention(key)}
                 activeOpacity={0.7}
               >
                 <Ionicons
                   name={checked ? "checkbox" : "square-outline"}
-                  size={20}
+                  size={24}
                   color={checked ? colors.textPrimary : colors.textSecondary}
                 />
-                <Text style={styles.checkboxLabel}>{key}</Text>
+                <Text
+                  className="text-[15px] font-medium"
+                  style={{ color: colors.textHeading }}
+                >
+                  {key}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
         </View>
 
-        {displayError && <Text style={styles.errorText}>{displayError}</Text>}
+        {displayError && (
+          <Text className="text-[14px]" style={{ color: colors.dangerAlt }}>
+            {displayError}
+          </Text>
+        )}
 
         <PrimaryButton
           label={isBusy ? "Saving..." : "Proceed to Notes"}
           onPress={handleProceed}
           disabled={isBusy}
-          style={styles.proceedButton}
+          style={{ marginTop: 12 }}
         />
         {isBusy && <ActivityIndicator size="small" color={colors.primary} />}
       </ScrollView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.backgroundAlt,
-  },
-  container: {
-    padding: 20,
-    gap: 18,
-    paddingBottom: 40,
-  },
-  patientCard: {
-    backgroundColor: colors.white,
-    borderRadius: 12,
-    padding: 14,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-  },
-  patientLeft: {
-    flexDirection: "row",
-    gap: 12,
-    alignItems: "center",
-  },
-  patientName: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: colors.textHeading,
-  },
-  patientMeta: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  section: {
-    gap: 8,
-  },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: colors.textHeading,
-  },
-  grid2x2: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  toggleChip: {
-    width: "48.5%",
-    height: 44,
-    backgroundColor: colors.white,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 8,
-  },
-  activeChip: {
-    backgroundColor: colors.primary,
-  },
-  chipText: {
-    fontSize: 13,
-    fontWeight: "500",
-    color: colors.textSecondary,
-    textAlign: "center",
-  },
-  activeChipText: {
-    color: colors.white,
-    fontWeight: "600",
-  },
-  gcsInputRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.white,
-    borderRadius: 8,
-    width: 130,
-    height: 44,
-    paddingHorizontal: 12,
-    justifyContent: "center",
-  },
-  gcsInput: {
-    fontSize: 15,
-    color: colors.textHeading,
-    textAlign: "center",
-    width: 30,
-  },
-  gcsDenominator: {
-    fontSize: 14,
-    color: colors.textHeading,
-    fontWeight: "600",
-    marginLeft: 4,
-  },
-  sliderContainer: {
-    gap: 2,
-  },
-  sliderHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 4,
-  },
-  sliderMinMax: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    fontWeight: "600",
-  },
-  sliderValueText: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: colors.textHeading,
-  },
-  slider: {
-    width: "100%",
-    height: 30,
-  },
-  vitalsGridTop: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  vitalsGridBottom: {
-    flexDirection: "row",
-    gap: 8,
-    justifyContent: "center",
-    marginTop: 8,
-  },
-  vitalInput: {
-    flex: 1,
-    height: 44,
-    backgroundColor: colors.white,
-    borderRadius: 8,
-    textAlign: "center",
-    fontSize: 13,
-    color: colors.inputValue,
-  },
-  vitalInputHalf: {
-    width: "48.5%",
-    height: 44,
-    backgroundColor: colors.white,
-    borderRadius: 8,
-    textAlign: "center",
-    fontSize: 13,
-    color: colors.inputValue,
-  },
-  interventionsList: {
-    gap: 10,
-    marginTop: 4,
-  },
-  checkboxRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  checkboxLabel: {
-    fontSize: 13,
-    color: colors.textHeading,
-    fontWeight: "500",
-  },
-  proceedButton: {
-    marginTop: 12,
-  },
-  errorText: {
-    color: colors.dangerAlt,
-    fontSize: 13,
-  },
-});

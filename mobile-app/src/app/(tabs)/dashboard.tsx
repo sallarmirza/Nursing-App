@@ -4,7 +4,6 @@ import {
   ActivityIndicator,
   RefreshControl,
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -43,7 +42,6 @@ const TOOLS = [
   },
 ] as const;
 
-// Assumed shift boundaries: 06-14 morning, 14-22 evening, otherwise night
 function getShiftLabel(now: Date): string {
   const hour = now.getHours();
   if (hour >= 6 && hour < 14) return "Morning Shift";
@@ -90,21 +88,24 @@ export default function DashboardScreen() {
   const greeting = data?.nurse_name ? `Welcome ${data.nurse_name}!` : "Welcome!";
 
   return (
-    <View style={[styles.mainContainer, { paddingTop: insets.top }]}>
+    <View 
+      className="flex-1" 
+      style={{ backgroundColor: colors.background, paddingTop: insets.top }}
+    >
       <ScrollView
-        contentContainerStyle={[
-          styles.container,
-          { paddingBottom: insets.bottom + 80 },
-        ]}
+        contentContainerClassName="px-5 pt-4"
+        style={{ paddingBottom: insets.bottom + 80 }}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={isRefreshing} onRefresh={refresh} />
         }
       >
-        <View style={styles.header}>
+        <View className="flex-row justify-between items-center mb-6">
           <View>
-            <Text style={styles.greeting}>{greeting}</Text>
-            <Text style={styles.shiftText}>
+            <Text className="text-[22px] font-bold" style={{ color: colors.textPrimary }}>
+              {greeting}
+            </Text>
+            <Text className="text-sm mt-0.5" style={{ color: colors.textMuted }}>
               {getShiftLabel(now)}, {formatDate(now)}
             </Text>
           </View>
@@ -113,7 +114,7 @@ export default function DashboardScreen() {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.toolsList}>
+        <View className="gap-3 mb-7">
           {TOOLS.map((tool) => (
             <ToolCard
               key={tool.id}
@@ -124,18 +125,29 @@ export default function DashboardScreen() {
           ))}
         </View>
 
-        <View style={styles.patientsHeader}>
-          <Text style={styles.sectionTitle}>Recent Patients</Text>
+        <View className="flex-row justify-between items-center mb-3">
+          <Text className="text-[15px] font-semibold" style={{ color: colors.textSecondary }}>
+            Recent Patients
+          </Text>
           <TouchableOpacity onPress={() => router.push("/(tabs)/patients")}>
-            <Text style={styles.seeAllText}>See all</Text>
+            <Text className="text-sm font-semibold" style={{ color: colors.textPrimary }}>
+              See all
+            </Text>
           </TouchableOpacity>
         </View>
 
         {error && (
-          <View style={styles.errorCard}>
-            <Text style={styles.errorText}>{error}</Text>
+          <View 
+            className="flex-row items-center justify-between gap-2 p-3 rounded-xl mb-3" 
+            style={{ backgroundColor: colors.white }}
+          >
+            <Text className="text-xs flex-1" style={{ color: colors.dangerAlt }}>
+              {error}
+            </Text>
             <TouchableOpacity onPress={refresh}>
-              <Text style={styles.retryText}>Retry</Text>
+              <Text className="text-xs font-semibold" style={{ color: colors.textPrimary }}>
+                Retry
+              </Text>
             </TouchableOpacity>
           </View>
         )}
@@ -143,18 +155,24 @@ export default function DashboardScreen() {
         {isLoading && <ActivityIndicator size="small" color={colors.textMuted} />}
 
         {!isLoading && !error && patients.length === 0 && (
-          <Text style={styles.emptyText}>No patients assigned yet.</Text>
+          <Text className="text-[13px] text-center mt-2" style={{ color: colors.textMuted }}>
+            No patients assigned yet.
+          </Text>
         )}
 
         {patients.length > 0 && (
-          <View style={styles.patientsCard}>
+          <View className="rounded-2xl px-4 py-2" style={{ backgroundColor: colors.white }}>
             {patients.map((patient, index) => (
               <TouchableOpacity
                 key={patient.patient_id}
-                style={[
-                  styles.patientRow,
-                  index < patients.length - 1 && styles.patientRowBorder,
-                ]}
+                className={`flex-row items-center justify-between py-3 ${
+                  index < patients.length - 1 ? "border-b" : ""
+                }`}
+                style={
+                  index < patients.length - 1
+                    ? { borderBottomColor: colors.border }
+                    : undefined
+                }
                 onPress={() =>
                   router.push({
                     pathname: "/patients/[id]" as any,
@@ -162,17 +180,19 @@ export default function DashboardScreen() {
                   })
                 }
               >
-                <View style={styles.patientInfo}>
+                <View className="flex-row items-center gap-3 flex-1">
                   <PersonAvatar size={32} />
-                  <Text style={styles.patientName} numberOfLines={1}>
+                  <Text 
+                    className="text-sm font-semibold flex-shrink-1" 
+                    style={{ color: colors.textHeading }}
+                    numberOfLines={1}
+                  >
                     {patient.patient_name}
                   </Text>
                 </View>
                 <Text
-                  style={[
-                    styles.statusText,
-                    { color: getStatusColor(patient.vitals_status) },
-                  ]}
+                  className="text-xs font-medium ml-2"
+                  style={{ color: getStatusColor(patient.vitals_status) }}
                 >
                   {getStatusLabel(patient.vitals_status)}
                 </Text>
@@ -185,108 +205,3 @@ export default function DashboardScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  mainContainer: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  container: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 24,
-  },
-  greeting: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: colors.textPrimary,
-  },
-  shiftText: {
-    fontSize: 14,
-    color: colors.textMuted,
-    marginTop: 2,
-  },
-  toolsList: {
-    gap: 12,
-    marginBottom: 28,
-  },
-  patientsHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: colors.textSecondary,
-  },
-  seeAllText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: colors.textPrimary,
-  },
-  errorCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 8,
-    padding: 12,
-    backgroundColor: colors.white,
-    borderRadius: 12,
-    marginBottom: 12,
-  },
-  errorText: {
-    fontSize: 12,
-    color: colors.dangerAlt,
-    flex: 1,
-  },
-  retryText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: colors.textPrimary,
-  },
-  emptyText: {
-    fontSize: 13,
-    color: colors.textMuted,
-    textAlign: "center",
-    marginTop: 8,
-  },
-  patientsCard: {
-    backgroundColor: colors.white,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  patientRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 12,
-  },
-  patientRowBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  patientInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    flex: 1,
-  },
-  patientName: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: colors.textHeading,
-    flexShrink: 1,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: "500",
-    marginLeft: 8,
-  },
-});

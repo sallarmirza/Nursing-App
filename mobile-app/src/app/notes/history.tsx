@@ -5,7 +5,6 @@ import { useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -89,47 +88,52 @@ export default function NotesHistoryScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+    <SafeAreaView className="flex-1 bg-[#F3EFEF]" edges={["top", "left", "right"]}>
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerClassName="p-4 gap-4 pb-10"
         showsVerticalScrollIndicator={false}
       >
         {/* Top Bar */}
-        <View style={styles.headerRow}>
+        <View className="flex-row items-center justify-between mt-1">
           <TouchableOpacity
             onPress={() => router.back()}
-            style={styles.backButton}
+            className="p-1"
           >
             <Ionicons name="chevron-back" size={24} color="#000000" />
           </TouchableOpacity>
 
-          <View style={styles.titleContainer}>
-            <Text style={styles.headerTitle}>Notes History</Text>
-            <Text style={styles.headerSubtitle}>
+          <View className="flex-1 ml-2">
+            <Text className="text-[18px] font-bold text-black">
+              Notes History
+            </Text>
+            <Text className="text-xs text-[#6B7280] mt-[1px]">
               {params.patientName || "Patient"}
             </Text>
           </View>
 
-          <View style={styles.avatarBadge}>
+          <View className="w-9 h-9 rounded-full bg-[#EDE9FE] items-center justify-center">
             <Ionicons name="person" size={20} color="#A78BFA" />
           </View>
         </View>
 
         {/* Filter Pills */}
-        <View style={styles.filterRow}>
+        <View className="flex-row gap-2">
           {FILTER_OPTIONS.map((filter) => {
             const isActive = selectedFilter === filter;
             return (
               <TouchableOpacity
                 key={filter}
-                style={[styles.filterPill, isActive && styles.activeFilterPill]}
+                className={`flex-1 h-8 rounded-md items-center justify-center ${
+                  isActive ? "bg-[#1D9BF0]" : "bg-white"
+                }`}
                 onPress={() => setSelectedFilter(filter)}
               >
                 <Text
-                  style={[
-                    styles.filterText,
-                    isActive && styles.activeFilterText,
-                  ]}
+                  className={`text-xs ${
+                    isActive
+                      ? "text-white font-semibold"
+                      : "text-[#374151] font-medium"
+                  }`}
                 >
                   {filter}
                 </Text>
@@ -139,31 +143,31 @@ export default function NotesHistoryScreen() {
         </View>
 
         {!params.patientId && (
-          <View style={styles.messageCard}>
+          <View className="flex-row items-center gap-1.5 p-3 bg-white rounded-lg">
             <Ionicons name="alert-circle" size={16} color="#EF4444" />
-            <Text style={styles.errorText}>
+            <Text className="text-xs text-[#EF4444] flex-1">
               No patient selected. Open this screen from a patient record.
             </Text>
           </View>
         )}
 
         {error && (
-          <View style={styles.messageCard}>
+          <View className="flex-row items-center gap-1.5 p-3 bg-white rounded-lg">
             <Ionicons name="alert-circle" size={16} color="#EF4444" />
-            <Text style={styles.errorText}>{error}</Text>
+            <Text className="text-xs text-[#EF4444] flex-1">{error}</Text>
           </View>
         )}
 
         {isLoading && <ActivityIndicator size="small" color="#1D9BF0" />}
 
         {!isLoading && !error && params.patientId && visibleNotes.length === 0 && (
-          <Text style={styles.emptyText}>
+          <Text className="text-[13px] text-[#6B7280] text-center mt-3">
             No notes for {selectedFilter.toLowerCase()}.
           </Text>
         )}
 
         {/* History Cards List */}
-        <View style={styles.listContainer}>
+        <View className="gap-3">
           {visibleNotes.map((note) => {
             const soapCount = note.soap_history?.length ?? 0;
             const isCompleted = soapCount > 0;
@@ -176,106 +180,119 @@ export default function NotesHistoryScreen() {
             return (
               <TouchableOpacity
                 key={note.note_id}
-                style={styles.card}
+                className="bg-white rounded-xl p-3.5 gap-2.5"
                 activeOpacity={0.8}
                 onPress={() => toggleExpanded(note.note_id)}
               >
-                <View style={styles.cardHeader}>
-                  <View style={styles.leftRow}>
-                    <View style={styles.rowAvatar}>
+                <View className="flex-row justify-between items-start">
+                  <View className="flex-row gap-2.5 items-center flex-1">
+                    <View className="w-8 h-8 rounded-full bg-[#EDE9FE] items-center justify-center">
                       <Ionicons name="document-text" size={16} color="#A78BFA" />
                     </View>
                     <View>
-                      <Text style={styles.patientName}>
+                      <Text className="text-[15px] font-bold text-[#1F2937]">
                         {note.patient_condition}
                       </Text>
-                      <Text style={styles.patientSubtitle}>
+                      <Text className="text-xs text-[#6B7280]">
                         {formatDateTime(note.notes_created_at)}
                       </Text>
                     </View>
                   </View>
 
                   <View
-                    style={[
-                      styles.badge,
-                      isCompleted ? styles.badgeCompleted : styles.badgeDraft,
-                    ]}
+                    className={`px-3 py-1 rounded ${
+                      isCompleted ? "bg-[#DCFCE7]" : "bg-[#E5E7EB]"
+                    }`}
                   >
                     <Text
-                      style={[
-                        styles.badgeText,
-                        isCompleted
-                          ? styles.badgeTextCompleted
-                          : styles.badgeTextDraft,
-                      ]}
+                      className={`text-[11px] font-semibold ${
+                        isCompleted ? "text-[#166534]" : "text-[#EF4444]"
+                      }`}
                     >
                       {isCompleted ? "Completed" : "Draft"}
                     </Text>
                   </View>
                 </View>
 
-                <View style={styles.cardFooter}>
-                  <Text style={styles.subDetailsText}>
+                <View className="flex-row justify-between items-center pt-1">
+                  <Text className="text-[11px] text-[#6B7280] flex-1">
                     {note.conscious_level} | GCS {note.glasgow_coma_score}/15 |
                     Pain {note.pain_scale}/10
                   </Text>
-                  <Text style={styles.viewLink}>
+                  <Text className="text-[11px] font-semibold text-[#374151] ml-2">
                     {isExpanded ? "Hide" : "View"}
                   </Text>
                 </View>
 
                 {isExpanded && (
-                  <View style={styles.detailBox}>
-                    <Text style={styles.detailLabel}>Interventions Performed</Text>
+                  <View className="border-t border-[#E5E7EB] pt-2.5 gap-1">
+                    <Text className="text-xs font-bold text-[#1F2937] mt-1">
+                      Interventions Performed
+                    </Text>
                     {interventionsDone.length > 0 ? (
                       interventionsDone.map((name) => (
-                        <View key={name} style={styles.interventionRow}>
+                        <View
+                          key={name}
+                          className="flex-row items-center gap-1.5"
+                        >
                           <Ionicons
                             name="checkmark-circle"
                             size={14}
                             color="#166534"
                           />
-                          <Text style={styles.detailText}>{name}</Text>
+                          <Text className="text-xs text-[#374151] leading-[17px]">
+                            {name}
+                          </Text>
                         </View>
                       ))
                     ) : (
-                      <Text style={styles.detailText}>
+                      <Text className="text-xs text-[#374151] leading-[17px]">
                         No interventions recorded.
                       </Text>
                     )}
 
                     {latestSoap ? (
                       <>
-                        <Text style={styles.detailVersion}>
+                        <Text className="text-[11px] font-semibold text-[#6B7280] mt-2 mb-1">
                           SOAP v{latestSoap.version} (
                           {formatDateTime(latestSoap.created_at)})
                         </Text>
-                        <Text style={styles.detailLabel}>Subjective</Text>
-                        <Text style={styles.detailText}>
+                        <Text className="text-xs font-bold text-[#1F2937] mt-1">
+                          Subjective
+                        </Text>
+                        <Text className="text-xs text-[#374151] leading-[17px]">
                           {latestSoap.subjective}
                         </Text>
-                        <Text style={styles.detailLabel}>Objective</Text>
-                        <Text style={styles.detailText}>
+                        <Text className="text-xs font-bold text-[#1F2937] mt-1">
+                          Objective
+                        </Text>
+                        <Text className="text-xs text-[#374151] leading-[17px]">
                           {latestSoap.objective}
                         </Text>
-                        <Text style={styles.detailLabel}>Assessment</Text>
-                        <Text style={styles.detailText}>
+                        <Text className="text-xs font-bold text-[#1F2937] mt-1">
+                          Assessment
+                        </Text>
+                        <Text className="text-xs text-[#374151] leading-[17px]">
                           {latestSoap.assessment}
                         </Text>
-                        <Text style={styles.detailLabel}>Plan</Text>
-                        <Text style={styles.detailText}>{latestSoap.plan}</Text>
+                        <Text className="text-xs font-bold text-[#1F2937] mt-1">
+                          Plan
+                        </Text>
+                        <Text className="text-xs text-[#374151] leading-[17px]">
+                          {latestSoap.plan}
+                        </Text>
                       </>
                     ) : (
-                      <Text style={styles.detailVersion}>
+                      <Text className="text-[11px] font-semibold text-[#6B7280] mt-2 mb-1">
                         No SOAP note recorded for this assessment yet.
                       </Text>
                     )}
 
                     <TouchableOpacity
-                      style={styles.addSoapButton}
+                      className="mt-2.5 h-9 rounded-md bg-[#1D9BF0] items-center justify-center"
                       onPress={() => handleAddSoap(note)}
                     >
-                      <Text style={styles.addSoapText}>
+                      <Text className="text-xs font-semibold text-white">
                         {isCompleted ? "Add New SOAP Version" : "Add SOAP Note"}
                       </Text>
                     </TouchableOpacity>
@@ -289,206 +306,3 @@ export default function NotesHistoryScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#F3EFEF",
-  },
-  container: {
-    padding: 16,
-    gap: 16,
-    paddingBottom: 40,
-  },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: 4,
-  },
-  backButton: {
-    padding: 4,
-  },
-  titleContainer: {
-    flex: 1,
-    marginLeft: 8,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#000000",
-  },
-  headerSubtitle: {
-    fontSize: 12,
-    color: "#6B7280",
-    marginTop: 1,
-  },
-  avatarBadge: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "#EDE9FE",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  filterRow: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  filterPill: {
-    flex: 1,
-    height: 32,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 6,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  activeFilterPill: {
-    backgroundColor: "#1D9BF0",
-  },
-  filterText: {
-    fontSize: 12,
-    fontWeight: "500",
-    color: "#374151",
-  },
-  activeFilterText: {
-    color: "#FFFFFF",
-    fontWeight: "600",
-  },
-  messageCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    padding: 12,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 8,
-  },
-  errorText: {
-    fontSize: 12,
-    color: "#EF4444",
-    flex: 1,
-  },
-  emptyText: {
-    fontSize: 13,
-    color: "#6B7280",
-    textAlign: "center",
-    marginTop: 12,
-  },
-  listContainer: {
-    gap: 12,
-  },
-  card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    padding: 14,
-    gap: 10,
-  },
-  cardHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-  },
-  leftRow: {
-    flexDirection: "row",
-    gap: 10,
-    alignItems: "center",
-    flex: 1,
-  },
-  rowAvatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "#EDE9FE",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  patientName: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#1F2937",
-  },
-  patientSubtitle: {
-    fontSize: 12,
-    color: "#6B7280",
-  },
-  badge: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  badgeDraft: {
-    backgroundColor: "#E5E7EB",
-  },
-  badgeCompleted: {
-    backgroundColor: "#DCFCE7",
-  },
-  badgeText: {
-    fontSize: 11,
-    fontWeight: "600",
-  },
-  badgeTextDraft: {
-    color: "#EF4444",
-  },
-  badgeTextCompleted: {
-    color: "#166534",
-  },
-  cardFooter: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingTop: 4,
-  },
-  subDetailsText: {
-    fontSize: 11,
-    color: "#6B7280",
-    flex: 1,
-  },
-  viewLink: {
-    fontSize: 11,
-    fontWeight: "600",
-    color: "#374151",
-    marginLeft: 8,
-  },
-  detailBox: {
-    borderTopWidth: 1,
-    borderTopColor: "#E5E7EB",
-    paddingTop: 10,
-    gap: 4,
-  },
-  interventionRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  detailVersion: {
-    fontSize: 11,
-    fontWeight: "600",
-    color: "#6B7280",
-    marginTop: 8,
-    marginBottom: 4,
-  },
-  detailLabel: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: "#1F2937",
-    marginTop: 4,
-  },
-  detailText: {
-    fontSize: 12,
-    color: "#374151",
-    lineHeight: 17,
-  },
-  addSoapButton: {
-    marginTop: 10,
-    height: 36,
-    borderRadius: 6,
-    backgroundColor: "#1D9BF0",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  addSoapText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#FFFFFF",
-  },
-});
