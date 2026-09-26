@@ -2,7 +2,7 @@
 import { useFocusEffect } from "expo-router";
 import { useCallback, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { dashboardService } from "../services/dashboardService";
+import { dashboardService } from "../services/dashboard/dashboardService";
 import { DashboardResponse } from "../types/dashboard";
 
 export default function useDashboard() {
