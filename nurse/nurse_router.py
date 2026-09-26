@@ -95,3 +95,15 @@ def delete_nurse_account(nurse_id):
         raise
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    
+    
+@router.get("/{nurse_id}")
+def get_nurse(nurse_id: str):
+    """Fetch a single nurse's profile."""
+    try:
+        return nurse_service.get_nurse_profile(nurse_id)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )

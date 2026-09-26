@@ -173,7 +173,38 @@ class NurseService:
 
         finally:
             session.close()
-        
+            
+    def get_nurse_profile(self, nurse_id: str):
+        """Fetch one nurse's profile fields."""
+        session = self.db.get_session()
+
+        try:
+            nurse = session.query(Nurse).filter(Nurse.nurse_id == nurse_id).first()
+
+            if nurse is None:
+                raise ValueError("Nurse not found")
+
+            return {
+                "nurse_id": nurse.nurse_id,
+                "nurse_name": nurse.nurse_name,
+                "nurse_email": nurse.nurse_email,
+                "nurse_qualification": nurse.nurse_qualification,
+                "nurse_designation": nurse.nurse_designation,
+                "nurse_hospital": nurse.nurse_hospital,
+                "nurse_experience": nurse.nurse_experience,
+            }
+
+        except ValueError:
+            raise
+
+        except Exception as e:
+            raise ValueError("Failed to retrieve nurse profile") from e
+
+        finally:
+            session.close()
+            
+    
+
     
     def nurse_patients(self, nurse_id: str):
         """Show all patients assigned to a nurse."""
