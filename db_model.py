@@ -1,5 +1,5 @@
 # db_model.py
-from sqlalchemy import Column,INTEGER,String,Float,ForeignKey,DateTime,TEXT,JSON,DATE,func
+from sqlalchemy import Column,INTEGER,String,Float,ForeignKey,DateTime,TEXT,JSON,DATE,func,Boolean
 from sqlalchemy.orm import declarative_base
 from datetime import datetime
 
@@ -119,3 +119,13 @@ class CurrentMedication(Base):
     dose_unit = Column(String(20))
     frequency = Column(String(50))
     med_start_date = Column(DateTime, server_default=func.current_timestamp())
+    
+class RefreshToken(Base):
+    __tablename__ = 'refresh_tokens'
+
+    token_id = Column(String(36), primary_key=True)
+    nurse_id = Column(String(36), ForeignKey('nurses.nurse_id'), nullable=False, index=True)
+    token_hash = Column(String(255), nullable=False, unique=True, index=True)
+    revoked = Column(Boolean, default=False, nullable=False)
+    expires_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, server_default=func.current_timestamp())

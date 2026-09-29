@@ -1,5 +1,5 @@
 from storage import DBManager
-from schema.register_schema import SBARHandoverRegister
+from sbar.sbar_schema import SBARHandoverRegister
 from datetime import datetime
 from typing import Any
 import uuid

@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 from typing import Any
-from schema.calculation_schema import DosageCalculatorRegister
+from dosage.dosage_schema import DosageCalculatorRegister
 from storage import DBManager
 from db_model import DosageCalculation, Patient  
 

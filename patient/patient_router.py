@@ -1,7 +1,9 @@
-from fastapi import APIRouter,HTTPException,status
+# patient/patient_router
+from fastapi import APIRouter,HTTPException,status,Depends
 from patient.patient_service import PatientService
 from storage import DBManager
-from schema.patient_schema import PatientRegister,PatientResponse
+from patient.patient_schema import PatientRegister,PatientResponse
+from core.deps import get_current_nurse
 
 
 router=APIRouter()
@@ -11,7 +13,11 @@ patient_service=PatientService(db)
 
 
 @router.post('/create/{nurse_id}')
-def create_patient_profile(nurse_id: str, data: PatientRegister):
+def create_patient_profile(
+    nurse_id: str,
+    data: PatientRegister,
+    current_nurse_id: str = Depends(get_current_nurse),
+):
     """creating patient profile"""
     try:
         return patient_service.create_patient_profile(nurse_id, data)
@@ -22,7 +28,11 @@ def create_patient_profile(nurse_id: str, data: PatientRegister):
         )
 
 @router.get('/view/{nurse_id}/{patient_id}', response_model=PatientResponse)
-def view_patient_information(nurse_id: str, patient_id: str) -> PatientResponse:
+def view_patient_information(
+    nurse_id: str,
+    patient_id: str,
+    current_nurse_id: str = Depends(get_current_nurse),
+) -> PatientResponse:
     """view patient's complete info"""
     try:
         return patient_service.view_patient(nurse_id, patient_id)
@@ -30,7 +40,10 @@ def view_patient_information(nurse_id: str, patient_id: str) -> PatientResponse:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 @router.get("/{nurse_id}/all")
-def show_all_patient(nurse_id: str):
+def show_all_patient(
+    nurse_id: str,
+    current_nurse_id: str = Depends(get_current_nurse),
+):
     """List all patients under nurse."""
     try:
         return patient_service.all_patients(nurse_id)
@@ -44,7 +57,8 @@ def show_all_patient(nurse_id: str):
 @router.delete('/delete/{nurse_id}/{patient_id}')
 def delete_patient_profile(
     nurse_id: str,
-    patient_id: str
+    patient_id: str,
+    current_nurse_id: str = Depends(get_current_nurse),
 ):
     """Delete patient profile."""
     try:

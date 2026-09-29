@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException, status
-from schema.calculation_schema import DosageCalculatorRegister
+from fastapi import APIRouter, HTTPException, status, Depends
+from dosage.dosage_schema import DosageCalculatorRegister
 from dosage.dosage_service import DosageCalc
 from storage import DBManager
+from core.deps import get_current_nurse
 
 db = DBManager()
 dosage_cal = DosageCalc(db)
@@ -23,6 +24,7 @@ def calculate_medication_dosage_for_patient(
     nurse_id: str,
     patient_id: str,
     data: DosageCalculatorRegister,
+    current_nurse_id: str = Depends(get_current_nurse),
 ):
     """dosage after selecting the patient"""
     try:
@@ -32,7 +34,11 @@ def calculate_medication_dosage_for_patient(
 
 
 @router.get("/{nurse_id}/{patient_id}")
-def return_all_dosage_for_patient(nurse_id: str, patient_id: str):
+def return_all_dosage_for_patient(
+    nurse_id: str,
+    patient_id: str,
+    current_nurse_id: str = Depends(get_current_nurse),
+):
     try:
         return dosage_cal.list_dosage_calculations(nurse_id, patient_id)
     except ValueError as e:
@@ -40,7 +46,12 @@ def return_all_dosage_for_patient(nurse_id: str, patient_id: str):
 
 
 @router.delete("/{nurse_id}/{patient_id}/{dose_calc_id}")
-def delete_dosage_cal(nurse_id: str, patient_id: str, dose_calc_id: str):
+def delete_dosage_cal(
+    nurse_id: str,
+    patient_id: str,
+    dose_calc_id: str,
+    current_nurse_id: str = Depends(get_current_nurse),
+):
     try:
         return dosage_cal.delete_dosage_calculation(nurse_id, patient_id, dose_calc_id)
     except ValueError as e:

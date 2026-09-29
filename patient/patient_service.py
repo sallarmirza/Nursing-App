@@ -1,7 +1,7 @@
 from storage import DBManager
 from datetime import datetime
 import uuid
-from schema.patient_schema import PatientRegister,PatientResponse
+from patient.patient_schema import PatientRegister,PatientResponse
 from typing import Any
 from db_model import Patient, Nurse ,Vitals,NursingNote,CurrentMedication,DosageCalculation,SBAR,IVDripCalculation
 

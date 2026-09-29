@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 
-from schema.calculation_schema import DripCalculationRegister
+from .drip_schema import DripCalculationRegister
 from drip.drip_service import DripCalc
 from storage import DBManager
+from core.deps import get_current_nurse
 
 db = DBManager()
 drip_rate = DripCalc(db)
@@ -11,7 +12,11 @@ router = APIRouter()
 
 
 @router.get('/{nurse_id}/{patient_id}')
-def return_all_drip_for_patient(nurse_id:str,patient_id: str):
+def return_all_drip_for_patient(
+    nurse_id: str,
+    patient_id: str,
+    current_nurse_id: str = Depends(get_current_nurse),
+):
     try:
         return drip_rate.list_all_patient_drip_calculations(nurse_id,patient_id)
     except ValueError as e:
@@ -32,6 +37,7 @@ def calculate_patient_drip_rate(
     nurse_id: str,
     patient_id: str,
     data: DripCalculationRegister,
+    current_nurse_id: str = Depends(get_current_nurse),
 ):
     """Calculate and save drip rate for a patient."""
     try:
@@ -41,7 +47,12 @@ def calculate_patient_drip_rate(
 
 
 @router.delete("/{nurse_id}/{patient_id}/{drip_calc_id}")
-def delete_drip_cal(nurse_id: str, patient_id: str, drip_calc_id: str):
+def delete_drip_cal(
+    nurse_id: str,
+    patient_id: str,
+    drip_calc_id: str,
+    current_nurse_id: str = Depends(get_current_nurse),
+):
     try:
         return drip_rate.delete_drip_calculation(nurse_id, patient_id, drip_calc_id)
     except ValueError as e:

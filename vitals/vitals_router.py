@@ -1,7 +1,8 @@
-from fastapi import APIRouter,HTTPException,status
+from fastapi import APIRouter,HTTPException,status,Depends
 from vitals.vitals_service import Vitals
-from schema.register_schema import VitalsRegister
+from .vitals_schema import VitalsRegister
 from storage import DBManager
+from core.deps import get_current_nurse
 
 db=DBManager()
 vitals=Vitals(db)
@@ -9,7 +10,12 @@ vitals=Vitals(db)
 router=APIRouter()
 
 @router.post("/{nurse_id}/{patient_id}")
-def create_vitals(nurse_id: str,patient_id: str,data: VitalsRegister):
+def create_vitals(
+    nurse_id: str,
+    patient_id: str,
+    data: VitalsRegister,
+    current_nurse_id: str = Depends(get_current_nurse),
+):
     try:
         return vitals.create_vitals(
             nurse_id=nurse_id,
@@ -24,7 +30,11 @@ def create_vitals(nurse_id: str,patient_id: str,data: VitalsRegister):
         )
         
 @router.get("/{nurse_id}/{patient_id}")
-def show_vitals(nurse_id: str, patient_id: str):
+def show_vitals(
+    nurse_id: str,
+    patient_id: str,
+    current_nurse_id: str = Depends(get_current_nurse),
+):
     try:
         return vitals.show_vitals(
             nurse_id=nurse_id,

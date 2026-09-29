@@ -1,12 +1,12 @@
-from fastapi import APIRouter, HTTPException, status
-
+from fastapi import APIRouter, HTTPException, status, Depends
 from nursing_notes.notes_service import Notes
 from storage import DBManager
-from schema.note_schema import (
+from nursing_notes.notes_schema import (
     NursingNoteRegister,
     NursingNotesResponse,
     SoapRegister,
 )
+from core.deps import get_current_nurse
 
 db = DBManager()
 notes = Notes(db)
@@ -18,7 +18,8 @@ router = APIRouter()
 def create_nursing_note(
     nurse_id: str,
     patient_id: str,
-    data: NursingNoteRegister
+    data: NursingNoteRegister,
+    current_nurse_id: str = Depends(get_current_nurse),
 ):
     try:
         return notes.create_notes(
@@ -39,7 +40,8 @@ def save_soap(
     nurse_id: str,
     patient_id: str,
     note_id: str,
-    data: SoapRegister
+    data: SoapRegister,
+    current_nurse_id: str = Depends(get_current_nurse),
 ):
     try:
         return notes.register_soap(
@@ -62,7 +64,11 @@ def save_soap(
         
         
 @router.get('/{nurse_id}/{patient_id}',response_model=NursingNotesResponse)
-def show_notes(nurse_id: str, patient_id: str):
+def show_notes(
+    nurse_id: str,
+    patient_id: str,
+    current_nurse_id: str = Depends(get_current_nurse),
+):
     """return the notes"""
     try:
         return notes.show_nursing_notes(
@@ -77,7 +83,8 @@ def show_notes(nurse_id: str, patient_id: str):
 def remove_notes(
     note_id: str,
     nurse_id: str,
-    patient_id: str
+    patient_id: str,
+    current_nurse_id: str = Depends(get_current_nurse),
 ):
     try:
         return notes.delete_notes(

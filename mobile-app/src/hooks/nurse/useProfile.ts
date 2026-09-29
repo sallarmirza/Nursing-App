@@ -17,6 +17,7 @@ export default function useProfile() {
   const [isOffline, setIsOffline] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  
   const fetchProfile = useCallback(async () => {
     if (!nurse) {
       setError("No nurse session found. Please log in again.");
