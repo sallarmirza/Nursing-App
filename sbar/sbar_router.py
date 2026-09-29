@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from sbar.sbar_service import Sbar
 from storage import DBManager
-from schema.register_schema import SBARHandoverRegister
+from sbar.sbar_schema import SBARHandoverRegister
+from core.deps import get_current_nurse
 
 db = DBManager()
 sbar = Sbar(db)
@@ -12,7 +13,8 @@ router = APIRouter()
 def create_sbar_handover(
     nurse_id: str,
     patient_id: str,
-    data: SBARHandoverRegister
+    data: SBARHandoverRegister,
+    current_nurse_id: str = Depends(get_current_nurse),
 ):
     try:
         return sbar.create_sbar(
@@ -28,7 +30,11 @@ def create_sbar_handover(
 
 
 @router.get("/{nurse_id}/{patient_id}")
-def show_sbar_handovers(nurse_id: str, patient_id: str):
+def show_sbar_handovers(
+    nurse_id: str,
+    patient_id: str,
+    current_nurse_id: str = Depends(get_current_nurse),
+):
     try:
         return sbar.show_sbar(
             nurse_id=nurse_id,
@@ -39,7 +45,12 @@ def show_sbar_handovers(nurse_id: str, patient_id: str):
     
     
 @router.delete("/{nurse_id}/{patient_id}/{sbar_id}")
-def remove_sbar_handover(nurse_id: str,patient_id: str,sbar_id: str):
+def remove_sbar_handover(
+    nurse_id: str,
+    patient_id: str,
+    sbar_id: str,
+    current_nurse_id: str = Depends(get_current_nurse),
+):
     try:
         return sbar.delete_sbar_by_nurse(
             nurse_id=nurse_id,

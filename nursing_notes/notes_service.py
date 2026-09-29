@@ -1,6 +1,6 @@
 # nursing_notes/notes_service.py
 from storage import DBManager
-from schema.note_schema import NursingNoteRegister, SoapRegister, NursingNotesResponse
+from nursing_notes.notes_schema import NursingNoteRegister, SoapRegister, NursingNotesResponse
 from datetime import datetime
 import uuid
 from typing import Any

@@ -1,7 +1,7 @@
 from storage import DBManager
 import uuid
 from datetime import datetime
-from schema.register_schema import CurrentMedicationRegister
+from .medication_schema import CurrentMedicationRegister
 
 from db_model import CurrentMedication, Patient  
 

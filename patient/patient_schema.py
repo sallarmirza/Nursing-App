@@ -2,9 +2,12 @@ from pydantic import BaseModel,Field,field_validator
 from enum import Enum
 from typing import Optional,List
 from datetime import date
-from schema.register_schema import VitalsResponse,MedicationResponse,SBARResponse
-from schema.calculation_schema import DripResponse,DosageResponse
-from schema.note_schema import NursingNoteOut
+from vitals.vitals_schema import VitalsResponse
+from nursing_notes.notes_schema import NursingNoteOut
+from medication.medication_schema import MedicationResponse
+from sbar.sbar_schema import SBARResponse
+from dosage.dosage_schema import DosageResponse
+from drip.drip_schema import DripResponse
 
 class Gender(str, Enum):
     MALE = "Male"

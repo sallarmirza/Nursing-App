@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 
 from storage import DBManager
 from medication.medication_service import Medication
-from schema.register_schema import CurrentMedicationRegister
+from .medication_schema import CurrentMedicationRegister
+from core.deps import get_current_nurse
 
 
 router = APIRouter(prefix="/medications", tags=["Medications"])
@@ -12,7 +13,11 @@ medication_service = Medication(db)
 
 
 @router.get("/{nurse_id}/{patient_id}")
-def list_medications(nurse_id: str, patient_id: str):
+def list_medications(
+    nurse_id: str,
+    patient_id: str,
+    current_nurse_id: str = Depends(get_current_nurse),
+):
     try:
         return medication_service.list_all_medication(
             nurse_id=nurse_id,
@@ -29,7 +34,8 @@ def list_medications(nurse_id: str, patient_id: str):
 def add_medication(
     nurse_id: str,
     patient_id: str,
-    data: CurrentMedicationRegister
+    data: CurrentMedicationRegister,
+    current_nurse_id: str = Depends(get_current_nurse),
 ):
     try:
         return medication_service.add_medicine(
@@ -45,7 +51,12 @@ def add_medication(
 
 
 @router.delete("/{nurse_id}/{patient_id}/{med_id}")
-def delete_medication(nurse_id: str, patient_id: str, med_id: str):
+def delete_medication(
+    nurse_id: str,
+    patient_id: str,
+    med_id: str,
+    current_nurse_id: str = Depends(get_current_nurse),
+):
     try:
         return medication_service.delete_medicine(
             nurse_id=nurse_id,

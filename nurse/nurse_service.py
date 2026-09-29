@@ -1,11 +1,13 @@
 from sqlalchemy.exc import IntegrityError
 from storage import DBManager
-from schema.nurse_schema import NurseSignUp, NurseRegister,NurseSignIn
+from nurse.nurse_schema import NurseSignUp, NurseRegister,NurseSignIn
 from nurse.nurse_helper import hash_password, verify_password
+from core.security import generate_refresh_token, hash_refresh_token
+from core.config import REFRESH_TOKEN_EXPIRE_DAYS
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 
-from db_model import Nurse, Patient  
+from db_model import Nurse, Patient, RefreshToken  
 
 
 class NurseService:
@@ -241,6 +243,82 @@ class NurseService:
 
         except Exception as e:
             raise ValueError("Failed to retrieve patients") from e
+
+        finally:
+            session.close()
+
+    def create_refresh_token(self, nurse_id: str) -> str:
+        """Issues a new refresh token for this nurse and stores its hash."""
+        session = self.db.get_session()
+
+        try:
+            raw_token = generate_refresh_token()
+            token_hash = hash_refresh_token(raw_token)
+            expires_at = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+
+            refresh_token = RefreshToken(
+                token_id=uuid.uuid4().hex[:12],
+                nurse_id=nurse_id,
+                token_hash=token_hash,
+                expires_at=expires_at,
+            )
+
+            session.add(refresh_token)
+            session.commit()
+
+            return raw_token
+
+        except Exception:
+            session.rollback()
+            raise
+
+        finally:
+            session.close()
+
+    def verify_refresh_token(self, raw_token: str) -> str:
+        """Returns the nurse_id if the refresh token is valid, raises otherwise."""
+        session = self.db.get_session()
+
+        try:
+            token_hash = hash_refresh_token(raw_token)
+
+            record = (
+                session.query(RefreshToken)
+                .filter(RefreshToken.token_hash == token_hash)
+                .first()
+            )
+
+            if record is None or record.revoked:
+                raise ValueError("Invalid refresh token")
+
+            if record.expires_at < datetime.utcnow():
+                raise ValueError("Refresh token expired")
+
+            return record.nurse_id
+
+        finally:
+            session.close()
+
+    def revoke_refresh_token(self, raw_token: str) -> None:
+        """Used on logout. Silently no-ops if the token doesn't exist."""
+        session = self.db.get_session()
+
+        try:
+            token_hash = hash_refresh_token(raw_token)
+
+            record = (
+                session.query(RefreshToken)
+                .filter(RefreshToken.token_hash == token_hash)
+                .first()
+            )
+
+            if record:
+                record.revoked = True
+                session.commit()
+
+        except Exception:
+            session.rollback()
+            raise
 
         finally:
             session.close()

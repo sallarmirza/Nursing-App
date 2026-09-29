@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from schema.register_schema import VitalsRegister
+from vitals.vitals_schema import VitalsRegister
 from storage import DBManager
 from db_model import Vitals as VitalsModel, Patient 
 

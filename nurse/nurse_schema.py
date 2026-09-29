@@ -27,3 +27,6 @@ class NurseProfile(BaseModel):
     nurse_designation: Optional[str] = None
     nurse_hospital: Optional[str] = None
     nurse_experience: Optional[float] = None
+    
+class TokenRefreshRequest(BaseModel):
+    refresh_token:str
