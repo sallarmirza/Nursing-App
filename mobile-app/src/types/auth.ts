@@ -15,10 +15,33 @@ export interface NurseSignInRequest {
   nurse_email: string;
   nurse_password: string;
 }
-export interface NurseSignInResponse {
+export interface NurseProfile {
   nurse_id: string;
   nurse_name: string | null;
   nurse_email: string;
+}
+export interface NurseSignInResponse {
+  nurse: NurseProfile;
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+}
+
+// POST /nurse/refresh
+export interface TokenRefreshRequest {
+  refresh_token: string;
+}
+export interface TokenRefreshResponse {
+  access_token: string;
+  token_type: string;
+}
+
+// POST /nurse/logout
+export interface LogoutRequest {
+  refresh_token: string;
+}
+export interface LogoutResponse {
+  message: string;
 }
 
 // POST /nurse/setup/{nurse_id}
