@@ -1,0 +1,17 @@
+# DNA - Digital Nursing Assistant
+
+> DNA is a mobile application designed to streamline nursing workflows, digital clinical records, SBAR handovers, and accurate dosage calculations.
+
+## Main Features
+- Patient Management: Register patients and maintain comprehensive digital records.
+- SOAP Notes: Structured clinical documentation.
+- SBAR Handovers: Safe and clear shift handovers.
+- Calculations & Meds: Dosage and IV drip-rate calculators.
+
+## Links
+- [Home](https://yourdomain.com/): Landing page with early access waitlist.
+- [Privacy Policy](https://yourdomain.com/privacy): Data privacy details.
+- [Terms of Service](https://yourdomain.com/terms): App usage terms.
+
+## Contact
+- Email: support@dna-app.com

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    
+    <link rel="manifest" href="/manifest.json" />
+    <!-- Your Custom Logo Favicon -->
+    <link rel="icon" type="image/png" href="/src/assets/nursing-app-logo-blue.png" />
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="DNA is a digital nursing assistant app for managing patients, clinical records, SBAR handovers, vitals, and dosage calculations." />
+    <meta name="theme-color" content="#0d54ff" />
+    
+    <!-- Open Graph tags for social sharing -->
+    <meta property="og:title" content="DNA | Digital Nursing Assistant" />
+    <meta property="og:description" content="Streamline your workflow with digital clinical records, SBAR handovers, and accurate dosage calculations." />
+    <meta property="og:type" content="website" />
+    
+    <title>DNA | Digital Nursing Assistant</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+    <!-- FAQ Schema for AEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [{
+        "@type": "Question",
+        "name": "When will the app be available?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "We are currently in active development and testing. You can join the waitlist below to get early access and be notified as soon as we launch."
+        }
+      }, {
+        "@type": "Question",
+        "name": "Is patient data secure and HIPAA compliant?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Absolutely. Security is our top priority. We use industry-standard encryption for all clinical records, SBAR handovers, and patient data."
+        }
+      }, {
+        "@type": "Question",
+        "name": "Does it include medication and IV drip calculators?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, the app features built-in dosage and IV drip-rate calculators to help minimize medication errors and save you time during your shift."
+        }
+      }]
+    }
+    </script>

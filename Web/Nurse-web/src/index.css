@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@theme {
+  /* Colors extracted from screenshots */
+  --color-brand-blue: #0d54ff;
+  --color-brand-hover: #003ecc;
+  --color-brand-light: #eff4ff;
+  --color-bg-beige: #fdfbf7;
+  --color-text-dark: #111827;
+  --color-text-muted: #6b7280;
+  
+  /* Fonts */
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+/* Base styles */
+@layer base {
+  body {
+    @apply bg-white text-text-dark font-sans antialiased;
+  }
+  
+  h1, h2, h3, h4 {
+    @apply font-bold tracking-tight;
+  }
+/* Add this to the bottom of src/index.css */
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Offset for the sticky navbar (h-20 is 5rem) */
+section[id] {
+  scroll-margin-top: 5rem;
+}
+}
