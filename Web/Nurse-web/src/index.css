@@ -1,35 +1,66 @@
 @import "tailwindcss";
 
 @theme {
-  /* Colors extracted from screenshots */
   --color-brand-blue: #0d54ff;
   --color-brand-hover: #003ecc;
   --color-brand-light: #eff4ff;
   --color-bg-beige: #fdfbf7;
   --color-text-dark: #111827;
   --color-text-muted: #6b7280;
-  
-  /* Fonts */
+
+  /* Semantic state colors */
+  --color-success: #166534;
+  --color-success-bg: #f0fdf4;
+  --color-error: #dc2626;
+  --color-error-bg: #fef2f2;
+  --color-warning: #d97706;
+  --color-warning-bg: #fffbeb;
+
   --font-sans: "Inter", system-ui, sans-serif;
 }
 
-/* Base styles */
 @layer base {
   body {
     @apply bg-white text-text-dark font-sans antialiased;
   }
-  
   h1, h2, h3, h4 {
     @apply font-bold tracking-tight;
   }
-/* Add this to the bottom of src/index.css */
+}
 
 html {
   scroll-behavior: smooth;
 }
 
-/* Offset for the sticky navbar (h-20 is 5rem) */
-section[id] {
-  scroll-margin-top: 5rem;
+/* Remove 300ms tap delay on touch devices */
+button, a, [role="button"] {
+  touch-action: manipulation;
 }
+
+/* Notch / Dynamic Island safe areas (viewport-fit=cover) */
+header {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+footer {
+  padding-bottom: max(2rem, env(safe-area-inset-bottom, 0px));
+}
+
+/* Sticky nav height + safe area top */
+section[id] {
+  scroll-margin-top: calc(5rem + env(safe-area-inset-top, 0px));
+}
+
+/* Respect OS-level reduce-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* Loading spinner is state feedback, not decoration — restore it */
+  .animate-spin {
+    animation-duration: 0.8s !important;
+    animation-iteration-count: infinite !important;
+  }
 }

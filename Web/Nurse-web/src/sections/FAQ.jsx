@@ -50,9 +50,11 @@ export default function FAQ() {
                 key={index} 
                 className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden transition-all duration-300"
               >
-                <button 
+                <button
                   onClick={() => toggleAccordion(index)}
-                  className="w-full flex items-center justify-between p-6 md:p-8 text-left focus:outline-none"
+                  aria-expanded={isOpen}
+                  aria-controls={`faq-answer-${index}`}
+                  className="w-full flex items-center justify-between p-6 md:p-8 text-left focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 rounded-2xl"
                 >
                   <h3 className="text-lg md:text-xl font-semibold text-text-dark">
                     {faq.question}
@@ -67,7 +69,8 @@ export default function FAQ() {
                 </button>
                 
                 {/* Answer Panel */}
-                <div 
+                <div
+                  id={`faq-answer-${index}`}
                   className={`px-6 md:px-8 pb-6 md:pb-8 text-text-muted leading-relaxed transition-all duration-300 ${
                     isOpen ? 'block' : 'hidden'
                   }`}

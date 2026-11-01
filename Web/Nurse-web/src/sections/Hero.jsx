@@ -13,7 +13,7 @@ export default function Hero() {
             {/* Review Badge */}
             <div className="inline-flex items-center gap-2 bg-white px-4 py-1.5 rounded-full shadow-sm w-fit mb-8 border border-gray-100">
               <span className="text-brand-blue text-lg">★</span>
-              <span className="text-sm font-semibold text-text-dark">4.9 (Trusted by Nurses)</span>
+              <span className="text-sm font-semibold text-text-dark">Built for Nurses</span>
             </div>
 
             {/* Headline */}
@@ -28,17 +28,22 @@ export default function Hero() {
 
             {/* CTAs */}
             <div className="flex flex-wrap gap-4">
-              <Button variant="primary" className="px-8 py-3.5 text-base">Get Started</Button>
-              <Button variant="secondary" className="px-8 py-3.5 text-base">Learn More</Button>
+              <a href="#waitlist"><Button variant="primary" className="px-8 py-3.5 text-base">Get Started</Button></a>
+              <a href="#features"><Button variant="secondary" className="px-8 py-3.5 text-base">Learn More</Button></a>
             </div>
           </div>
 
           {/* Right Image */}
           <div className="relative h-64 lg:h-auto">
             {/* Placeholder image from Unsplash. You can replace this with your own asset later */}
-            <img 
-              src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=2070&auto=format&fit=crop" 
-              alt="Nurse smiling" 
+            {/* fetchPriority=high marks this as the LCP candidate so the browser preloads it early */}
+            <img
+              src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=1200&auto=format&fit=crop"
+              srcSet="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=640&auto=format&fit=crop 640w, https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=1200&auto=format&fit=crop 1200w"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              alt="Nurse smiling"
+              fetchPriority="high"
+              decoding="async"
               className="absolute inset-0 w-full h-full object-cover object-center lg:rounded-l-[2.5rem]"
             />
             {/* Subtle gradient overlay to blend image with background on desktop */}
