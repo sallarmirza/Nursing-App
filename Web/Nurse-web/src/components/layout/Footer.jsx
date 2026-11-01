@@ -19,7 +19,7 @@ export default function Footer() {
               streamline documentation, and ensure safety.
             </p>
             <div className="text-text-muted text-sm space-y-2">
-              <p>support@dna-app.com</p>
+              <p>ha5599248@gmail.com</p>
             </div>
           </div>
 
