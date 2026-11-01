@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom"; // Make sure to import Link
 import Button from "../ui/Button";
 import logoBlue from "../../assets/nursing-app-logo-blue.png"; // Import the logo
 
@@ -54,7 +53,10 @@ export default function Navbar() {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-text-dark text-2xl p-2 focus:outline-none"
+              aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="mobile-nav-menu"
+              className="text-text-dark text-2xl p-3 focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 rounded-md"
             >
               {isMobileMenuOpen ? "✕" : "☰"}
             </button>
@@ -64,7 +66,7 @@ export default function Navbar() {
 
       {/* Mobile Menu Dropdown */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-100 absolute w-full left-0 shadow-lg">
+        <div id="mobile-nav-menu" className="md:hidden bg-white border-t border-gray-100 absolute w-full left-0 shadow-lg">
           <div className="flex flex-col px-4 py-6 gap-6">
             {navLinks.map((item) => (
               <a

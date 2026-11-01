@@ -60,9 +60,13 @@ export default function WhyChooseUs() {
 
         {/* Large Feature Image */}
         <div className="w-full h-100 lg:h-137.5 rounded-4xl overflow-hidden mb-8 shadow-sm">
-          <img 
-            src="https://images.unsplash.com/photo-1631815589968-fdb09a223b1e?q=80&w=2070&auto=format&fit=crop" 
-            alt="Medical team collaborating" 
+          <img
+            src="https://images.unsplash.com/photo-1631815589968-fdb09a223b1e?q=80&w=1400&auto=format&fit=crop"
+            srcSet="https://images.unsplash.com/photo-1631815589968-fdb09a223b1e?q=80&w=768&auto=format&fit=crop 768w, https://images.unsplash.com/photo-1631815589968-fdb09a223b1e?q=80&w=1400&auto=format&fit=crop 1400w"
+            sizes="(max-width: 768px) 100vw, 90vw"
+            alt="Medical team collaborating"
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover object-center"
           />
         </div>

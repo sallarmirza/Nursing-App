@@ -1,12 +1,13 @@
-import { Link } from 'react-router-dom';
-import logoBlue from '../../assets/nursing-app-logo-blue.png'; // Import the logo
+// Footer — plain <a> tags used throughout; React Router <Link> removed to prevent
+// useHref() crash when no <BrowserRouter> wraps the app.
+import logoBlue from '../../assets/nursing-app-logo-blue.png';
 
 export default function Footer() {
   return (
     <footer className="bg-white pt-16 pb-8 border-t border-gray-100 flex flex-col justify-between min-h-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 mb-16">
-          
+
           {/* Logo & Contact Info */}
           <div className="lg:col-span-6">
             <div className="flex items-center gap-3 mb-6">
@@ -42,8 +43,9 @@ export default function Footer() {
             </h4>
             <ul className="space-y-3 text-sm text-text-muted">
               <li><a href="#waitlist" className="hover:text-brand-blue transition-colors">Join Waitlist</a></li>
-              <li><Link to="/privacy" className="hover:text-brand-blue transition-colors">Privacy Policy</Link></li>
-              <li><Link to="/terms" className="hover:text-brand-blue transition-colors">Terms of Service</Link></li>
+              <li><a href="#waitlist" className="hover:text-brand-blue transition-colors">Send Feedback</a></li>
+              <li><a href="/privacy" className="hover:text-brand-blue transition-colors">Privacy Policy</a></li>
+              <li><a href="/terms" className="hover:text-brand-blue transition-colors">Terms of Service</a></li>
             </ul>
           </div>
         </div>
@@ -54,8 +56,8 @@ export default function Footer() {
         <div className="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-text-muted">
           <p>© {new Date().getFullYear()} Digital Nursing Assistant (DNA). All rights reserved.</p>
           <div className="flex gap-6">
-            <Link to="/terms" className="hover:text-text-dark transition-colors">Terms & Conditions</Link>
-            <Link to="/privacy" className="hover:text-text-dark transition-colors">Privacy Policy</Link>
+            <a href="/terms" className="hover:text-text-dark transition-colors">Terms & Conditions</a>
+            <a href="/privacy" className="hover:text-text-dark transition-colors">Privacy Policy</a>
           </div>
         </div>
       </div>
