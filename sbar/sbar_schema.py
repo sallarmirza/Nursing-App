@@ -1,7 +1,5 @@
-from pydantic import BaseModel, Field, EmailStr
-from typing import Optional, Any, List
-from datetime import date
-from enum import Enum
+from pydantic import BaseModel
+from typing import Optional, Any
 from datetime import datetime
 
 
@@ -11,7 +9,7 @@ class SBARHandoverRegister(BaseModel):
     assessment: Optional[str] = None
     recommendation: Optional[str] = None
     current_iv_medications: Optional[dict[str, Any]] = None
-    nursing_interventions: Optional[dict[str, Any]] = None
+    nursing_interventions: Optional[dict[str, bool]] = None
     soap_notes: Optional[dict[str, Any]] = None
 
 
@@ -25,7 +23,7 @@ class SBARResponse(BaseModel):
     assessment: Optional[str] = None
     recommendation: Optional[str] = None
     current_iv_medications: Optional[dict[str, Any]] = {}
-    nursing_interventions: Optional[dict[str, Any]] = {}
+    nursing_interventions: Optional[dict[str, bool]] = {}
     soap_notes: Optional[dict[str, Any]] = {}
     sbar_created_at: datetime
 

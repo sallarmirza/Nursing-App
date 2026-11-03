@@ -1,7 +1,6 @@
-from pydantic import BaseModel,Field
+from pydantic import BaseModel, Field, model_validator
 from datetime import datetime
 from typing import Optional
-
 
 
 class DosageCalculatorRegister(BaseModel):
@@ -11,6 +10,20 @@ class DosageCalculatorRegister(BaseModel):
     dose_unit: str
     concentration_value: float = Field(gt=0)
     concentration_unit: str
+
+    @model_validator(mode="after")
+    def check_unit_consistency(self) -> "DosageCalculatorRegister":
+        # concentration_unit must be "{dose_unit}/mL" so the division
+        # required_dose / concentration_value yields mL correctly.
+        # e.g. dose_unit="mg" → concentration_unit must be "mg/mL"
+        expected = f"{self.dose_unit}/mL"
+        if self.concentration_unit.lower() != expected.lower():
+            raise ValueError(
+                f"concentration_unit must be '{expected}' when dose_unit is "
+                f"'{self.dose_unit}' (got '{self.concentration_unit}'). "
+                f"Convert both to the same unit before submitting."
+            )
+        return self
 
 class DosageResponse(BaseModel):
     dose_calc_id: str

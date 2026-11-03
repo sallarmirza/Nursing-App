@@ -1,13 +1,13 @@
 from sqlalchemy.exc import IntegrityError
 from storage import DBManager
-from nurse.nurse_schema import NurseSignUp, NurseRegister,NurseSignIn
+from nurse.nurse_schema import NurseSignUp, NurseRegister, NurseSignIn
 from nurse.nurse_helper import hash_password, verify_password
 from core.security import generate_refresh_token, hash_refresh_token
 from core.config import REFRESH_TOKEN_EXPIRE_DAYS
 import uuid
 from datetime import datetime, timedelta
 
-from db_model import Nurse, Patient, RefreshToken  
+from db_model import Nurse, Patient, RefreshToken
 
 
 class NurseService:
@@ -19,14 +19,10 @@ class NurseService:
     def create_nurse_id() -> str:
         year = datetime.now().year
         unique_part = uuid.uuid4().hex[:12].upper()
-
         return f"NUR-{year}-{unique_part}"
 
     def nurse_signup(self, data: NurseSignUp):
-
-        session = self.db.get_session()
-
-        try:
+        with self.db.get_session() as session:
             existing_nurse = (
                 session.query(Nurse)
                 .filter(Nurse.nurse_email == data.nurse_email)
@@ -34,9 +30,7 @@ class NurseService:
             )
 
             if existing_nurse:
-                raise ValueError(
-                    "Nurse with this email already exists"
-                )
+                raise ValueError("Nurse with this email already exists")
 
             nurse_id = self.create_nurse_id()
             hashed_password = hash_password(data.nurse_password)
@@ -47,31 +41,22 @@ class NurseService:
                 nurse_password_hash=hashed_password,
             )
 
-            session.add(nurse)
-            session.commit()
+            try:
+                session.add(nurse)
+                session.commit()
+            except IntegrityError:
+                # Race condition: two signups with the same email both passed
+                # the check above before either committed.
+                raise ValueError("Nurse with this email already exists")
 
             return {
                 "message": "Nurse registered successfully",
                 "nurse_id": nurse_id
             }
 
-        except IntegrityError:
-            # Catches the race where two signups with the same email
-            # both pass the check above before either commits
-            session.rollback()
-            raise ValueError("Nurse with this email already exists")
-
-        except Exception:
-            session.rollback()
-            raise
-
-        finally:
-            session.close()
-
     def nurse_account_setup(self, nurse_id: str, data: NurseRegister):
-        """additional info of nurse"""
-        session = self.db.get_session()
-        try:
+        """Additional info of nurse."""
+        with self.db.get_session() as session:
             nurse = session.query(Nurse).filter(Nurse.nurse_id == nurse_id).first()
 
             if nurse is None:
@@ -90,17 +75,8 @@ class NurseService:
                 "nurse_id": nurse_id
             }
 
-        except Exception:
-            session.rollback()
-            raise
-
-        finally:
-            session.close()
-
     def list_all_nurses(self) -> dict:
-        session = self.db.get_session()
-
-        try:
+        with self.db.get_session() as session:
             rows = session.query(Nurse).all()
 
             return [
@@ -117,44 +93,24 @@ class NurseService:
                 for n in rows
             ]
 
-        except Exception as e:
-            raise ValueError("Failed to retrieve nurses") from e
-
-        finally:
-            session.close()
-
     def delete_nurse(self, nurse_id: str) -> bool:
-        """delete nurse"""
-        session = self.db.get_session()
-
+        """Delete nurse. Returns False if not found or on error."""
         try:
-            nurse = session.query(Nurse).filter(Nurse.nurse_id == nurse_id).first()
+            with self.db.get_session() as session:
+                nurse = session.query(Nurse).filter(Nurse.nurse_id == nurse_id).first()
 
-            if nurse is None:
-                return False
+                if nurse is None:
+                    return False
 
-            session.delete(nurse)
-            session.commit()
-            return True
-
+                session.delete(nurse)
+                session.commit()
+                return True
         except Exception:
-            # Note: this will also swallow the FK IntegrityError raised
-            # when the nurse still has patients assigned to them on Postgres.
-            # Consider raising distinct errors for "not found" vs
-            # "can't delete, has dependent patients" instead of collapsing
-            # both to False.
-            session.rollback()
             return False
 
-        finally:
-            session.close()
-
-
     def nurse_signIn(self, data: NurseSignIn):
-        """nurse login"""
-        session = self.db.get_session()
-
-        try:
+        """Nurse login."""
+        with self.db.get_session() as session:
             nurse = (
                 session.query(Nurse)
                 .filter(Nurse.nurse_email == data.nurse_email)
@@ -170,17 +126,9 @@ class NurseService:
                 "nurse_email": nurse.nurse_email,
             }
 
-        except Exception as e:
-            raise ValueError("Login failed") from e
-
-        finally:
-            session.close()
-            
     def get_nurse_profile(self, nurse_id: str):
         """Fetch one nurse's profile fields."""
-        session = self.db.get_session()
-
-        try:
+        with self.db.get_session() as session:
             nurse = session.query(Nurse).filter(Nurse.nurse_id == nurse_id).first()
 
             if nurse is None:
@@ -196,24 +144,9 @@ class NurseService:
                 "nurse_experience": nurse.nurse_experience,
             }
 
-        except ValueError:
-            raise
-
-        except Exception as e:
-            raise ValueError("Failed to retrieve nurse profile") from e
-
-        finally:
-            session.close()
-            
-    
-
-    
     def nurse_patients(self, nurse_id: str):
         """Show all patients assigned to a nurse."""
-
-        session = self.db.get_session()
-
-        try:
+        with self.db.get_session() as session:
             patients = (
                 session.query(Patient)
                 .filter(Patient.assigned_nurse_id == nurse_id)
@@ -221,9 +154,7 @@ class NurseService:
             )
 
             if not patients:
-                return {
-                    "message": f"{nurse_id} has no patients"
-                }
+                return {"message": f"{nurse_id} has no patients"}
 
             return [
                 {
@@ -241,17 +172,9 @@ class NurseService:
                 for p in patients
             ]
 
-        except Exception as e:
-            raise ValueError("Failed to retrieve patients") from e
-
-        finally:
-            session.close()
-
     def create_refresh_token(self, nurse_id: str) -> str:
-        """Issues a new refresh token for this nurse and stores its hash."""
-        session = self.db.get_session()
-
-        try:
+        """Issues a new refresh token and stores its hash."""
+        with self.db.get_session() as session:
             raw_token = generate_refresh_token()
             token_hash = hash_refresh_token(raw_token)
             expires_at = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
@@ -268,18 +191,9 @@ class NurseService:
 
             return raw_token
 
-        except Exception:
-            session.rollback()
-            raise
-
-        finally:
-            session.close()
-
     def verify_refresh_token(self, raw_token: str) -> str:
         """Returns the nurse_id if the refresh token is valid, raises otherwise."""
-        session = self.db.get_session()
-
-        try:
+        with self.db.get_session() as session:
             token_hash = hash_refresh_token(raw_token)
 
             record = (
@@ -296,14 +210,9 @@ class NurseService:
 
             return record.nurse_id
 
-        finally:
-            session.close()
-
     def revoke_refresh_token(self, raw_token: str) -> None:
         """Used on logout. Silently no-ops if the token doesn't exist."""
-        session = self.db.get_session()
-
-        try:
+        with self.db.get_session() as session:
             token_hash = hash_refresh_token(raw_token)
 
             record = (
@@ -315,10 +224,3 @@ class NurseService:
             if record:
                 record.revoked = True
                 session.commit()
-
-        except Exception:
-            session.rollback()
-            raise
-
-        finally:
-            session.close()

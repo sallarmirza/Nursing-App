@@ -4,7 +4,7 @@ import { NurseProfile } from "../../types/nurse";
 
 export const nurseService = {
   getProfile: async (nurseId: string): Promise<NurseProfile> => {
-    const response = await apiClient.get<NurseProfile>(`/nurses/${nurseId}`);
+    const response = await apiClient.get<NurseProfile>(`/nurse/${nurseId}`);
     return response.data;
   },
 };

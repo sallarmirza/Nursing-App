@@ -6,7 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 export default function useSignup() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { setNurse } = useAuth();
+  const { login } = useAuth();
 
   const signup = async (
     email: string,
@@ -15,14 +15,31 @@ export default function useSignup() {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await authService.signup({
+      const signupResponse = await authService.signup({
         nurse_email: email,
         nurse_password: password,
       });
-      // Signup only returns nurse_id + message — name isn't known yet
-      // until the profile-setup step, which comes next in the flow.
-      setNurse({ nurse_id: response.nurse_id, nurse_email: email });
-      return response.nurse_id;
+
+      // Auto-login immediately so tokens are set before the onboarding screen
+      // calls /nurse/setup/{nurse_id}. Without this, setupProfile would either
+      // send no token (403) or a stale token from a previous session (also 403).
+      const loginResponse = await authService.login({
+        nurse_email: email,
+        nurse_password: password,
+      });
+
+      await login(
+        {
+          nurse_id: loginResponse.nurse.nurse_id,
+          nurse_email: loginResponse.nurse.nurse_email,
+        },
+        {
+          access_token: loginResponse.access_token,
+          refresh_token: loginResponse.refresh_token,
+        }
+      );
+
+      return signupResponse.nurse_id;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Signup failed");
       return null;

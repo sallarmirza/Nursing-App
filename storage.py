@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
@@ -26,16 +27,17 @@ class DBManager:
     def initialize_db(self):
         Base.metadata.create_all(bind=self.engine)
 
+    @contextmanager
     def get_session(self):
-        return self.SessionLocal()
-
-    def get_db(self):
-        db = self.SessionLocal()
-
+        # Yields a session that auto-rollbacks on exception and always closes.
+        session = self.SessionLocal()
         try:
-            yield db
+            yield session
+        except Exception:
+            session.rollback()
+            raise
         finally:
-            db.close()
+            session.close()
 
     def close(self):
         self.engine.dispose()

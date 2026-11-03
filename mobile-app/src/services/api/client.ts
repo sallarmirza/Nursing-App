@@ -1,7 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { tokenManager } from "../auth/tokenManager";
 
-const BASE_URL = "http://192.168.100.20:8000";
+const BASE_URL = "http://192.168.1.6:8000";
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,

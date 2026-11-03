@@ -4,7 +4,8 @@ from datetime import datetime
 from typing import Any
 import uuid
 
-from db_model import SBAR as SBARModel  
+from db_model import SBAR as SBARModel, Patient
+
 
 class Sbar:
     def __init__(self, db: DBManager):
@@ -16,17 +17,22 @@ class Sbar:
         unique_part = uuid.uuid4().hex[:12].upper()
         return f"SBAR-{year}-{unique_part}"
 
-    def create_sbar(
-        self,
-        nurse_id: str,
-        patient_id: str,
-        data: SBARHandoverRegister
-    ) -> dict[str, Any]:
+    def create_sbar(self, nurse_id: str, patient_id: str, data: SBARHandoverRegister) -> dict[str, Any]:
         """Create a new SBAR handover note."""
+        with self.db.get_session() as session:
+            patient = (
+                session.query(Patient)
+                .filter(
+                    Patient.patient_id == patient_id,
+                    Patient.assigned_nurse_id == nurse_id,
+                )
+                .first()
+            )
+            if patient is None:
+                raise ValueError(
+                    "Patient does not exist or is not assigned to this nurse"
+                )
 
-        session = self.db.get_session()
-
-        try:
             sbar_id = self.create_sbar_id()
 
             handover = SBARModel(
@@ -50,23 +56,9 @@ class Sbar:
                 "sbar_id": sbar_id
             }
 
-        except Exception:
-            session.rollback()
-            raise
-
-        finally:
-            session.close()
-
-    def show_sbar(
-        self,
-        nurse_id: str,
-        patient_id: str
-    ) -> dict[str, Any]:
+    def show_sbar(self, nurse_id: str, patient_id: str) -> dict[str, Any]:
         """List all SBAR handovers for a patient recorded by a given nurse."""
-
-        session = self.db.get_session()
-
-        try:
+        with self.db.get_session() as session:
             rows = (
                 session.query(SBARModel)
                 .filter(
@@ -84,37 +76,30 @@ class Sbar:
                     "handovers": []
                 }
 
-            handovers = [
-                {
-                    "sbar_id": h.sbar_id,
-                    "patient_id": h.patient_id,
-                    "nurse_id": h.nurse_id,
-                    "situation": h.situation,
-                    "background": h.background,
-                    "assessment": h.assessment,
-                    "recommendation": h.recommendation,
-                    "current_iv_medications": h.current_iv_medications,
-                    "nursing_interventions": h.nursing_interventions,
-                    "soap_notes": h.soap_notes,
-                    "sbar_created_at": h.sbar_created_at,
-                }
-                for h in rows
-            ]
-
             return {
                 "patient_id": patient_id,
                 "nurse_id": nurse_id,
-                "handovers": handovers
+                "handovers": [
+                    {
+                        "sbar_id": h.sbar_id,
+                        "patient_id": h.patient_id,
+                        "nurse_id": h.nurse_id,
+                        "situation": h.situation,
+                        "background": h.background,
+                        "assessment": h.assessment,
+                        "recommendation": h.recommendation,
+                        "current_iv_medications": h.current_iv_medications,
+                        "nursing_interventions": h.nursing_interventions,
+                        "soap_notes": h.soap_notes,
+                        "sbar_created_at": h.sbar_created_at,
+                    }
+                    for h in rows
+                ],
             }
 
-        finally:
-            session.close()
-
     def delete_sbar_by_nurse(self, nurse_id: str, patient_id: str, sbar_id: str) -> dict[str, Any]:
-        """Delete sbar by nurse"""
-        session = self.db.get_session()
-
-        try:
+        """Delete SBAR by nurse."""
+        with self.db.get_session() as session:
             handover = (
                 session.query(SBARModel)
                 .filter(
@@ -141,10 +126,3 @@ class Sbar:
                 "patient_id": patient_id,
                 "nurse_id": nurse_id
             }
-
-        except Exception:
-            session.rollback()
-            raise
-
-        finally:
-            session.close()
