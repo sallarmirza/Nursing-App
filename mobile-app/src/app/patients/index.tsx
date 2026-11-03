@@ -1,4 +1,5 @@
 // app/(tabs)/patients/index
+import { Ionicons } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback } from "react";
 import {
@@ -107,12 +108,13 @@ export default function PatientsRecordScreen() {
                   })
                 }
               >
-                <View className="flex-row items-center gap-3">
+                <View className="flex-row items-center gap-3 flex-1">
                   <PersonAvatar size={36} />
-                  <View>
+                  <View className="flex-1">
                     <Text
                       className="text-base font-bold mb-[2px]"
                       style={{ color: colors.textHeading }}
+                      numberOfLines={1}
                     >
                       {item.patient_name}
                     </Text>
@@ -121,11 +123,13 @@ export default function PatientsRecordScreen() {
                       style={{ color: colors.textSecondary }}
                     >
                       {age !== null
-                        ? `${age} years, ${item.patient_gender}`
+                        ? `${age} yrs, ${item.patient_gender}`
                         : item.patient_gender}
+                      {item.ward ? ` · ${item.ward}` : ""}
                     </Text>
                   </View>
                 </View>
+                <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
               </TouchableOpacity>
             );
           })}

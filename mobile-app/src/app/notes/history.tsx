@@ -1,4 +1,6 @@
 // app/notes/history
+// Shows nursing note history for a patient with time-range filters.
+// Each card is expandable to reveal interventions and the latest SOAP note.
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
@@ -10,6 +12,10 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { BackButton } from "../../components/common/BackButton";
+import { PersonAvatar } from "../../components/common/PersonAvatar";
+import { PrimaryButton } from "../../components/common/PrimaryButton";
+import { colors } from "../../theme/colors";
 import useNotesHistory from "../../hooks/notes/useNotesHistory";
 import { NursingNote } from "../../types/notes";
 
@@ -50,7 +56,6 @@ function formatDateTime(isoDate: string): string {
   return `${date} ${time}`;
 }
 
-// Names of the interventions ticked on this note (empty for older notes)
 function performedInterventions(note: NursingNote): string[] {
   return Object.entries(note.nursing_interventions ?? {})
     .filter(([, done]) => done)
@@ -88,32 +93,35 @@ export default function NotesHistoryScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-[#F3EFEF]" edges={["top", "left", "right"]}>
+    <SafeAreaView
+      className="flex-1"
+      style={{ backgroundColor: colors.backgroundAlt }}
+      edges={["top", "left", "right"]}
+    >
       <ScrollView
         contentContainerClassName="p-4 gap-4 pb-10"
         showsVerticalScrollIndicator={false}
       >
-        {/* Top Bar */}
+        {/* Header — custom because it carries a patient-name subtitle */}
         <View className="flex-row items-center justify-between mt-1">
-          <TouchableOpacity
-            onPress={() => router.back()}
-            className="p-1"
-          >
-            <Ionicons name="chevron-back" size={24} color="#000000" />
-          </TouchableOpacity>
+          <BackButton />
 
           <View className="flex-1 ml-2">
-            <Text className="text-[18px] font-bold text-black">
+            <Text
+              className="text-[18px] font-bold"
+              style={{ color: colors.textPrimary }}
+            >
               Notes History
             </Text>
-            <Text className="text-xs text-[#6B7280] mt-[1px]">
+            <Text
+              className="text-xs mt-[1px]"
+              style={{ color: colors.textSecondary }}
+            >
               {params.patientName || "Patient"}
             </Text>
           </View>
 
-          <View className="w-9 h-9 rounded-full bg-[#EDE9FE] items-center justify-center">
-            <Ionicons name="person" size={20} color="#A78BFA" />
-          </View>
+          <PersonAvatar size={36} />
         </View>
 
         {/* Filter Pills */}
@@ -123,17 +131,17 @@ export default function NotesHistoryScreen() {
             return (
               <TouchableOpacity
                 key={filter}
-                className={`flex-1 h-8 rounded-md items-center justify-center ${
-                  isActive ? "bg-[#1D9BF0]" : "bg-white"
-                }`}
+                className="flex-1 h-10 rounded-md items-center justify-center"
+                style={{
+                  backgroundColor: isActive ? colors.primary : colors.white,
+                }}
                 onPress={() => setSelectedFilter(filter)}
               >
                 <Text
-                  className={`text-xs ${
-                    isActive
-                      ? "text-white font-semibold"
-                      : "text-[#374151] font-medium"
-                  }`}
+                  className={`text-xs ${isActive ? "font-semibold" : "font-medium"}`}
+                  style={{
+                    color: isActive ? colors.white : colors.textHeading,
+                  }}
                 >
                   {filter}
                 </Text>
@@ -143,30 +151,43 @@ export default function NotesHistoryScreen() {
         </View>
 
         {!params.patientId && (
-          <View className="flex-row items-center gap-1.5 p-3 bg-white rounded-lg">
-            <Ionicons name="alert-circle" size={16} color="#EF4444" />
-            <Text className="text-xs text-[#EF4444] flex-1">
+          <View
+            className="flex-row items-center gap-1.5 p-3 rounded-lg"
+            style={{ backgroundColor: colors.white }}
+          >
+            <Ionicons name="alert-circle" size={16} color={colors.dangerAlt} />
+            <Text className="text-xs flex-1" style={{ color: colors.dangerAlt }}>
               No patient selected. Open this screen from a patient record.
             </Text>
           </View>
         )}
 
         {error && (
-          <View className="flex-row items-center gap-1.5 p-3 bg-white rounded-lg">
-            <Ionicons name="alert-circle" size={16} color="#EF4444" />
-            <Text className="text-xs text-[#EF4444] flex-1">{error}</Text>
+          <View
+            className="flex-row items-center gap-1.5 p-3 rounded-lg"
+            style={{ backgroundColor: colors.white }}
+          >
+            <Ionicons name="alert-circle" size={16} color={colors.dangerAlt} />
+            <Text className="text-xs flex-1" style={{ color: colors.dangerAlt }}>
+              {error}
+            </Text>
           </View>
         )}
 
-        {isLoading && <ActivityIndicator size="small" color="#1D9BF0" />}
+        {isLoading && (
+          <ActivityIndicator size="small" color={colors.primary} />
+        )}
 
         {!isLoading && !error && params.patientId && visibleNotes.length === 0 && (
-          <Text className="text-[13px] text-[#6B7280] text-center mt-3">
+          <Text
+            className="text-[13px] text-center mt-3"
+            style={{ color: colors.textSecondary }}
+          >
             No notes for {selectedFilter.toLowerCase()}.
           </Text>
         )}
 
-        {/* History Cards List */}
+        {/* History Cards */}
         <View className="gap-3">
           {visibleNotes.map((note) => {
             const soapCount = note.soap_history?.length ?? 0;
@@ -180,34 +201,52 @@ export default function NotesHistoryScreen() {
             return (
               <TouchableOpacity
                 key={note.note_id}
-                className="bg-white rounded-xl p-3.5 gap-2.5"
+                className="rounded-xl p-3.5 gap-2.5"
+                style={{ backgroundColor: colors.white }}
                 activeOpacity={0.8}
                 onPress={() => toggleExpanded(note.note_id)}
               >
                 <View className="flex-row justify-between items-start">
                   <View className="flex-row gap-2.5 items-center flex-1">
-                    <View className="w-8 h-8 rounded-full bg-[#EDE9FE] items-center justify-center">
-                      <Ionicons name="document-text" size={16} color="#A78BFA" />
+                    <View
+                      className="w-8 h-8 rounded-full items-center justify-center"
+                      style={{ backgroundColor: colors.accentBg }}
+                    >
+                      <Ionicons
+                        name="document-text"
+                        size={16}
+                        color={colors.accent}
+                      />
                     </View>
                     <View>
-                      <Text className="text-[15px] font-bold text-[#1F2937]">
+                      <Text
+                        className="text-[15px] font-bold"
+                        style={{ color: colors.textHeading }}
+                      >
                         {note.patient_condition}
                       </Text>
-                      <Text className="text-xs text-[#6B7280]">
+                      <Text
+                        className="text-xs"
+                        style={{ color: colors.textSecondary }}
+                      >
                         {formatDateTime(note.notes_created_at)}
                       </Text>
                     </View>
                   </View>
 
                   <View
-                    className={`px-3 py-1 rounded ${
-                      isCompleted ? "bg-[#DCFCE7]" : "bg-[#E5E7EB]"
-                    }`}
+                    className="px-3 py-1 rounded"
+                    style={{
+                      backgroundColor: isCompleted
+                        ? colors.successBg
+                        : colors.badgeNeutralBg,
+                    }}
                   >
                     <Text
-                      className={`text-[11px] font-semibold ${
-                        isCompleted ? "text-[#166534]" : "text-[#EF4444]"
-                      }`}
+                      className="text-[11px] font-semibold"
+                      style={{
+                        color: isCompleted ? colors.success : colors.dangerAlt,
+                      }}
                     >
                       {isCompleted ? "Completed" : "Draft"}
                     </Text>
@@ -215,18 +254,30 @@ export default function NotesHistoryScreen() {
                 </View>
 
                 <View className="flex-row justify-between items-center pt-1">
-                  <Text className="text-[11px] text-[#6B7280] flex-1">
+                  <Text
+                    className="text-[11px] flex-1"
+                    style={{ color: colors.textSecondary }}
+                  >
                     {note.conscious_level} | GCS {note.glasgow_coma_score}/15 |
                     Pain {note.pain_scale}/10
                   </Text>
-                  <Text className="text-[11px] font-semibold text-[#374151] ml-2">
+                  <Text
+                    className="text-[11px] font-semibold ml-2"
+                    style={{ color: colors.textHeading }}
+                  >
                     {isExpanded ? "Hide" : "View"}
                   </Text>
                 </View>
 
                 {isExpanded && (
-                  <View className="border-t border-[#E5E7EB] pt-2.5 gap-1">
-                    <Text className="text-xs font-bold text-[#1F2937] mt-1">
+                  <View
+                    className="border-t pt-2.5 gap-1"
+                    style={{ borderColor: colors.border }}
+                  >
+                    <Text
+                      className="text-xs font-bold mt-1"
+                      style={{ color: colors.textHeading }}
+                    >
                       Interventions Performed
                     </Text>
                     {interventionsDone.length > 0 ? (
@@ -238,64 +289,75 @@ export default function NotesHistoryScreen() {
                           <Ionicons
                             name="checkmark-circle"
                             size={14}
-                            color="#166534"
+                            color={colors.success}
                           />
-                          <Text className="text-xs text-[#374151] leading-[17px]">
+                          <Text
+                            className="text-xs leading-[17px]"
+                            style={{ color: colors.textPrimary }}
+                          >
                             {name}
                           </Text>
                         </View>
                       ))
                     ) : (
-                      <Text className="text-xs text-[#374151] leading-[17px]">
+                      <Text
+                        className="text-xs leading-[17px]"
+                        style={{ color: colors.textPrimary }}
+                      >
                         No interventions recorded.
                       </Text>
                     )}
 
                     {latestSoap ? (
                       <>
-                        <Text className="text-[11px] font-semibold text-[#6B7280] mt-2 mb-1">
+                        <Text
+                          className="text-[11px] font-semibold mt-2 mb-1"
+                          style={{ color: colors.textSecondary }}
+                        >
                           SOAP v{latestSoap.version} (
                           {formatDateTime(latestSoap.created_at)})
                         </Text>
-                        <Text className="text-xs font-bold text-[#1F2937] mt-1">
-                          Subjective
-                        </Text>
-                        <Text className="text-xs text-[#374151] leading-[17px]">
-                          {latestSoap.subjective}
-                        </Text>
-                        <Text className="text-xs font-bold text-[#1F2937] mt-1">
-                          Objective
-                        </Text>
-                        <Text className="text-xs text-[#374151] leading-[17px]">
-                          {latestSoap.objective}
-                        </Text>
-                        <Text className="text-xs font-bold text-[#1F2937] mt-1">
-                          Assessment
-                        </Text>
-                        <Text className="text-xs text-[#374151] leading-[17px]">
-                          {latestSoap.assessment}
-                        </Text>
-                        <Text className="text-xs font-bold text-[#1F2937] mt-1">
-                          Plan
-                        </Text>
-                        <Text className="text-xs text-[#374151] leading-[17px]">
-                          {latestSoap.plan}
-                        </Text>
+                        {(
+                          [
+                            ["Subjective", latestSoap.subjective],
+                            ["Objective", latestSoap.objective],
+                            ["Assessment", latestSoap.assessment],
+                            ["Plan", latestSoap.plan],
+                          ] as const
+                        ).map(([label, value]) => (
+                          <View key={label}>
+                            <Text
+                              className="text-xs font-bold mt-1"
+                              style={{ color: colors.textHeading }}
+                            >
+                              {label}
+                            </Text>
+                            <Text
+                              className="text-xs leading-[17px]"
+                              style={{ color: colors.textPrimary }}
+                            >
+                              {value}
+                            </Text>
+                          </View>
+                        ))}
                       </>
                     ) : (
-                      <Text className="text-[11px] font-semibold text-[#6B7280] mt-2 mb-1">
+                      <Text
+                        className="text-[11px] font-semibold mt-2 mb-1"
+                        style={{ color: colors.textSecondary }}
+                      >
                         No SOAP note recorded for this assessment yet.
                       </Text>
                     )}
 
-                    <TouchableOpacity
-                      className="mt-2.5 h-9 rounded-md bg-[#1D9BF0] items-center justify-center"
-                      onPress={() => handleAddSoap(note)}
-                    >
-                      <Text className="text-xs font-semibold text-white">
-                        {isCompleted ? "Add New SOAP Version" : "Add SOAP Note"}
-                      </Text>
-                    </TouchableOpacity>
+                    <View className="mt-2.5">
+                      <PrimaryButton
+                        label={
+                          isCompleted ? "Add New SOAP Version" : "Add SOAP Note"
+                        }
+                        onPress={() => handleAddSoap(note)}
+                      />
+                    </View>
                   </View>
                 )}
               </TouchableOpacity>

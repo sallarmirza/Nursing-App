@@ -27,7 +27,13 @@ export const colors = {
   successAlt: "#10B981",       // modal checkmark circle
   danger: "#DC2626",
   dangerAlt: "#EF4444",        // alerts, overdue status, draft badge text
+  dangerBg: "#FEE2E2",         // danger badge / error highlight background
   warning: "#84CC16",          // "IV Bag Low" status
+  warningBg: "#ECFCCB",        // warning badge background
+  warningText: "#4D7C0F",      // warning badge text
+  warningSolid: "#D97706",     // clinical caution icon (amber)
+  warningTextDark: "#92400E",  // clinical caution body text
+  sliderTrack: "#CBD5E1",      // inactive slider track
 
   // Borders / dividers
   border: "#E5E7EB",

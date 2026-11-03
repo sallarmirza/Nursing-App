@@ -10,8 +10,8 @@ interface StatusBadgeProps {
 
 const toneStyles: Record<StatusTone, { bg: string; text: string }> = {
   success: { bg: colors.successBg, text: colors.success },
-  danger: { bg: "#FEE2E2", text: colors.danger },
-  warning: { bg: "#ECFCCB", text: "#4D7C0F" },
+  danger: { bg: colors.dangerBg, text: colors.danger },
+  warning: { bg: colors.warningBg, text: colors.warningText },
   neutral: { bg: colors.badgeNeutralBg, text: colors.textSecondary },
 };
 
