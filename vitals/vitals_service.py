@@ -3,7 +3,8 @@ from datetime import datetime
 
 from vitals.vitals_schema import VitalsRegister
 from storage import DBManager
-from db_model import Vitals as VitalsModel, Patient 
+from db_model import Vitals as VitalsModel, Patient
+
 
 class Vitals:
 
@@ -17,11 +18,8 @@ class Vitals:
         return f"VITAL-{year}-{unique}"
 
     def create_vitals(self, nurse_id: str, patient_id: str, data: VitalsRegister):
-        """Create and save patient vitals. Source is defined by frontend."""
-
-        session = self.db.get_session()
-
-        try:
+        """Create and save patient vitals."""
+        with self.db.get_session() as session:
             patient = (
                 session.query(Patient)
                 .filter(
@@ -41,12 +39,12 @@ class Vitals:
                 patient_id=patient_id,
                 nurse_id=nurse_id,
                 source=data.source,
-                vitals_data=data.vitals_data, 
+                vitals_data=data.vitals_data,
             )
 
             session.add(vital)
             session.commit()
-            session.refresh(vital)  
+            session.refresh(vital)
 
             return {
                 "message": "Vitals created successfully",
@@ -57,19 +55,9 @@ class Vitals:
                 "vitals_data": vital.vitals_data,
             }
 
-        except Exception:
-            session.rollback()
-            raise
-
-        finally:
-            session.close()
-
     def show_vitals(self, nurse_id: str, patient_id: str):
         """List all vitals recorded for a patient by a given nurse."""
-
-        session = self.db.get_session()
-
-        try:
+        with self.db.get_session() as session:
             rows = (
                 session.query(VitalsModel)
                 .filter(
@@ -87,23 +75,18 @@ class Vitals:
                     "vitals": [],
                 }
 
-            vitals = [
-                {
-                    "vital_id": v.vital_id,
-                    "patient_id": v.patient_id,
-                    "nurse_id": v.nurse_id,
-                    "source": v.source,
-                    "vitals_data": v.vitals_data,  
-                    "recorded_at": v.recorded_at,
-                }
-                for v in rows
-            ]
-
             return {
                 "patient_id": patient_id,
                 "nurse_id": nurse_id,
-                "vitals": vitals,
+                "vitals": [
+                    {
+                        "vital_id": v.vital_id,
+                        "patient_id": v.patient_id,
+                        "nurse_id": v.nurse_id,
+                        "source": v.source,
+                        "vitals_data": v.vitals_data,
+                        "recorded_at": v.recorded_at,
+                    }
+                    for v in rows
+                ],
             }
-
-        finally:
-            session.close()

@@ -4,7 +4,8 @@ from typing import Any
 from .drip_schema import DripCalculationRegister
 from storage import DBManager
 
-from db_model import IVDripCalculation, Patient 
+from db_model import IVDripCalculation, Patient
+
 
 class DripCalc:
 
@@ -19,8 +20,7 @@ class DripCalc:
 
     def list_all_patient_drip_calculations(self, nurse_id: str, patient_id: str) -> dict:
         """List all drip calculations for a patient, scoped to the requesting nurse."""
-        session = self.db.get_session()
-        try:
+        with self.db.get_session() as session:
             rows = (
                 session.query(IVDripCalculation)
                 .filter(
@@ -38,37 +38,26 @@ class DripCalc:
                     "drips": []
                 }
 
-            drips = [
-                {
-                    "drip_calc_id": d.drip_calc_id,
-                    "patient_id": d.patient_id,
-                    "nurse_id": d.nurse_id,
-                    "total_volume_ml": d.total_volume_ml,
-                    "time_duration_min": d.time_duration_min,
-                    "drop_factor": d.drop_factor,
-                    "drop_per_min": d.drop_per_min,
-                    "created_at": d.created_at,
-                }
-                for d in rows
-            ]
-
             return {
                 "patient_id": patient_id,
-                "drips": drips
+                "drips": [
+                    {
+                        "drip_calc_id": d.drip_calc_id,
+                        "patient_id": d.patient_id,
+                        "nurse_id": d.nurse_id,
+                        "total_volume_ml": d.total_volume_ml,
+                        "time_duration_min": d.time_duration_min,
+                        "drop_factor": d.drop_factor,
+                        "drop_per_min": d.drop_per_min,
+                        "created_at": d.created_at,
+                    }
+                    for d in rows
+                ],
             }
-        except Exception as e:
-            raise ValueError(f"Unable to retrieve drip records: {str(e)}")
-        finally:
-            session.close()
 
     def calculate_simple_driprate(self, data: DripCalculationRegister) -> dict[str, Any]:
-        """Calculate IV drip rate without patient. No DB access, unchanged."""
-
-        if data.time_duration_min <= 0:
-            raise ValueError("Time duration must be greater than zero")
-
+        """Calculate IV drip rate without patient. No DB access."""
         drop_rate = (data.total_volume * data.drop_factor) / data.time_duration_min
-
         return {
             "total_volume_ml": data.total_volume,
             "time_duration_min": data.time_duration_min,
@@ -80,16 +69,7 @@ class DripCalc:
         self, nurse_id: str, patient_id: str, data: DripCalculationRegister
     ) -> dict[str, Any]:
         """Calculate and save IV drip rate for a patient."""
-
-        if not nurse_id or not patient_id:
-            raise ValueError("Nurse ID and patient ID are required")
-
-        if data.time_duration_min <= 0:
-            raise ValueError("Time duration must be greater than zero")
-
-        session = self.db.get_session()
-
-        try:
+        with self.db.get_session() as session:
             patient = (
                 session.query(Patient)
                 .filter(
@@ -101,8 +81,7 @@ class DripCalc:
 
             if patient is None:
                 raise ValueError(
-                    "Patient does not exist or nurse is not assigned "
-                    "to this patient"
+                    "Patient does not exist or nurse is not assigned to this patient"
                 )
 
             drop_rate = round(
@@ -134,25 +113,11 @@ class DripCalc:
                 "drop_rate_gtt_min": drop_rate
             }
 
-        except Exception:
-            session.rollback()
-            raise
-
-        finally:
-            session.close()
-
     def delete_drip_calculation(
         self, nurse_id: str, patient_id: str, drip_calc_id: str
     ) -> dict[str, Any]:
         """Delete a specific IV drip calculation."""
-        if not nurse_id or not patient_id or not drip_calc_id:
-            raise ValueError(
-                "Nurse ID, patient ID and drip calculation ID are required"
-            )
-
-        session = self.db.get_session()
-
-        try:
+        with self.db.get_session() as session:
             drip = (
                 session.query(IVDripCalculation)
                 .filter(
@@ -179,10 +144,3 @@ class DripCalc:
                 "patient_id": patient_id,
                 "nurse_id": nurse_id
             }
-
-        except Exception:
-            session.rollback()
-            raise
-
-        finally:
-            session.close()

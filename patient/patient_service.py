@@ -1,9 +1,10 @@
 from storage import DBManager
 from datetime import datetime
 import uuid
-from patient.patient_schema import PatientRegister,PatientResponse
+from patient.patient_schema import PatientRegister, PatientResponse
 from typing import Any
-from db_model import Patient, Nurse ,Vitals,NursingNote,CurrentMedication,DosageCalculation,SBAR,IVDripCalculation
+from db_model import Patient, Nurse, Vitals, NursingNote, CurrentMedication, DosageCalculation, SBAR, IVDripCalculation
+
 
 class PatientService:
 
@@ -14,13 +15,11 @@ class PatientService:
     def create_patient_id() -> str:
         year = datetime.now().year
         unique_part = uuid.uuid4().hex[:12].upper()
-
         return f"PAT-{year}-{unique_part}"
 
     def create_patient_profile(self, nurse_id: str, data: PatientRegister) -> dict[str, str]:
-        """create patient profile"""
-        session = self.db.get_session()
-        try:
+        """Create patient profile."""
+        with self.db.get_session() as session:
             nurse = session.query(Nurse).filter(Nurse.nurse_id == nurse_id).first()
             if not nurse:
                 raise ValueError("Nurse does not exist")
@@ -49,17 +48,10 @@ class PatientService:
                 "patient_id": patient_id,
                 "message": f"{patient_name} for {nurse_id} created successfully"
             }
-        except Exception:
-            session.rollback()
-            raise
-        finally:
-            session.close()
 
     def all_patients(self, nurse_id: str):
         """List all patients assigned to a nurse."""
-        session = self.db.get_session()
-
-        try:
+        with self.db.get_session() as session:
             nurse = session.query(Nurse).filter(Nurse.nurse_id == nurse_id).first()
 
             if not nurse:
@@ -90,14 +82,9 @@ class PatientService:
                 for p in patients
             ]
 
-        finally:
-            session.close()
-
     def delete_patient_acc(self, nurse_id: str, patient_id: str) -> dict:
         """Delete a patient only if assigned to the requesting nurse."""
-        session = self.db.get_session()
-
-        try:
+        with self.db.get_session() as session:
             patient = (
                 session.query(Patient)
                 .filter(
@@ -120,18 +107,9 @@ class PatientService:
                 "message": f"Patient {patient_id} deleted successfully"
             }
 
-        except Exception:
-            session.rollback()
-            raise
-
-        finally:
-            session.close()
-                
-                
     def view_patient(self, nurse_id: str, patient_id: str) -> dict[str, Any]:
-        """view complete info of patient"""
-        session = self.db.get_session()
-        try:
+        """View complete info of patient."""
+        with self.db.get_session() as session:
             patient = (
                 session.query(Patient)
                 .filter(Patient.patient_id == patient_id, Patient.assigned_nurse_id == nurse_id)
@@ -190,8 +168,7 @@ class PatientService:
                 patient_weight=patient.patient_weight,
                 patient_height=patient.patient_height,
                 patient_blood_group=patient.patient_blood_group,
-                ward=patient.ward,
-                assigned_nurse_id=patient.assigned_nurse_id,
+                patient_ward=patient.ward,
                 vitals=vitals,
                 nursing_notes=nursing_notes,
                 medications=medications,
@@ -201,8 +178,3 @@ class PatientService:
             )
 
             return response.model_dump()
-
-        except ValueError:
-            raise
-        finally:
-            session.close()

@@ -25,9 +25,7 @@ class DashboardService:
         return "updated"
 
     def get_dashboard(self, nurse_id: str) -> dict[str, Any]:
-        session = self.db.get_session()
-
-        try:
+        with self.db.get_session() as session:
             nurse = (
                 session.query(Nurse)
                 .filter(Nurse.nurse_id == nurse_id)
@@ -48,7 +46,7 @@ class DashboardService:
 
             patient_ids = [p.patient_id for p in patients]
 
-            # Latest vitals per patient, patient-scoped across all nurses
+            # Latest vitals per patient
             last_vitals: dict[str, datetime] = {}
             if patient_ids:
                 rows = (
@@ -59,7 +57,7 @@ class DashboardService:
                 )
                 last_vitals = {pid: ts for pid, ts in rows}
 
-            # current_timestamp in SQLite is UTC, so compare against UTC
+            # current_timestamp in SQLite is UTC, compare against UTC
             now = datetime.now(timezone.utc).replace(tzinfo=None)
 
             return {
@@ -77,6 +75,3 @@ class DashboardService:
                     for p in patients
                 ],
             }
-
-        finally:
-            session.close()

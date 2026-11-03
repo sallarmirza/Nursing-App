@@ -16,7 +16,6 @@ class Notes:
     def create_note_id():
         year = datetime.now().year
         unique = uuid.uuid4().hex[:12].upper()
-
         return f"NOTE-{year}-{unique}"
 
     @staticmethod
@@ -37,10 +36,8 @@ class Notes:
             )
 
     def create_notes(self, nurse_id: str, patient_id: str, data: NursingNoteRegister) -> dict[str, str]:
-        """create notes by nurse for the patient"""
-        session = self.db.get_session()
-
-        try:
+        """Create notes by nurse for the patient."""
+        with self.db.get_session() as session:
             self._assert_patient_assigned(session, nurse_id, patient_id)
 
             note_id = self.create_note_id()
@@ -65,18 +62,9 @@ class Notes:
                 "note_id": note_id
             }
 
-        except Exception:
-            session.rollback()
-            raise
-
-        finally:
-            session.close()
-
     def register_soap(self, nurse_id: str, patient_id: str, note_id: str, data: SoapRegister) -> dict[str, Any]:
-        """register soap and save it into json"""
-        session = self.db.get_session()
-
-        try:
+        """Register SOAP and append it to the note's json history."""
+        with self.db.get_session() as session:
             note = (
                 session.query(NursingNote)
                 .filter(
@@ -94,7 +82,6 @@ class Notes:
                 )
 
             soap_history = list(note.soap_history) if note.soap_history else []
-
             new_version = len(soap_history) + 1
 
             new_soap = {
@@ -108,8 +95,7 @@ class Notes:
             }
 
             soap_history.append(new_soap)
-
-            # Reassign (not in-place append) so SQLAlchemy detects the change
+            # Reassign (not in-place) so SQLAlchemy detects the change on JSON column
             note.soap_history = soap_history
 
             session.commit()
@@ -121,18 +107,9 @@ class Notes:
                 "soap": new_soap
             }
 
-        except Exception:
-            session.rollback()
-            raise
-
-        finally:
-            session.close()
-
     def show_nursing_notes(self, nurse_id: str, patient_id: str) -> dict[str, Any]:
-
         """Show all nursing notes for a patient."""
-        session = self.db.get_session()
-        try:
+        with self.db.get_session() as session:
             rows = (
                 session.query(NursingNote)
                 .filter(
@@ -143,35 +120,29 @@ class Notes:
                 .all()
             )
 
-            notes = [
-                {
-                    "note_id": n.note_id,
-                    "patient_id": n.patient_id,
-                    "nurse_id": n.nurse_id,
-                    "patient_condition": n.patient_condition,
-                    "conscious_level": n.conscious_level,
-                    "glasgow_coma_score": n.glasgow_coma_score,
-                    "pain_scale": n.pain_scale,
-                    "nursing_interventions": n.nursing_interventions or {},
-                    "soap_history": n.soap_history,
-                    "notes_created_at": n.notes_created_at,
-                }
-                for n in rows
-            ]
-
             return {
                 "patient_id": patient_id,
                 "nurse_id": nurse_id,
-                "notes": notes,
+                "notes": [
+                    {
+                        "note_id": n.note_id,
+                        "patient_id": n.patient_id,
+                        "nurse_id": n.nurse_id,
+                        "patient_condition": n.patient_condition,
+                        "conscious_level": n.conscious_level,
+                        "glasgow_coma_score": n.glasgow_coma_score,
+                        "pain_scale": n.pain_scale,
+                        "nursing_interventions": n.nursing_interventions or {},
+                        "soap_history": n.soap_history,
+                        "notes_created_at": n.notes_created_at,
+                    }
+                    for n in rows
+                ],
             }
 
-        finally:
-            session.close()
-
     def delete_notes(self, nurse_id: str, patient_id: str, note_id: str) -> dict[str, Any]:
-        """Deleting notes for patient by nurse"""
-        session = self.db.get_session()
-        try:
+        """Delete note for patient by nurse."""
+        with self.db.get_session() as session:
             note = (
                 session.query(NursingNote)
                 .filter(
@@ -198,10 +169,3 @@ class Notes:
                 "patient_id": patient_id,
                 "nurse_id": nurse_id
             }
-
-        except Exception:
-            session.rollback()
-            raise
-
-        finally:
-            session.close()
