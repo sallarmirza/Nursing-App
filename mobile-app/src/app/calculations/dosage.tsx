@@ -3,7 +3,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -180,10 +179,6 @@ export default function DosageCalculatorScreen() {
             />
           </View>
 
-          {isLoading && (
-            <ActivityIndicator size="small" color={colors.primary} className="mt-2" />
-          )}
-
           {error && (
             <View 
               className="flex-row items-center gap-1.5 p-3 rounded-lg mt-2" 
@@ -210,8 +205,8 @@ export default function DosageCalculatorScreen() {
               </Text>
 
               <View className="flex-row items-center gap-1.5 mt-3 p-3 rounded-lg bg-yellow-50 border border-yellow-200">
-                <Ionicons name="warning" size={16} color="#D97706" />
-                <Text className="text-xs flex-1" style={{ color: "#92400E" }}>
+                <Ionicons name="warning" size={16} color={colors.warningSolid} />
+                <Text className="text-xs flex-1" style={{ color: colors.warningTextDark }}>
                   Verify concentration & double-check calculations before administration.
                 </Text>
               </View>
@@ -233,10 +228,6 @@ export default function DosageCalculatorScreen() {
                   onPress={handleSave}
                   disabled={isSaving}
                 />
-              )}
-
-              {isSaving && (
-                <ActivityIndicator size="small" color={colors.primary} />
               )}
 
               {saveError && (

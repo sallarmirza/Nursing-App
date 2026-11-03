@@ -105,7 +105,7 @@ export default function SoapNotesScreen() {
             value={subjective}
             onChangeText={setSubjective}
             placeholder="Patient reports abdominal pain and nausea..."
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.textFaint}
             textAlignVertical="top"
           />
         </View>
@@ -130,7 +130,7 @@ export default function SoapNotesScreen() {
             value={objective}
             onChangeText={setObjective}
             placeholder="BP, HR, RR, SpO2, physical examination findings..."
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.textFaint}
             textAlignVertical="top"
           />
         </View>
@@ -155,7 +155,7 @@ export default function SoapNotesScreen() {
             value={assessment}
             onChangeText={setAssessment}
             placeholder="Nursing assessment of the patient's condition..."
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.textFaint}
             textAlignVertical="top"
           />
         </View>
@@ -180,7 +180,7 @@ export default function SoapNotesScreen() {
             value={plan}
             onChangeText={setPlan}
             placeholder="Continue monitoring, administer medication, reassess pain in 30 minutes..."
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.textFaint}
             textAlignVertical="top"
           />
         </View>

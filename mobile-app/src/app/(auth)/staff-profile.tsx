@@ -1,7 +1,7 @@
 // app/(auth)/staff-profile
 import { router } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FormInput } from "../../components/common/FormInput";
 import { PrimaryButton } from "../../components/common/PrimaryButton";
@@ -123,7 +123,7 @@ export default function StaffProfileScreen() {
         <FormInput
           label="Full Name"
           placeholder="Write your full name"
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor={colors.textFaint}
           editable={isEditing}
           value={name}
           onChangeText={setName}
@@ -135,7 +135,7 @@ export default function StaffProfileScreen() {
               <FormInput
                 label="Qualification"
                 placeholder="Select your Qualification"
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor={colors.textFaint}
                 editable={false}
                 value={qualification}
                 onChangeText={setQualification}
@@ -151,7 +151,7 @@ export default function StaffProfileScreen() {
               <FormInput
                 label="Designation"
                 placeholder="Select your Designation"
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor={colors.textFaint}
                 editable={false}
                 value={designation}
                 onChangeText={setDesignation}
@@ -164,7 +164,7 @@ export default function StaffProfileScreen() {
         <FormInput
           label="Institute"
           placeholder="Enter Institute Name"
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor={colors.textFaint}
           editable={isEditing}
           value={institute}
           onChangeText={setInstitute}
@@ -176,7 +176,7 @@ export default function StaffProfileScreen() {
               <FormInput
                 label="Experience"
                 placeholder="Select Years of Experience"
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor={colors.textFaint}
                 editable={false}
                 value={experience}
                 onChangeText={setExperience}
@@ -198,9 +198,6 @@ export default function StaffProfileScreen() {
             onPress={handleSave}
             disabled={isLoading}
           />
-          {isLoading && (
-            <ActivityIndicator size="small" color={colors.primaryAlt} />
-          )}
           <PrimaryButton label="Edit" variant="outline" onPress={handleEdit} />
         </View>
       </ScrollView>

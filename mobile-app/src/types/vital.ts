@@ -26,10 +26,8 @@ export interface VitalsCreateResponse {
 }
 
 // Raw form values as held by a screen (strings until parsed on submit)
-// BP is split into two fields so both can be submitted as numbers.
 export interface VitalsFormValues {
-  bp_systolic: string;
-  bp_diastolic: string;
+  bp: string;
   hr: string;
   rr: string;
   spO2: string;

@@ -2,7 +2,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Link, router } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { FormInput } from "../../components/common/FormInput";
 import { PrimaryButton } from "../../components/common/PrimaryButton";
 import { colors } from "../../theme/colors";
@@ -62,15 +62,14 @@ export default function SignupScreen() {
             disabled={isLoading}
             style={{ marginTop: 8 }}
           />
-          {isLoading && <ActivityIndicator size="small" color={colors.primaryAlt} />}
         </View>
 
         <View className="flex-row items-center my-5">
-          <View className="flex-1 h-[1px]" style={{ backgroundColor: colors.textPrimary }} />
+          <View className="flex-1 h-[1px]" style={{ backgroundColor: colors.divider }} />
           <Text className="text-sm mx-4" style={{ color: colors.textMuted }}>
             or
           </Text>
-          <View className="flex-1 h-[1px]" style={{ backgroundColor: colors.textPrimary }} />
+          <View className="flex-1 h-[1px]" style={{ backgroundColor: colors.divider }} />
         </View>
 
         <Text className="text-center text-sm font-medium mb-4" style={{ color: colors.textMuted }}>

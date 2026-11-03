@@ -212,7 +212,7 @@ export default function SbarHandoverScreen() {
             multiline
             numberOfLines={3}
             placeholder="Problem: e.g. sudden drop in BP, patient restless..."
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.textFaint}
             value={situation}
             onChangeText={setSituation}
           />
@@ -235,7 +235,7 @@ export default function SbarHandoverScreen() {
             multiline
             numberOfLines={3}
             placeholder="Admission diagnosis, past history, recent procedures/labs..."
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.textFaint}
             value={background}
             onChangeText={setBackground}
           />
@@ -249,7 +249,7 @@ export default function SbarHandoverScreen() {
               color: colors.textPrimary,
             }}
             placeholder="SpO2"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.textFaint}
             keyboardType="numeric"
             value={spo2}
             onChangeText={setSpo2}
@@ -261,7 +261,7 @@ export default function SbarHandoverScreen() {
               color: colors.textPrimary,
             }}
             placeholder="Temp (°F)"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.textFaint}
             keyboardType="numeric"
             value={temp}
             onChangeText={setTemp}
@@ -285,7 +285,7 @@ export default function SbarHandoverScreen() {
             multiline
             numberOfLines={3}
             placeholder="Your assessment of the current problem..."
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.textFaint}
             value={assessment}
             onChangeText={setAssessment}
           />
@@ -308,7 +308,7 @@ export default function SbarHandoverScreen() {
             multiline
             numberOfLines={3}
             placeholder="What needs to happen next..."
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.textFaint}
             value={recommendation}
             onChangeText={setRecommendation}
           />
@@ -371,7 +371,7 @@ export default function SbarHandoverScreen() {
               className="flex-1 text-[15px]"
               style={{ color: colors.textPrimary }}
               placeholder="Name"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={colors.textFaint}
               maxLength={255}
               value={medName}
               onChangeText={setMedName}
@@ -384,7 +384,7 @@ export default function SbarHandoverScreen() {
               className="flex-1 text-[15px]"
               style={{ color: colors.textPrimary }}
               placeholder="Dose"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={colors.textFaint}
               keyboardType="numeric"
               value={medDose}
               onChangeText={setMedDose}
@@ -399,7 +399,7 @@ export default function SbarHandoverScreen() {
               className="flex-1 text-[15px]"
               style={{ color: colors.textPrimary }}
               placeholder="Unit (e.g. mg)"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={colors.textFaint}
               maxLength={20}
               value={medUnit}
               onChangeText={setMedUnit}
@@ -412,7 +412,7 @@ export default function SbarHandoverScreen() {
               className="flex-1 text-[15px]"
               style={{ color: colors.textPrimary }}
               placeholder="Frequency"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={colors.textFaint}
               maxLength={50}
               value={medFrequency}
               onChangeText={setMedFrequency}
