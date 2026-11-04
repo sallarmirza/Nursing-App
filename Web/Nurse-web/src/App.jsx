@@ -1,23 +1,27 @@
-import Navbar from './components/layout/Navbar';
-import Hero from './sections/Hero';
-import Features from './sections/Features';
-import WhyChooseUs from './sections/WhyChooseUs';
-import HowItWorks from './sections/HowItWorks';
-import FAQ from './sections/FAQ';
-import Waitlist from './sections/Waitlist';
-import Footer from './components/layout/Footer';
+import Navbar from "./components/layout/Navbar";
+import Footer from "./components/layout/Footer";
+import Hero from "./sections/Hero";
+import Install from "./sections/Install";
+import Features from "./sections/Features";
+import Download from "./sections/Download";
+import Team from "./sections/Team";
+import FAQ from "./sections/FAQ";
+import Feedback from "./sections/Feedback";
 
+// Home page. Order follows the visitor's job:
+// get the app -> install it -> see what it does -> download -> who built it -> questions -> feedback
 export default function App() {
   return (
     <div className="min-h-screen bg-white font-sans flex flex-col">
       <Navbar />
       <main className="grow">
         <Hero />
+        <Install />
         <Features />
-        <WhyChooseUs />
-        <HowItWorks />
+        <Download />
+        <Team />
         <FAQ />
-        <Waitlist />
+        <Feedback />
       </main>
       <Footer />
     </div>

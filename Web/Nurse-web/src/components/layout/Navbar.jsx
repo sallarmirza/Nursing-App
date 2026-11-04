@@ -1,91 +1,102 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "../ui/Button";
-import logoBlue from "../../assets/nursing-app-logo-blue.png"; // Import the logo
+import logoBlue from "../../assets/nursing-app-logo-blue.png";
+import { SITE } from "../../config/site";
+
+// Anchor targets match the section ids used on the home page.
+const NAV_LINKS = [
+  { label: "Install", href: "#install" },
+  { label: "Features", href: "#features" },
+  { label: "Team", href: "#team" },
+  { label: "FAQ", href: "#faq" },
+];
 
 export default function Navbar() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const navLinks = ["Features", "How it Works", "FAQ"];
+  const [open, setOpen] = useState(false);
+
+  // Close the mobile menu with Escape
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
 
   return (
     <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
-          {/* Logo */}
-          <div className="flex items-center gap-3">
-            <img
-              src={logoBlue}
-              alt="DNA Logo"
-              className="h-10 w-auto object-contain"
-            />
-            <div className="flex flex-col justify-center">
+          {/* Logo: links back to the top of the page */}
+          <a href="#top" className="flex items-center gap-3" aria-label={`${SITE.name} home`}>
+            <img src={logoBlue} alt="" className="h-10 w-auto object-contain" />
+            <span className="flex flex-col justify-center">
               <span className="text-[1.4rem] font-black text-text-dark tracking-tighter leading-none">
-                DNA
+                {SITE.short}
               </span>
-              <span className="text-[9px] font-bold text-gray-500 tracking-[0.2em] uppercase mt-0.5">
-                Digital Nursing Assistant
+              <span className="text-xs font-medium text-text-muted mt-0.5">
+                {SITE.name}
               </span>
-            </div>
-          </div>
+            </span>
+          </a>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex gap-8">
-            {navLinks.map((item) => (
+          {/* Desktop links */}
+          <nav className="hidden md:flex gap-8" aria-label="Main">
+            {NAV_LINKS.map((l) => (
               <a
-                key={item}
-                href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
+                key={l.href}
+                href={l.href}
                 className="text-sm font-medium text-text-muted hover:text-brand-blue transition-colors"
               >
-                {item}
+                {l.label}
               </a>
             ))}
           </nav>
 
-          {/* Desktop CTA Button */}
+          {/* Desktop CTA: jumps to the download band (shows version + checksum) */}
           <div className="hidden md:block">
-            <a href="#waitlist">
-              <Button variant="primary" className="px-6 py-2.5">
-                Join Waitlist
-              </Button>
-            </a>
+            <Button href="#download" className="px-6 py-2.5">
+              Download APK
+            </Button>
           </div>
 
-          {/* Mobile Hamburger Button */}
+          {/* Mobile menu toggle */}
           <div className="md:hidden flex items-center">
             <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
-              aria-expanded={isMobileMenuOpen}
+              onClick={() => setOpen(!open)}
+              aria-label={open ? "Close menu" : "Open menu"}
+              aria-expanded={open}
               aria-controls="mobile-nav-menu"
-              className="text-text-dark text-2xl p-3 focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 rounded-md"
+              className="text-text-dark text-2xl p-3 rounded-md"
             >
-              {isMobileMenuOpen ? "✕" : "☰"}
+              {open ? "✕" : "☰"}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Menu Dropdown */}
-      {isMobileMenuOpen && (
-        <div id="mobile-nav-menu" className="md:hidden bg-white border-t border-gray-100 absolute w-full left-0 shadow-lg">
-          <div className="flex flex-col px-4 py-6 gap-6">
-            {navLinks.map((item) => (
+      {/* Mobile dropdown */}
+      {open && (
+        <div
+          id="mobile-nav-menu"
+          className="md:hidden bg-white border-t border-gray-100 absolute w-full left-0 shadow-lg"
+        >
+          <nav className="flex flex-col px-4 py-6 gap-6" aria-label="Mobile">
+            {NAV_LINKS.map((l) => (
               <a
-                key={item}
-                href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
-                onClick={() => setIsMobileMenuOpen(false)}
+                key={l.href}
+                href={l.href}
+                onClick={() => setOpen(false)}
                 className="text-base font-medium text-text-dark hover:text-brand-blue transition-colors"
               >
-                {item}
+                {l.label}
               </a>
             ))}
             <div className="pt-4 border-t border-gray-100">
-              <a href="#waitlist" onClick={() => setIsMobileMenuOpen(false)}>
-                <Button variant="primary" className="w-full py-3">
-                  Join Waitlist
-                </Button>
-              </a>
+              <Button href="#download" onClick={() => setOpen(false)} className="w-full py-3">
+                Download APK
+              </Button>
             </div>
-          </div>
+          </nav>
         </div>
       )}
     </header>

@@ -1,22 +1,29 @@
+/* Geist, self-hosted via Fontsource (family name: "Geist Variable") */
+@import "@fontsource-variable/geist";
 @import "tailwindcss";
 
+/* Design tokens. Original brand blue restored everywhere. */
 @theme {
   --color-brand-blue: #0d54ff;
   --color-brand-hover: #003ecc;
   --color-brand-light: #eff4ff;
-  --color-bg-beige: #fdfbf7;
+  /* Alias kept so Button and PhoneFrame need no edits: this is now the
+     original brand blue, not a separate navy. */
+  --color-brand-navy: #0d54ff;
+  --color-bg-soft: #f6f8fc;         /* cool off-white section background */
+  --color-bg-beige: #f6f8fc;        /* legacy alias */
   --color-text-dark: #111827;
-  --color-text-muted: #6b7280;
+  --color-text-muted: #5b6472;
 
-  /* Semantic state colors */
+  /* Semantic state colors (status messages only, never decoration) */
   --color-success: #166534;
   --color-success-bg: #f0fdf4;
   --color-error: #dc2626;
   --color-error-bg: #fef2f2;
-  --color-warning: #d97706;
+  --color-warning: #b45309;
   --color-warning-bg: #fffbeb;
 
-  --font-sans: "Inter", system-ui, sans-serif;
+  --font-sans: "Geist Variable", system-ui, sans-serif;
 }
 
 @layer base {
@@ -25,6 +32,11 @@
   }
   h1, h2, h3, h4 {
     @apply font-bold tracking-tight;
+  }
+  /* One visible keyboard focus style for every interactive element */
+  a:focus-visible, button:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--color-brand-blue);
+    outline-offset: 3px;
   }
 }
 
@@ -45,7 +57,7 @@ footer {
   padding-bottom: max(2rem, env(safe-area-inset-bottom, 0px));
 }
 
-/* Sticky nav height + safe area top */
+/* Sticky nav height + safe area top, so anchor jumps don't hide headings */
 section[id] {
   scroll-margin-top: calc(5rem + env(safe-area-inset-top, 0px));
 }
@@ -58,7 +70,7 @@ section[id] {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  /* Loading spinner is state feedback, not decoration — restore it */
+  /* Loading spinner is state feedback, not decoration, so restore it */
   .animate-spin {
     animation-duration: 0.8s !important;
     animation-iteration-count: infinite !important;
