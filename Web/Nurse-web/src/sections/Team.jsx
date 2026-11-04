@@ -5,7 +5,7 @@ import SectionHeader from "../components/ui/SectionHeader";
 // Links with href "#" are hidden until a real URL is added.
 const TEAM = [
   {
-    name: "Muhammad Haseeb Abbassi",
+    name: "Haseeb Abbasi",
     role: "Clinical Co-Founder",
     photo: "/haseeb-img.png",
     email: "ha5599248@gmail.com",
@@ -14,7 +14,7 @@ const TEAM = [
   {
     name: "Salar Ahmed Mirza",
     role: "Developer",
-    photo: "/linkedin-Salar-pf-1.jpg",
+    photo: "/salar-img.png",
     email: "sallarmirza77@gmail.com",
     links: [{ label: "GitHub", href: "#" }],
   },

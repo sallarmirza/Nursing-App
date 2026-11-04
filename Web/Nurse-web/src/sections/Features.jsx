@@ -1,9 +1,8 @@
 import { useState } from "react";
 import SectionHeader from "../components/ui/SectionHeader";
 import PhoneFrame from "../components/ui/PhoneFrame";
+import nursingnote from '../assets/shots/nursing_note.png'
 
-// Features: pick a feature on the left, see its real app screen on the right.
-// Replace each `shot` with an imported screenshot, e.g.
 // import soapShot from "../assets/shots/soap.png"
 const FEATURES = [
   {
@@ -22,7 +21,7 @@ const FEATURES = [
     title: "SBAR handovers",
     description:
       "Hand over the shift with Situation, Background, Assessment and Recommendation, including current IV medications.",
-    shot: "",
+    shot: nursingnote,
   },
   {
     title: "Dosage and IV drip calculators",
