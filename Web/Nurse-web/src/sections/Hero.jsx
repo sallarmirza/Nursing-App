@@ -1,11 +1,11 @@
 import Button from "../components/ui/Button";
 import PhoneFrame from "../components/ui/PhoneFrame";
 import { SITE } from "../config/site";
-
+import dashboardShot from "../assets/shots/dashboard.png";
 // Hero: the page's first job is getting the APK into the visitor's hands.
 // Left: headline + download action + file facts. Right: phone with a real screen.
-const HERO_SCREENSHOT = ""; // e.g. import dashboardShot from "../assets/shots/dashboard.png"
-
+// const HERO_SCREENSHOT = ""; // e.g. import dashboardShot from "../assets/shots/dashboard.png"
+const HERO_SCREENSHOT = dashboardShot;
 export default function Hero() {
   const { apk } = SITE;
 
