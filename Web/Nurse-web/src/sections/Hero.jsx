@@ -1,55 +1,52 @@
-import Button from '../components/ui/Button';
+import Button from "../components/ui/Button";
+import PhoneFrame from "../components/ui/PhoneFrame";
+import { SITE } from "../config/site";
+
+// Hero: the page's first job is getting the APK into the visitor's hands.
+// Left: headline + download action + file facts. Right: phone with a real screen.
+const HERO_SCREENSHOT = ""; // e.g. import dashboardShot from "../assets/shots/dashboard.png"
 
 export default function Hero() {
-  return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-16">
-      {/* Outer container with light background and rounded corners */}
-      <div className="bg-gray-50 rounded-[2.5rem] overflow-hidden relative">
-        <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[600px]">
-          
-          {/* Left Content */}
-          <div className="flex flex-col justify-center p-10 lg:p-16 xl:p-20 z-10">
-            
-            {/* Review Badge */}
-            <div className="inline-flex items-center gap-2 bg-white px-4 py-1.5 rounded-full shadow-sm w-fit mb-8 border border-gray-100">
-              <span className="text-brand-blue text-lg">★</span>
-              <span className="text-sm font-semibold text-text-dark">Built for Nurses</span>
-            </div>
+  const { apk } = SITE;
 
-            {/* Headline */}
-            <h1 className="text-5xl lg:text-6xl font-bold text-text-dark leading-[1.1] mb-6">
-              Empowering Nurses, <br className="hidden lg:block"/> Enhancing Care
+  return (
+    <section id="top" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-16">
+      <div className="bg-bg-soft rounded-[2.5rem] overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-10 p-8 sm:p-12 lg:p-16">
+          {/* Left: message + action */}
+          <div className="flex flex-col">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-text-dark leading-[1.1] mb-6">
+              Your ward notes, handovers and dose checks in one Android app
             </h1>
 
-            {/* Subtext */}
-            <p className="text-lg text-text-muted mb-10 max-w-lg leading-relaxed">
-              Streamline your workflow with digital clinical records, SBAR handovers, and accurate dosage calculations—all in one secure, intuitive app.
+            <p className="text-lg text-text-muted mb-8 max-w-lg leading-relaxed">
+              DNA keeps patient records, SOAP and SBAR notes, and dosage and IV
+              drip calculators on your phone. Download it directly and install
+              it in a few minutes.
             </p>
 
-            {/* CTAs */}
-            <div className="flex flex-wrap gap-4">
-              <a href="#waitlist"><Button variant="primary" className="px-8 py-3.5 text-base">Get Started</Button></a>
-              <a href="#features"><Button variant="secondary" className="px-8 py-3.5 text-base">Learn More</Button></a>
+            <div className="flex flex-wrap gap-4 mb-6">
+              <Button href={apk.url} download className="px-8 py-3.5 text-base">
+                Download APK
+              </Button>
+              <Button href="#install" variant="secondary" className="px-8 py-3.5 text-base">
+                How to install
+              </Button>
             </div>
+
+            {/* File facts: what the visitor is about to download */}
+            <p className="text-sm text-text-muted">
+              Version {apk.version} · {apk.size} · {apk.minAndroid}
+            </p>
+            <p className="text-sm text-text-muted mt-1">
+              Not on the Play Store yet, so you install the APK file directly.
+            </p>
           </div>
 
-          {/* Right Image */}
-          <div className="relative h-64 lg:h-auto">
-            {/* Placeholder image from Unsplash. You can replace this with your own asset later */}
-            {/* fetchPriority=high marks this as the LCP candidate so the browser preloads it early */}
-            <img
-              src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=1200&auto=format&fit=crop"
-              srcSet="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=640&auto=format&fit=crop 640w, https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=1200&auto=format&fit=crop 1200w"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              alt="Nurse smiling"
-              fetchPriority="high"
-              decoding="async"
-              className="absolute inset-0 w-full h-full object-cover object-center lg:rounded-l-[2.5rem]"
-            />
-            {/* Subtle gradient overlay to blend image with background on desktop */}
-            <div className="absolute inset-0 bg-gradient-to-r from-gray-50 via-transparent to-transparent hidden lg:block w-32"></div>
+          {/* Right: phone with a real screen */}
+          <div className="flex justify-center">
+            <PhoneFrame src={HERO_SCREENSHOT} alt="DNA dashboard screen" priority />
           </div>
-
         </div>
       </div>
     </section>

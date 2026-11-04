@@ -1,64 +1,58 @@
-// Footer — plain <a> tags used throughout; React Router <Link> removed to prevent
-// useHref() crash when no <BrowserRouter> wraps the app.
-import logoBlue from '../../assets/nursing-app-logo-blue.png';
+// Footer on the original brand blue. Hash links scroll the home page;
+// legal links use router <Link> (Footer renders inside RouterProvider via App).
+import { Link } from "react-router-dom";
+import logoWhite from "../../assets/nursing-app-logo-white.png";
+import { SITE } from "../../config/site";
+
+// Higher opacity than before so small text stays readable on bright blue
+const linkClass = "text-white/85 hover:text-white transition-colors";
 
 export default function Footer() {
   return (
-    <footer className="bg-white pt-16 pb-8 border-t border-gray-100 flex flex-col justify-between min-h-100">
+    <footer className="bg-brand-blue text-white pt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 mb-16">
-
-          {/* Logo & Contact Info */}
+          {/* Brand + contact */}
           <div className="lg:col-span-6">
             <div className="flex items-center gap-3 mb-6">
-              <img src={logoBlue} alt="DNA Logo" className="h-9 w-auto object-contain" />
-              <span className="text-2xl font-bold text-text-dark tracking-tight">DNA</span>
+              <img src={logoWhite} alt="" className="h-9 w-auto object-contain" />
+              <span className="text-2xl font-bold tracking-tight">{SITE.short}</span>
             </div>
-            <p className="text-text-muted text-sm leading-relaxed mb-6 max-w-md">
-              Digital Nursing Assistant. Empowering nurses with digital tools to enhance patient care,
-              streamline documentation, and ensure safety.
+            <p className="text-white/85 text-sm leading-relaxed mb-6 max-w-md">
+              {SITE.name}. Digital tools that help nurses document care, hand over
+              shifts, and calculate doses safely.
             </p>
-            <div className="text-text-muted text-sm space-y-2">
-              <p>ha5599248@gmail.com</p>
-            </div>
+            <a href={`mailto:${SITE.email}`} className={`text-sm ${linkClass}`}>
+              {SITE.email}
+            </a>
           </div>
 
-          {/* Product Links */}
+          {/* Get the app */}
           <div className="lg:col-span-3">
-            <h4 className="font-semibold text-text-dark mb-4 tracking-wide text-sm uppercase">
-              Product
-            </h4>
-            <ul className="space-y-3 text-sm text-text-muted">
-              <li><a href="#features" className="hover:text-brand-blue transition-colors">Features</a></li>
-              <li><a href="#how-it-works" className="hover:text-brand-blue transition-colors">How it Works</a></li>
-              <li><a href="#about" className="hover:text-brand-blue transition-colors">About</a></li>
-              <li><a href="#faq" className="hover:text-brand-blue transition-colors">FAQ</a></li>
+            <h4 className="font-semibold mb-4 text-sm">Get the app</h4>
+            <ul className="space-y-3 text-sm">
+              <li><a href="#download" className={linkClass}>Download APK</a></li>
+              <li><a href="#install" className={linkClass}>Install guide</a></li>
+              <li><a href="#features" className={linkClass}>Features</a></li>
             </ul>
           </div>
 
-          {/* Resources Links */}
+          {/* About + legal */}
           <div className="lg:col-span-3">
-            <h4 className="font-semibold text-text-dark mb-4 tracking-wide text-sm uppercase">
-              Resources
-            </h4>
-            <ul className="space-y-3 text-sm text-text-muted">
-              <li><a href="#waitlist" className="hover:text-brand-blue transition-colors">Join Waitlist</a></li>
-              <li><a href="#waitlist" className="hover:text-brand-blue transition-colors">Send Feedback</a></li>
-              <li><a href="/privacy" className="hover:text-brand-blue transition-colors">Privacy Policy</a></li>
-              <li><a href="/terms" className="hover:text-brand-blue transition-colors">Terms of Service</a></li>
+            <h4 className="font-semibold mb-4 text-sm">About</h4>
+            <ul className="space-y-3 text-sm">
+              <li><a href="#team" className={linkClass}>Team</a></li>
+              <li><a href="#faq" className={linkClass}>FAQ</a></li>
+              <li><a href="#feedback" className={linkClass}>Send feedback</a></li>
+              <li><Link to="/privacy" className={linkClass}>Privacy Policy</Link></li>
+              <li><Link to="/terms" className={linkClass}>Terms of Service</Link></li>
             </ul>
           </div>
         </div>
-      </div>
 
-      {/* Bottom Copyright Bar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-text-muted">
-          <p>© {new Date().getFullYear()} Digital Nursing Assistant (DNA). All rights reserved.</p>
-          <div className="flex gap-6">
-            <a href="/terms" className="hover:text-text-dark transition-colors">Terms & Conditions</a>
-            <a href="/privacy" className="hover:text-text-dark transition-colors">Privacy Policy</a>
-          </div>
+        {/* Copyright bar */}
+        <div className="py-8 border-t border-white/25 text-sm text-white/85">
+          <p>© {new Date().getFullYear()} {SITE.name} ({SITE.short}). All rights reserved.</p>
         </div>
       </div>
     </footer>
