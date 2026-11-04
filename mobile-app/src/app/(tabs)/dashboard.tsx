@@ -94,7 +94,7 @@ export default function DashboardScreen() {
     >
       <ScrollView
         contentContainerClassName="px-5 pt-4"
-        style={{ paddingBottom: insets.bottom + 80 }}
+        contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={isRefreshing} onRefresh={refresh} />

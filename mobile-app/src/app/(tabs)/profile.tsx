@@ -1,12 +1,13 @@
 // app/(tabs)/profile
 import { router } from "expo-router";
-import { ActivityIndicator, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, ScrollView, Text, View, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PersonAvatar } from "../../components/common/PersonAvatar";
 import { PrimaryButton } from "../../components/common/PrimaryButton";
 import { ScreenHeader } from "../../components/common/ScreenHeader";
 import { colors } from "../../theme/colors";
 import useProfile from "../../hooks/nurse/useProfile";
+import { useAuth } from "../../context/AuthContext";
 
 function formatExperience(years: number | null): string {
   if (years === null) return "—";
@@ -15,6 +16,21 @@ function formatExperience(years: number | null): string {
 
 export default function ProfileScreen() {
   const { data, isLoading, isOffline, error, refetch } = useProfile();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    Alert.alert("Log Out", "Are you sure you want to log out?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Log Out",
+        style: "destructive",
+        onPress: async () => {
+          await logout();
+          router.replace("/(auth)/login");
+        },
+      },
+    ]);
+  };
 
   const details = data
     ? [
@@ -93,7 +109,7 @@ export default function ProfileScreen() {
 
             <PrimaryButton
               label="Log Out"
-              onPress={() => router.replace("/(auth)/login")}
+              onPress={handleLogout}
               style={{ backgroundColor: colors.dangerAlt }}
             />
           </>

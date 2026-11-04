@@ -3,7 +3,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -141,7 +140,7 @@ export default function IVDripRateScreen() {
             </Text>
             <View
               className="rounded-lg bg-white overflow-hidden"
-              style={{ borderWidth: 1, borderColor: "#E5E7EB" }}
+              style={{ borderWidth: 1, borderColor: colors.border }}
             >
               <TouchableOpacity
                 className="flex-row items-center justify-between p-3.5"
@@ -207,10 +206,6 @@ export default function IVDripRateScreen() {
             />
           </View>
 
-          {isLoading && (
-            <ActivityIndicator size="small" color={colors.primary} className="mt-2" />
-          )}
-
           {error && (
             <View
               className="flex-row items-center gap-1.5 p-3 rounded-lg mt-2"
@@ -242,8 +237,8 @@ export default function IVDripRateScreen() {
               )}
 
               <View className="flex-row items-center gap-1.5 mt-3 p-3 rounded-lg bg-yellow-50 border border-yellow-200">
-                <Ionicons name="warning" size={16} color="#D97706" />
-                <Text className="text-xs flex-1" style={{ color: "#92400E" }}>
+                <Ionicons name="warning" size={16} color={colors.warningSolid} />
+                <Text className="text-xs flex-1" style={{ color: colors.warningTextDark }}>
                   Check drop factor specified on the IV tubing packaging before starting.
                 </Text>
               </View>
@@ -272,10 +267,6 @@ export default function IVDripRateScreen() {
                   onPress={handleSave}
                   disabled={isSaving}
                 />
-              )}
-
-              {isSaving && (
-                <ActivityIndicator size="small" color={colors.primary} />
               )}
 
               {saveError && (

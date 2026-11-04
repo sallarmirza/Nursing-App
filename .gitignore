@@ -13,3 +13,4 @@ audit-schema.md
 .agents/
 .claude/
 skills-lock.json
+*.png
