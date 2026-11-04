@@ -4,12 +4,10 @@
 
 /* Design tokens. Original brand blue restored everywhere. */
 @theme {
-  --color-brand-blue: #0d54ff;
-  --color-brand-hover: #003ecc;
-  --color-brand-light: #eff4ff;
-  /* Alias kept so Button and PhoneFrame need no edits: this is now the
-     original brand blue, not a separate navy. */
-  --color-brand-navy: #0d54ff;
+  --color-brand-blue: #4281c3;   /* matches the DNA logo blue */
+  --color-brand-hover: #3570ab;
+  --color-brand-light: #ecf2f9;
+  --color-brand-navy: #4281c3;
   --color-bg-soft: #f6f8fc;         /* cool off-white section background */
   --color-bg-beige: #f6f8fc;        /* legacy alias */
   --color-text-dark: #111827;

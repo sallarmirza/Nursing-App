@@ -34,6 +34,7 @@ export default function Footer() {
               <li><a href="#download" className={linkClass}>Download APK</a></li>
               <li><a href="#install" className={linkClass}>Install guide</a></li>
               <li><a href="#features" className={linkClass}>Features</a></li>
+              <li><a href="#how-it-works" className={linkClass}>How it works</a></li>
             </ul>
           </div>
 
@@ -41,6 +42,7 @@ export default function Footer() {
           <div className="lg:col-span-3">
             <h4 className="font-semibold mb-4 text-sm">About</h4>
             <ul className="space-y-3 text-sm">
+              <li><a href="#about" className={linkClass}>Why DNA</a></li>
               <li><a href="#team" className={linkClass}>Team</a></li>
               <li><a href="#faq" className={linkClass}>FAQ</a></li>
               <li><a href="#feedback" className={linkClass}>Send feedback</a></li>

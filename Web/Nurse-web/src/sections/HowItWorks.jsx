@@ -66,7 +66,7 @@ export default function HowItWorks() {
                   {step.description}
                 </p>
                 <div>
-                  <a href="#waitlist"><Button variant="primary">Get Started</Button></a>
+                  <a href="#download"><Button variant="primary">Get Started</Button></a>
                 </div>
               </div>
             </div>
