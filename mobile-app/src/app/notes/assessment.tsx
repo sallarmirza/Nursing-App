@@ -240,7 +240,7 @@ export default function NursingAssessmentScreen() {
               className="text-[16px] text-center w-[36px]"
               style={{ color: colors.textHeading }}
               placeholder="--"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={colors.textFaint}
               keyboardType="numeric"
               maxLength={2}
               value={gcs}
@@ -291,7 +291,7 @@ export default function NursingAssessmentScreen() {
               value={painScale}
               onValueChange={setPainScale}
               minimumTrackTintColor={colors.primary}
-              maximumTrackTintColor="#CBD5E1"
+              maximumTrackTintColor={colors.sliderTrack}
               thumbTintColor={colors.primary}
             />
           </View>
@@ -309,7 +309,7 @@ export default function NursingAssessmentScreen() {
               className="flex-1 h-[52px] rounded-xl text-center text-[15px]"
               style={{ backgroundColor: colors.white, color: colors.textPrimary }}
               placeholder="BP (120/80)"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={colors.textFaint}
               value={bp}
               onChangeText={setBp}
             />
@@ -317,7 +317,7 @@ export default function NursingAssessmentScreen() {
               className="flex-1 h-[52px] rounded-xl text-center text-[15px]"
               style={{ backgroundColor: colors.white, color: colors.textPrimary }}
               placeholder="HR"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={colors.textFaint}
               keyboardType="numeric"
               value={hr}
               onChangeText={setHr}
@@ -326,7 +326,7 @@ export default function NursingAssessmentScreen() {
               className="flex-1 h-[52px] rounded-xl text-center text-[15px]"
               style={{ backgroundColor: colors.white, color: colors.textPrimary }}
               placeholder="RR"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={colors.textFaint}
               keyboardType="numeric"
               value={rr}
               onChangeText={setRr}
@@ -337,7 +337,7 @@ export default function NursingAssessmentScreen() {
               className="w-[48.5%] h-[52px] rounded-xl text-center text-[15px]"
               style={{ backgroundColor: colors.white, color: colors.textPrimary }}
               placeholder="SpO2"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={colors.textFaint}
               keyboardType="numeric"
               value={spO2}
               onChangeText={setSpO2}
@@ -346,7 +346,7 @@ export default function NursingAssessmentScreen() {
               className="w-[48.5%] h-[52px] rounded-xl text-center text-[15px]"
               style={{ backgroundColor: colors.white, color: colors.textPrimary }}
               placeholder="Temp (°F)"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={colors.textFaint}
               keyboardType="numeric"
               value={temp}
               onChangeText={setTemp}

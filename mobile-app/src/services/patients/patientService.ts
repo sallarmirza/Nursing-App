@@ -35,4 +35,8 @@ export const patientService = {
     );
     return response.data;
   },
+
+  delete: async (nurseId: string, patientId: string): Promise<void> => {
+    await apiClient.delete(`/patient/delete/${nurseId}/${patientId}`);
+  },
 };

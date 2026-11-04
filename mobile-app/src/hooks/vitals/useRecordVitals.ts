@@ -25,7 +25,10 @@ function buildVitalsData(
     if (!/^\d{2,3}\/\d{2,3}$/.test(bp)) {
       return { error: "BP must look like 120/80" };
     }
-    data.bp = bp;
+    // Backend requires numeric fields — split "120/80" into bp_systolic / bp_diastolic
+    const [sys, dia] = bp.split("/").map(Number);
+    data.bp_systolic = sys;
+    data.bp_diastolic = dia;
   }
 
   for (const [field, key, label] of NUMERIC_FIELDS) {

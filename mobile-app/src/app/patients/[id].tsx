@@ -4,6 +4,7 @@ import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { useCallback } from "react";
 import {
   ActivityIndicator,
+  Alert,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -15,6 +16,7 @@ import { PrimaryButton } from "../../components/common/PrimaryButton";
 import { ScreenHeader } from "../../components/common/ScreenHeader";
 import { colors } from "../../theme/colors";
 import usePatientDetail from "../../hooks/patients/usePatientDetail";
+import useDeletePatient from "../../hooks/patients/useDeletePatient";
 
 function calculateAge(dateOfBirth: string | null): number | null {
   if (!dateOfBirth) return null;
@@ -31,6 +33,28 @@ function calculateAge(dateOfBirth: string | null): number | null {
 export default function PatientProfileScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { patient, isLoading, error, fetchPatient } = usePatientDetail(id);
+  const { deletePatient, isLoading: isDeleting, error: deleteError } = useDeletePatient();
+
+  const handleDelete = () => {
+    if (!patient) return;
+    Alert.alert(
+      "Delete Patient",
+      `Are you sure you want to delete ${patient.patient_name}? This will permanently remove all their records.`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            const success = await deletePatient(patient.patient_id);
+            if (success) {
+              router.back();
+            }
+          },
+        },
+      ]
+    );
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -206,7 +230,7 @@ export default function PatientProfileScreen() {
           </View>
         </View>
 
-        <View className="mt-2">
+        <View className="mt-4">
           <PrimaryButton
             label="Create Nursing Assessment"
             onPress={() =>
@@ -218,6 +242,21 @@ export default function PatientProfileScreen() {
                 },
               })
             }
+          />
+        </View>
+
+        {deleteError && (
+          <Text className="text-[13px] text-center" style={{ color: colors.danger }}>
+            {deleteError}
+          </Text>
+        )}
+
+        <View className="mt-2 mb-2">
+          <PrimaryButton
+            label={isDeleting ? "Deleting..." : "Delete Patient"}
+            onPress={handleDelete}
+            disabled={isDeleting}
+            style={{ backgroundColor: colors.danger }}
           />
         </View>
       </ScrollView>
