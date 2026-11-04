@@ -26,21 +26,34 @@ export default function Hero() {
             </p>
 
             <div className="flex flex-wrap gap-4 mb-6">
-              <Button href={apk.url} download className="px-8 py-3.5 text-base">
-                Download APK
-              </Button>
-              <Button href="#install" variant="secondary" className="px-8 py-3.5 text-base">
-                How to install
+              {apk.available ? (
+                <Button href={apk.url} download className="px-8 py-3.5 text-base">
+                  Download APK
+                </Button>
+              ) : (
+                <Button href="#feedback" variant="primary" className="px-8 py-3.5 text-base">
+                  Get notified at launch
+                </Button>
+              )}
+              <Button href="#features" variant="secondary" className="px-8 py-3.5 text-base">
+                See features
               </Button>
             </div>
 
-            {/* File facts: what the visitor is about to download */}
-            <p className="text-sm text-text-muted">
-              Version {apk.version} · {apk.size} · {apk.minAndroid}
-            </p>
-            <p className="text-sm text-text-muted mt-1">
-              Not on the Play Store yet, so you install the APK file directly.
-            </p>
+            {apk.available ? (
+              <>
+                <p className="text-sm text-text-muted">
+                  Version {apk.version} · {apk.size} · {apk.minAndroid}
+                </p>
+                <p className="text-sm text-text-muted mt-1">
+                  Not on the Play Store yet, so you install the APK file directly.
+                </p>
+              </>
+            ) : (
+              <p className="text-sm text-text-muted">
+                Android {apk.minAndroid} · Free · APK download coming soon
+              </p>
+            )}
           </div>
 
           {/* Right: phone with a real screen */}

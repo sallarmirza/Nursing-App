@@ -3,10 +3,14 @@ import Button from "../ui/Button";
 import logoBlue from "../../assets/nursing-app-logo-blue.png";
 import { SITE } from "../../config/site";
 
+const CTA_HREF = SITE.apk.available ? "#download" : "#feedback";
+const CTA_LABEL = SITE.apk.available ? "Download APK" : "Get notified";
+
 // Anchor targets match the section ids used on the home page.
 const NAV_LINKS = [
-  { label: "Install", href: "#install" },
+  { label: "About", href: "#about" },
   { label: "Features", href: "#features" },
+  { label: "Install", href: "#install" },
   { label: "Team", href: "#team" },
   { label: "FAQ", href: "#faq" },
 ];
@@ -52,10 +56,9 @@ export default function Navbar() {
             ))}
           </nav>
 
-          {/* Desktop CTA: jumps to the download band (shows version + checksum) */}
           <div className="hidden md:block">
-            <Button href="#download" className="px-6 py-2.5">
-              Download APK
+            <Button href={CTA_HREF} className="px-6 py-2.5">
+              {CTA_LABEL}
             </Button>
           </div>
 
@@ -92,8 +95,8 @@ export default function Navbar() {
               </a>
             ))}
             <div className="pt-4 border-t border-gray-100">
-              <Button href="#download" onClick={() => setOpen(false)} className="w-full py-3">
-                Download APK
+              <Button href={CTA_HREF} onClick={() => setOpen(false)} className="w-full py-3">
+                {CTA_LABEL}
               </Button>
             </div>
           </nav>

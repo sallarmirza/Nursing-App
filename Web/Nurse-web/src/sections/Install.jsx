@@ -37,9 +37,15 @@ export default function Install() {
             title="Install DNA in five steps"
             subtitle="It takes about two minutes. Menu names can differ slightly between phone brands."
           />
-          <Button href={SITE.apk.url} download>
-            Download APK
-          </Button>
+          {SITE.apk.available ? (
+            <Button href={SITE.apk.url} download>
+              Download APK
+            </Button>
+          ) : (
+            <Button href="#feedback">
+              Get notified at launch
+            </Button>
+          )}
         </div>
 
         {/* Right: steps, separated by thin lines */}

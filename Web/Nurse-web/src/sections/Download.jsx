@@ -31,18 +31,29 @@ export default function Download() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         {/* Left: action */}
         <div>
-          <h2 className="text-3xl md:text-4xl mb-4">Download DNA for Android</h2>
+          <h2 className="text-3xl md:text-4xl mb-4">
+            {apk.available ? "Download DNA for Android" : "DNA is coming to Android"}
+          </h2>
           <p className="text-white/85 text-lg leading-relaxed mb-8 max-w-md">
-            One file, free to install. Follow the install guide above if this is
-            your first time installing an APK.
+            {apk.available
+              ? "One file, free to install. Follow the install guide above if this is your first time installing an APK."
+              : "The app is in development. Drop your email below and we'll let you know the moment the APK is ready to install."}
           </p>
           <div className="flex flex-wrap gap-4">
-            <Button href={apk.url} download variant="light" className="px-8 py-3.5 text-base">
-              Download APK
-            </Button>
-            <Button href="#install" variant="ghostLight" className="px-8 py-3.5 text-base">
-              Install guide
-            </Button>
+            {apk.available ? (
+              <>
+                <Button href={apk.url} download variant="light" className="px-8 py-3.5 text-base">
+                  Download APK
+                </Button>
+                <Button href="#install" variant="ghostLight" className="px-8 py-3.5 text-base">
+                  Install guide
+                </Button>
+              </>
+            ) : (
+              <Button href="#feedback" variant="light" className="px-8 py-3.5 text-base">
+                Get notified at launch
+              </Button>
+            )}
           </div>
         </div>
 
