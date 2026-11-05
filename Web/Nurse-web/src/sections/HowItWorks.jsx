@@ -45,11 +45,9 @@ const Photo = ({ step, className = "" }) => (
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-24 bg-bg-soft">
+    <section id="how-it-works" className="py-24 bg-brand-blue">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header: label + original title */}
-        <p className="text-center text-sm font-semibold text-brand-blue mb-2">How it works</p>
-        <SectionHeader align="center" title="Hassle-Free Shift Management" />
+        <SectionHeader align="center" title="Hassle-Free Shift Management" inverted />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-stretch">
           {/* Left: photo mosaic (photo 1 tall, photos 2 and 3 stacked) */}
@@ -65,26 +63,22 @@ export default function HowItWorks() {
           <ol className="flex flex-col justify-center">
             {steps.map((step) => (
               <li key={step.number} className="relative flex items-start gap-5 pl-6 py-6">
-                {/* Rule on the left edge */}
-                
-
-                {/* Number tile */}
-                <span className="shrink-0 w-12 h-12 rounded-xl bg-brand-blue text-white flex items-center justify-center font-bold text-lg">
+                {/* White tile on blue background — inverts the number tile */}
+                <span className="shrink-0 w-12 h-12 rounded-xl bg-white text-brand-blue flex items-center justify-center font-bold text-lg">
                   {step.number}
                 </span>
 
                 <div>
-                  <h3 className="text-xl font-bold text-text-dark mb-1">{step.title}</h3>
-                  <p className="text-text-muted leading-relaxed max-w-md">{step.description}</p>
+                  <h3 className="text-xl font-bold text-white mb-1">{step.title}</h3>
+                  <p className="text-white/80 leading-relaxed max-w-md">{step.description}</p>
                 </div>
               </li>
             ))}
           </ol>
         </div>
 
-        {/* Original "Get Started" action */}
         <div className="mt-12 flex justify-center">
-          <Button href="#download">Get Started</Button>
+          <Button href="#download" variant="light">Get Started</Button>
         </div>
       </div>
     </section>

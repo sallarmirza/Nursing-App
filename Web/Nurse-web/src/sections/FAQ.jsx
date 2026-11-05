@@ -47,9 +47,9 @@ export default function FAQ() {
   const toggle = (i) => setOpenIndex(openIndex === i ? -1 : i);
 
   return (
-    <section id="faq" className="py-24 bg-bg-soft">
+    <section id="faq" className="py-24 bg-brand-blue">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <SectionHeader title="Questions before you install" />
+        <SectionHeader title="Questions before you install" inverted />
 
         <div className="flex flex-col gap-3">
           {FAQS.map((faq, i) => {
