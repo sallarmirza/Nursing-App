@@ -1,7 +1,7 @@
 import { useState } from "react";
 import SectionHeader from "../components/ui/SectionHeader";
 import PhoneFrame from "../components/ui/PhoneFrame";
-import nursingnote from '../assets/shots/nursing_note.png'
+import nursingnote from "../assets/shots/nursing_note.webp";
 
 // import soapShot from "../assets/shots/soap.png"
 const FEATURES = [
