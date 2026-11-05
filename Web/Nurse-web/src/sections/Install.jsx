@@ -53,7 +53,7 @@ export default function Install() {
           <ol className="divide-y divide-gray-100 border-y border-gray-100">
             {STEPS.map((step, i) => (
               <li key={step.title} className="flex gap-6 py-6 sm:py-8">
-                <span className="w-8 shrink-0 text-3xl font-bold text-brand-blue leading-none">
+                <span className="w-9 h-9 shrink-0 rounded-xl bg-brand-blue text-white flex items-center justify-center font-bold text-base leading-none">
                   {i + 1}
                 </span>
                 <div className="max-w-xl">
