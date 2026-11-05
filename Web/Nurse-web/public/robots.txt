@@ -21,4 +21,4 @@ Allow: /
 User-agent: PerplexityBot
 Allow: /
 
-Sitemap: https://yourdomain.com/sitemap.xml
+Sitemap: https://nursing-app-murex.vercel.app/sitemap.xml
