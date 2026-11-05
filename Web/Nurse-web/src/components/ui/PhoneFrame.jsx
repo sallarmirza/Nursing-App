@@ -8,13 +8,13 @@ export default function PhoneFrame({
   className = "",
 }) {
   return (
-    <div className={`relative mx-auto w-56 sm:w-64 aspect-[9/19] ${className}`}>
+    <div className={`relative mx-auto w-56 sm:w-64 aspect-9/19 ${className}`}>
       {/* Outer matte black device body */}
       <div className="
         relative w-full h-full
         rounded-[2.7rem]
         bg-[#171717]
-        p-[5px]
+        p-1.25
         shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35),0_8px_20px_-8px_rgba(0,0,0,0.2)]
         ring-1 ring-black/20
       ">
@@ -24,7 +24,7 @@ export default function PhoneFrame({
           relative w-full h-full
           rounded-[2.4rem]
           bg-[#292929]
-          p-[2px]
+          p-0.5
         ">
 
           {/* Inner display */}
@@ -37,16 +37,16 @@ export default function PhoneFrame({
 
             {/* Android punch-hole camera */}
             <div className="
-              absolute top-[9px] left-1/2 -translate-x-1/2
+              absolute top-2.25 left-1/2 -translate-x-1/2
               z-20
-              w-[11px] h-[11px]
+              w-2.75 h-2.75
               rounded-full
               bg-[#050505]
               ring-[1.5px] ring-[#383838]
               shadow-inner
             ">
               <div className="
-                absolute inset-[3px]
+                absolute inset-0.75
                 rounded-full
                 bg-[#111827]
               " />
@@ -82,23 +82,23 @@ export default function PhoneFrame({
 
       {/* Physical side buttons */}
       <div className="
-        absolute -right-[3px] top-[22%]
-        w-[3px] h-10
+        absolute -right-0.75 top-[22%]
+        w-0.75 h-10
         rounded-r-md
         bg-[#393939]
         shadow-sm
       " />
 
       <div className="
-        absolute -left-[3px] top-[17%]
-        w-[3px] h-7
+        absolute -left-0.75 top-[17%]
+        w-0.75 h-7
         rounded-l-md
         bg-[#393939]
       " />
 
       <div className="
-        absolute -left-[3px] top-[27%]
-        w-[3px] h-7
+        absolute -left-0.75 top-[27%]
+        w-0.75 h-7
         rounded-l-md`
         bg-[#393939]
       " />

@@ -1,4 +1,3 @@
-// Footer on the original brand blue. Hash links scroll the home page;
 // legal links use router <Link> (Footer renders inside RouterProvider via App).
 import { Link } from "react-router-dom";
 import logoWhite from "../../assets/nursing-app-logo-white.png";
