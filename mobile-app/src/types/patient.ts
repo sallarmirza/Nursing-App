@@ -1,4 +1,9 @@
 // src/types/patient.ts
+import { VitalsEntry } from "./vital";
+import { NursingNote } from "./notes";
+import { Medication } from "./medication";
+import { SbarRecord } from "./sbar";
+import { DosageRecord, DripRecord } from "./calculations";
 
 export interface PatientCreateRequest {
   patient_first_name: string;
@@ -12,6 +17,11 @@ export interface PatientCreateRequest {
 }
 
 export interface PatientCreateResponse {
+  patient_id: string;
+  message: string;
+}
+
+export interface PatientDeleteResponse {
   patient_id: string;
   message: string;
 }
@@ -38,10 +48,10 @@ export interface PatientDetail {
   patient_height: number | null;
   patient_blood_group: string | null;
   patient_ward: string | null;
-  vitals: unknown[];
-  nursing_notes: unknown[];
-  medications: unknown[];
-  sbar_handovers: unknown[];
-  dosage_calculations: unknown[];
-  drip_calculations: unknown[];
+  vitals: VitalsEntry[];
+  nursing_notes: NursingNote[];
+  medications: Medication[];
+  sbar_handovers: SbarRecord[];
+  dosage_calculations: DosageRecord[];
+  drip_calculations: DripRecord[];
 }

@@ -25,6 +25,16 @@ export interface VitalsCreateResponse {
   vitals_data: VitalsData;
 }
 
+// Vitals record as returned in lists / nested in patient view
+export interface VitalsEntry {
+  vital_id: string;
+  patient_id: string;
+  nurse_id: string;
+  source: string;
+  vitals_data: VitalsData;
+  recorded_at: string;
+}
+
 // Raw form values as held by a screen (strings until parsed on submit)
 export interface VitalsFormValues {
   bp: string;
