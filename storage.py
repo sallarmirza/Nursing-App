@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 from db_model import Base
@@ -17,6 +17,15 @@ class DBManager:
             DB_URL,
             connect_args={"check_same_thread": False}
         )
+
+        # SQLite disables FK enforcement by default; enable it on every connection
+        # so ondelete="CASCADE" rules actually fire. PostgreSQL enforces FKs natively.
+        if DB_URL and DB_URL.startswith("sqlite"):
+            @event.listens_for(self.engine, "connect")
+            def _enable_sqlite_fk(dbapi_conn, _):
+                cursor = dbapi_conn.cursor()
+                cursor.execute("PRAGMA foreign_keys=ON")
+                cursor.close()
 
         self.SessionLocal = sessionmaker(
             autoflush=False,
