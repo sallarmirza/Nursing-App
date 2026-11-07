@@ -12,10 +12,10 @@ class NursingNoteRegister(BaseModel):
     nursing_interventions: dict[str, bool] = Field(default_factory=dict)
 
 class SoapRegister(BaseModel):
-    Subjective: str
-    Objective: str
-    Assessment: str
-    Plan: str
+    subjective: str
+    objective: str
+    assessment: str
+    plan: str
 
 class SoapEntry(BaseModel):
     version: int

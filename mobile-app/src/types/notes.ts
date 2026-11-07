@@ -15,10 +15,10 @@ export interface NursingNoteCreateResponse {
 
 // Mirrors backend: schema/note_schema.py -> SoapRegister
 export interface SoapCreateRequest {
-  Subjective: string;
-  Objective: string;
-  Assessment: string;
-  Plan: string;
+  subjective: string;
+  objective: string;
+  assessment: string;
+  plan: string;
 }
 
 // One entry inside NursingNote.soap_history
