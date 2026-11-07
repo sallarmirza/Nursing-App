@@ -1,10 +1,9 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from dosage.dosage_schema import DosageCalculatorRegister
 from dosage.dosage_service import DosageCalc
-from storage import DBManager
+from storage import db
 from core.deps import get_current_nurse
 
-db = DBManager()
 dosage_cal = DosageCalc(db)
 
 router = APIRouter()

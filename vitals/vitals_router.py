@@ -1,10 +1,9 @@
 from fastapi import APIRouter,HTTPException,status,Depends
 from vitals.vitals_service import Vitals
 from .vitals_schema import VitalsRegister
-from storage import DBManager
+from storage import db
 from core.deps import get_current_nurse
 
-db=DBManager()
 vitals=Vitals(db)
 
 router=APIRouter()

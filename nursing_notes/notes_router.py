@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from nursing_notes.notes_service import Notes
-from storage import DBManager
+from storage import db
 from nursing_notes.notes_schema import (
     NursingNoteRegister,
     NursingNotesResponse,
@@ -8,7 +8,6 @@ from nursing_notes.notes_schema import (
 )
 from core.deps import get_current_nurse
 
-db = DBManager()
 notes = Notes(db)
 
 router = APIRouter()

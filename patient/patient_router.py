@@ -1,14 +1,13 @@
 # patient/patient_router
 from fastapi import APIRouter,HTTPException,status,Depends
 from patient.patient_service import PatientService
-from storage import DBManager
+from storage import db
 from patient.patient_schema import PatientRegister,PatientResponse
 from core.deps import get_current_nurse
 
 
 router=APIRouter()
 
-db=DBManager()
 patient_service=PatientService(db)
 
 

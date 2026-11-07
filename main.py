@@ -8,11 +8,9 @@ from nursing_notes.notes_router import router as notes_router
 from sbar.sbar_router import router as sbar_router
 from vitals.vitals_router import router as vitals_router
 from medication.medication_router import router as med_router
-from storage import DBManager
 from fastapi.middleware.cors import CORSMiddleware
 from summary.summary_router import router as dashboard_router
-
-db = DBManager()
+from storage import db
 
 
 @asynccontextmanager

@@ -2,14 +2,13 @@ from fastapi import APIRouter, HTTPException, status, Depends
 
 from nurse.nurse_schema import NurseRegister, NurseSignUp, NurseSignIn, TokenRefreshRequest
 from nurse.nurse_service import NurseService
-from storage import DBManager
+from storage import db
 from core.security import create_access_token
 from core.deps import get_current_nurse, get_current_nurse_id
 
 
 router = APIRouter()
 
-db = DBManager()
 nurse_service = NurseService(db)
 
 # not to be used now , might come helpful later
