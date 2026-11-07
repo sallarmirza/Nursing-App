@@ -1,7 +1,7 @@
 # nursing_notes/notes_service.py
 from storage import DBManager
 from nursing_notes.notes_schema import NursingNoteRegister, SoapRegister, NursingNotesResponse
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 from typing import Any
 
@@ -86,12 +86,12 @@ class Notes:
 
             new_soap = {
                 "version": new_version,
-                "created_at": datetime.now().isoformat(),
+                "created_at": datetime.now(timezone.utc).isoformat(),
                 "nurse_id": nurse_id,
-                "subjective": data.Subjective,
-                "objective": data.Objective,
-                "assessment": data.Assessment,
-                "plan": data.Plan
+                "subjective": data.subjective,
+                "objective": data.objective,
+                "assessment": data.assessment,
+                "plan": data.plan,
             }
 
             soap_history.append(new_soap)

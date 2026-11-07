@@ -9,7 +9,7 @@ from .drip_schema import (
 )
 from drip.drip_service import DripCalc
 from storage import db
-from core.deps import get_current_nurse
+from core.deps import get_current_nurse, get_current_nurse_id
 
 drip_rate = DripCalc(db)
 
@@ -29,7 +29,10 @@ def return_all_drip_for_patient(
 
 
 @router.post("/calculate", response_model=DripSimpleResponse)
-def calculate_drip_rate(data: DripCalculationRegister):
+def calculate_drip_rate(
+    data: DripCalculationRegister,
+    current_nurse_id: str = Depends(get_current_nurse_id),
+):
     """Calculate a simple drip rate (not saved)."""
     try:
         return drip_rate.calculate_simple_driprate(data)

@@ -8,7 +8,7 @@ from dosage.dosage_schema import (
 )
 from dosage.dosage_service import DosageCalc
 from storage import db
-from core.deps import get_current_nurse
+from core.deps import get_current_nurse, get_current_nurse_id
 
 dosage_cal = DosageCalc(db)
 
@@ -16,7 +16,10 @@ router = APIRouter()
 
 
 @router.post("/calculate", response_model=DosageSimpleResponse)
-def calculate_dosage(data: DosageCalculatorRegister):
+def calculate_dosage(
+    data: DosageCalculatorRegister,
+    current_nurse_id: str = Depends(get_current_nurse_id),
+):
     """without adding patient"""
     try:
         return dosage_cal.calculate_simple_dosage(data)

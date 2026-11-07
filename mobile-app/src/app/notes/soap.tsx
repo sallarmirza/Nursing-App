@@ -34,10 +34,10 @@ export default function SoapNotesScreen() {
     if (!subjective || !objective || !assessment || !plan) return;
 
     const success = await registerSoap(params.patientId, params.noteId, {
-      Subjective: subjective,
-      Objective: objective,
-      Assessment: assessment,
-      Plan: plan,
+      subjective,
+      objective,
+      assessment,
+      plan,
     });
 
     if (success) {

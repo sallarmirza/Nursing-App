@@ -94,19 +94,16 @@ class NurseService:
             ]
 
     def delete_nurse(self, nurse_id: str) -> bool:
-        """Delete nurse. Returns False if not found or on error."""
-        try:
-            with self.db.get_session() as session:
-                nurse = session.query(Nurse).filter(Nurse.nurse_id == nurse_id).first()
+        """Delete nurse. Returns False only if not found; raises on DB errors."""
+        with self.db.get_session() as session:
+            nurse = session.query(Nurse).filter(Nurse.nurse_id == nurse_id).first()
 
-                if nurse is None:
-                    return False
+            if nurse is None:
+                return False
 
-                session.delete(nurse)
-                session.commit()
-                return True
-        except Exception:
-            return False
+            session.delete(nurse)
+            session.commit()
+            return True
 
     def nurse_signIn(self, data: NurseSignIn):
         """Nurse login."""

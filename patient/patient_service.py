@@ -118,10 +118,15 @@ class PatientService:
             if patient is None:
                 raise ValueError("Patient not found")
 
+            # Limit each collection to the most recent N records.
+            # Full history is available via the dedicated per-resource endpoints.
+            RECENT = 10
+
             vitals = (
                 session.query(Vitals)
                 .filter(Vitals.patient_id == patient_id)
                 .order_by(Vitals.recorded_at.desc())
+                .limit(RECENT)
                 .all()
             )
 
@@ -129,6 +134,7 @@ class PatientService:
                 session.query(NursingNote)
                 .filter(NursingNote.patient_id == patient_id)
                 .order_by(NursingNote.notes_created_at.desc())
+                .limit(RECENT)
                 .all()
             )
 
@@ -136,6 +142,7 @@ class PatientService:
                 session.query(CurrentMedication)
                 .filter(CurrentMedication.patient_id == patient_id)
                 .order_by(CurrentMedication.med_start_date.desc())
+                .limit(RECENT)
                 .all()
             )
 
@@ -143,6 +150,7 @@ class PatientService:
                 session.query(SBAR)
                 .filter(SBAR.patient_id == patient_id)
                 .order_by(SBAR.sbar_created_at.desc())
+                .limit(RECENT)
                 .all()
             )
 
@@ -150,6 +158,7 @@ class PatientService:
                 session.query(DosageCalculation)
                 .filter(DosageCalculation.patient_id == patient_id)
                 .order_by(DosageCalculation.dosage_created_at.desc())
+                .limit(RECENT)
                 .all()
             )
 
@@ -157,6 +166,7 @@ class PatientService:
                 session.query(IVDripCalculation)
                 .filter(IVDripCalculation.patient_id == patient_id)
                 .order_by(IVDripCalculation.created_at.desc())
+                .limit(RECENT)
                 .all()
             )
 
