@@ -2,10 +2,9 @@ from fastapi import APIRouter, HTTPException, status, Depends
 
 from .drip_schema import DripCalculationRegister
 from drip.drip_service import DripCalc
-from storage import DBManager
+from storage import db
 from core.deps import get_current_nurse
 
-db = DBManager()
 drip_rate = DripCalc(db)
 
 router = APIRouter()

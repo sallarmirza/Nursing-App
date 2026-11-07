@@ -41,3 +41,7 @@ class DBManager:
 
     def close(self):
         self.engine.dispose()
+
+
+# Single shared instance. Import this everywhere instead of calling DBManager().
+db = DBManager()

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 
-from storage import DBManager
+from storage import db
 from medication.medication_service import Medication
 from .medication_schema import CurrentMedicationRegister
 from core.deps import get_current_nurse
@@ -8,7 +8,6 @@ from core.deps import get_current_nurse
 
 router = APIRouter(prefix="/medications", tags=["Medications"])
 
-db = DBManager()
 medication_service = Medication(db)
 
 

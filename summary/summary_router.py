@@ -1,13 +1,12 @@
 # summary/router.py
 from fastapi import APIRouter, HTTPException, status, Depends
-from storage import DBManager
+from storage import db
 from summary.summary_schema import DashboardResponse
 from summary.summary_service import DashboardService
 from core.deps import get_current_nurse
 
 router = APIRouter()
 
-db = DBManager()
 dashboard_service = DashboardService(db)
 
 

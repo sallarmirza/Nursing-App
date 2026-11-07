@@ -1,10 +1,9 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from sbar.sbar_service import Sbar
-from storage import DBManager
+from storage import db
 from sbar.sbar_schema import SBARHandoverRegister
 from core.deps import get_current_nurse
 
-db = DBManager()
 sbar = Sbar(db)
 
 router = APIRouter()
