@@ -107,12 +107,7 @@ class Medication:
             )
 
             if not rows:
-                return {
-                    "status": True,
-                    "message": "No medications found",
-                    "patient_id": patient_id,
-                    "medications": []
-                }
+                return {"status": True, "patient_id": patient_id, "nurse_id": nurse_id, "medications": []}
 
             return {
                 "status": True,

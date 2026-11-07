@@ -38,3 +38,19 @@ class VitalsResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# --- Mutation / list responses ---
+
+class VitalsCreateResponse(BaseModel):
+    message: str
+    vital_id: str
+    patient_id: str
+    nurse_id: str
+    source: str
+    vitals_data: dict[str, float]
+
+class VitalsListResponse(BaseModel):
+    patient_id: str
+    nurse_id: str
+    vitals: list[VitalsResponse]

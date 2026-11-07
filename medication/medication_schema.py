@@ -23,3 +23,30 @@ class MedicationResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# --- Mutation / list responses ---
+
+class MedicationCreateResponse(BaseModel):
+    status: bool
+    message: str
+    med_id: str
+    patient_id: str
+    nurse_id: str
+    med_name: str
+    dose: float
+    dose_unit: str
+    frequency: str
+
+class MedicationListResponse(BaseModel):
+    status: bool
+    patient_id: str
+    nurse_id: str
+    medications: list[MedicationResponse]
+
+class MedicationDeleteResponse(BaseModel):
+    status: bool
+    message: str
+    med_id: str
+    patient_id: str
+    nurse_id: str

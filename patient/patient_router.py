@@ -2,7 +2,10 @@
 from fastapi import APIRouter,HTTPException,status,Depends
 from patient.patient_service import PatientService
 from storage import db
-from patient.patient_schema import PatientRegister,PatientResponse
+from patient.patient_schema import (
+    PatientRegister, PatientResponse,
+    PatientListItem, PatientCreateResponse, PatientDeleteResponse,
+)
 from core.deps import get_current_nurse
 
 
@@ -11,7 +14,7 @@ router=APIRouter()
 patient_service=PatientService(db)
 
 
-@router.post('/create/{nurse_id}')
+@router.post('/create/{nurse_id}', response_model=PatientCreateResponse, status_code=status.HTTP_201_CREATED)
 def create_patient_profile(
     nurse_id: str,
     data: PatientRegister,
@@ -38,7 +41,7 @@ def view_patient_information(
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
-@router.get("/{nurse_id}/all")
+@router.get("/{nurse_id}/all", response_model=list[PatientListItem])
 def show_all_patient(
     nurse_id: str,
     current_nurse_id: str = Depends(get_current_nurse),
@@ -53,7 +56,7 @@ def show_all_patient(
             detail=str(e)
         )
 
-@router.delete('/delete/{nurse_id}/{patient_id}')
+@router.delete('/delete/{nurse_id}/{patient_id}', response_model=PatientDeleteResponse)
 def delete_patient_profile(
     nurse_id: str,
     patient_id: str,

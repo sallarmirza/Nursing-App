@@ -5,6 +5,9 @@ from nursing_notes.notes_schema import (
     NursingNoteRegister,
     NursingNotesResponse,
     SoapRegister,
+    NoteCreateResponse,
+    SoapCreateResponse,
+    NoteDeleteResponse,
 )
 from core.deps import get_current_nurse
 
@@ -13,7 +16,7 @@ notes = Notes(db)
 router = APIRouter()
 
 
-@router.post("/{nurse_id}/{patient_id}")
+@router.post("/{nurse_id}/{patient_id}", response_model=NoteCreateResponse, status_code=status.HTTP_201_CREATED)
 def create_nursing_note(
     nurse_id: str,
     patient_id: str,
@@ -34,7 +37,7 @@ def create_nursing_note(
         )
 
 
-@router.post("/{nurse_id}/{patient_id}/{note_id}/soap")
+@router.post("/{nurse_id}/{patient_id}/{note_id}/soap", response_model=SoapCreateResponse)
 def save_soap(
     nurse_id: str,
     patient_id: str,
@@ -60,9 +63,9 @@ def save_soap(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
         )
-        
-        
-@router.get('/{nurse_id}/{patient_id}',response_model=NursingNotesResponse)
+
+
+@router.get('/{nurse_id}/{patient_id}', response_model=NursingNotesResponse)
 def show_notes(
     nurse_id: str,
     patient_id: str,
@@ -78,7 +81,7 @@ def show_notes(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 
-@router.delete("/{note_id}/{nurse_id}/{patient_id}")
+@router.delete("/{note_id}/{nurse_id}/{patient_id}", response_model=NoteDeleteResponse)
 def remove_notes(
     note_id: str,
     nurse_id: str,

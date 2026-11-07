@@ -154,7 +154,7 @@ class NurseService:
             )
 
             if not patients:
-                return {"message": f"{nurse_id} has no patients"}
+                return []
 
             return [
                 {

@@ -1,14 +1,19 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from sbar.sbar_service import Sbar
 from storage import db
-from sbar.sbar_schema import SBARHandoverRegister
+from sbar.sbar_schema import (
+    SBARHandoverRegister,
+    SBARCreateResponse,
+    SBARListResponse,
+    SBARDeleteResponse,
+)
 from core.deps import get_current_nurse
 
 sbar = Sbar(db)
 
 router = APIRouter()
 
-@router.post("/{nurse_id}/{patient_id}", status_code=status.HTTP_201_CREATED)
+@router.post("/{nurse_id}/{patient_id}", response_model=SBARCreateResponse, status_code=status.HTTP_201_CREATED)
 def create_sbar_handover(
     nurse_id: str,
     patient_id: str,
@@ -28,7 +33,7 @@ def create_sbar_handover(
         )
 
 
-@router.get("/{nurse_id}/{patient_id}")
+@router.get("/{nurse_id}/{patient_id}", response_model=SBARListResponse)
 def show_sbar_handovers(
     nurse_id: str,
     patient_id: str,
@@ -43,7 +48,7 @@ def show_sbar_handovers(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
     
     
-@router.delete("/{nurse_id}/{patient_id}/{sbar_id}")
+@router.delete("/{nurse_id}/{patient_id}/{sbar_id}", response_model=SBARDeleteResponse)
 def remove_sbar_handover(
     nurse_id: str,
     patient_id: str,

@@ -41,6 +41,35 @@ class DosageResponse(BaseModel):
         from_attributes = True
 
 
+# --- Calculation / list responses ---
+
+class DosageSimpleResponse(BaseModel):
+    """Returned by the stateless /calculate endpoint."""
+    medication: str
+    patient_weight_kg: float
+    required_dose: float
+    dose_unit: str
+    concentration: str
+    volume_to_administer_ml: float
+
+class DosagePatientResponse(DosageSimpleResponse):
+    """Extends simple response with the saved record's IDs."""
+    dose_calc_id: str
+    patient_id: str
+    nurse_id: str
+
+class DosageListResponse(BaseModel):
+    patient_id: str
+    dosages: list[DosageResponse]
+
+class DosageDeleteResponse(BaseModel):
+    message: str
+    status: bool
+    dose_calc_id: str
+    patient_id: str
+    nurse_id: str
+
+
 
 
 

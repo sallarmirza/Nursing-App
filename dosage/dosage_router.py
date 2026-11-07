@@ -1,5 +1,11 @@
 from fastapi import APIRouter, HTTPException, status, Depends
-from dosage.dosage_schema import DosageCalculatorRegister
+from dosage.dosage_schema import (
+    DosageCalculatorRegister,
+    DosageSimpleResponse,
+    DosagePatientResponse,
+    DosageListResponse,
+    DosageDeleteResponse,
+)
 from dosage.dosage_service import DosageCalc
 from storage import db
 from core.deps import get_current_nurse
@@ -9,7 +15,7 @@ dosage_cal = DosageCalc(db)
 router = APIRouter()
 
 
-@router.post("/calculate")
+@router.post("/calculate", response_model=DosageSimpleResponse)
 def calculate_dosage(data: DosageCalculatorRegister):
     """without adding patient"""
     try:
@@ -18,7 +24,7 @@ def calculate_dosage(data: DosageCalculatorRegister):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.post("/{nurse_id}/{patient_id}")
+@router.post("/{nurse_id}/{patient_id}", response_model=DosagePatientResponse, status_code=status.HTTP_201_CREATED)
 def calculate_medication_dosage_for_patient(
     nurse_id: str,
     patient_id: str,
@@ -29,10 +35,10 @@ def calculate_medication_dosage_for_patient(
     try:
         return dosage_cal.calculate_dosage_for_patient(nurse_id, patient_id, data)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.get("/{nurse_id}/{patient_id}")
+@router.get("/{nurse_id}/{patient_id}", response_model=DosageListResponse)
 def return_all_dosage_for_patient(
     nurse_id: str,
     patient_id: str,
@@ -44,7 +50,7 @@ def return_all_dosage_for_patient(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 
-@router.delete("/{nurse_id}/{patient_id}/{dose_calc_id}")
+@router.delete("/{nurse_id}/{patient_id}/{dose_calc_id}", response_model=DosageDeleteResponse)
 def delete_dosage_cal(
     nurse_id: str,
     patient_id: str,

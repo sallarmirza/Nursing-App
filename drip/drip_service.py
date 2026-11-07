@@ -32,11 +32,7 @@ class DripCalc:
             )
 
             if not rows:
-                return {
-                    "message": f"No drip calculations for {patient_id}",
-                    "patient_id": patient_id,
-                    "drips": []
-                }
+                return {"patient_id": patient_id, "drips": []}
 
             return {
                 "patient_id": patient_id,
