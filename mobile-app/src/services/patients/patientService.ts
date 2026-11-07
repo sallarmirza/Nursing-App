@@ -3,6 +3,7 @@ import { apiClient } from "../api/client";
 import {
   PatientCreateRequest,
   PatientCreateResponse,
+  PatientDeleteResponse,
   PatientListItem,
   PatientDetail,
 } from "../../types/patient";
@@ -36,7 +37,13 @@ export const patientService = {
     return response.data;
   },
 
-  delete: async (nurseId: string, patientId: string): Promise<void> => {
-    await apiClient.delete(`/patient/delete/${nurseId}/${patientId}`);
+  delete: async (
+    nurseId: string,
+    patientId: string
+  ): Promise<PatientDeleteResponse> => {
+    const response = await apiClient.delete<PatientDeleteResponse>(
+      `/patient/delete/${nurseId}/${patientId}`
+    );
+    return response.data;
   },
 };

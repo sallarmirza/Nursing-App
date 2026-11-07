@@ -32,12 +32,10 @@ export interface Medication {
   med_start_date: string;
 }
 
-// nurse_id is absent when the patient has no medications
 export interface MedicationListResponse {
   status: boolean;
-  message?: string;
   patient_id: string;
-  nurse_id?: string;
+  nurse_id: string;
   medications: Medication[];
 }
 

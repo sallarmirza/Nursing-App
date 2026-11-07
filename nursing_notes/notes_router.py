@@ -81,11 +81,11 @@ def show_notes(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 
-@router.delete("/{note_id}/{nurse_id}/{patient_id}", response_model=NoteDeleteResponse)
+@router.delete("/{nurse_id}/{patient_id}/{note_id}", response_model=NoteDeleteResponse)
 def remove_notes(
-    note_id: str,
     nurse_id: str,
     patient_id: str,
+    note_id: str,
     current_nurse_id: str = Depends(get_current_nurse),
 ):
     try:

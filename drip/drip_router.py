@@ -25,7 +25,7 @@ def return_all_drip_for_patient(
     try:
         return drip_rate.list_all_patient_drip_calculations(nurse_id,patient_id)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 
 @router.post("/calculate", response_model=DripSimpleResponse)
