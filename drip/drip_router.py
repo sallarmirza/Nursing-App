@@ -1,6 +1,12 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 
-from .drip_schema import DripCalculationRegister
+from .drip_schema import (
+    DripCalculationRegister,
+    DripSimpleResponse,
+    DripPatientResponse,
+    DripListResponse,
+    DripDeleteResponse,
+)
 from drip.drip_service import DripCalc
 from storage import db
 from core.deps import get_current_nurse
@@ -10,7 +16,7 @@ drip_rate = DripCalc(db)
 router = APIRouter()
 
 
-@router.get('/{nurse_id}/{patient_id}')
+@router.get('/{nurse_id}/{patient_id}', response_model=DripListResponse)
 def return_all_drip_for_patient(
     nurse_id: str,
     patient_id: str,
@@ -22,7 +28,7 @@ def return_all_drip_for_patient(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-@router.post("/calculate")
+@router.post("/calculate", response_model=DripSimpleResponse)
 def calculate_drip_rate(data: DripCalculationRegister):
     """Calculate a simple drip rate (not saved)."""
     try:
@@ -31,7 +37,7 @@ def calculate_drip_rate(data: DripCalculationRegister):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.post("/{nurse_id}/{patient_id}")
+@router.post("/{nurse_id}/{patient_id}", response_model=DripPatientResponse, status_code=status.HTTP_201_CREATED)
 def calculate_patient_drip_rate(
     nurse_id: str,
     patient_id: str,
@@ -45,7 +51,7 @@ def calculate_patient_drip_rate(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.delete("/{nurse_id}/{patient_id}/{drip_calc_id}")
+@router.delete("/{nurse_id}/{patient_id}/{drip_calc_id}", response_model=DripDeleteResponse)
 def delete_drip_cal(
     nurse_id: str,
     patient_id: str,

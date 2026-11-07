@@ -70,11 +70,7 @@ class Sbar:
             )
 
             if not rows:
-                return {
-                    "message": "No SBAR handovers found",
-                    "patient_id": patient_id,
-                    "handovers": []
-                }
+                return {"patient_id": patient_id, "nurse_id": nurse_id, "handovers": []}
 
             return {
                 "patient_id": patient_id,

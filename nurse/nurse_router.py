@@ -1,7 +1,12 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 
-from nurse.nurse_schema import NurseRegister, NurseSignUp, NurseSignIn, TokenRefreshRequest
+from nurse.nurse_schema import (
+    NurseRegister, NurseSignUp, NurseSignIn, TokenRefreshRequest,
+    NurseProfile, NurseActionResponse, NurseLoginResponse,
+    TokenResponse, MessageResponse, NurseDeleteResponse,
+)
 from nurse.nurse_service import NurseService
+from patient.patient_schema import PatientListItem
 from storage import db
 from core.security import create_access_token
 from core.deps import get_current_nurse, get_current_nurse_id
@@ -12,7 +17,7 @@ router = APIRouter()
 nurse_service = NurseService(db)
 
 # not to be used now , might come helpful later
-@router.get("/all")
+@router.get("/all", response_model=list[NurseProfile])
 def show_all_nurses(current_nurse_id: str = Depends(get_current_nurse_id)):
     """List all nurses."""
 
@@ -24,9 +29,9 @@ def show_all_nurses(current_nurse_id: str = Depends(get_current_nurse_id)):
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(e)
         )
-        
-        
-@router.get('/{nurse_id}/patients')
+
+
+@router.get('/{nurse_id}/patients', response_model=list[PatientListItem])
 def show_all_patients(nurse_id: str, current_nurse_id: str = Depends(get_current_nurse)):
     """list all patients under nurse"""
     try:
@@ -36,7 +41,7 @@ def show_all_patients(nurse_id: str, current_nurse_id: str = Depends(get_current
             status_code=status.HTTP_404_NOT_FOUND,detail=str(e)
         )
 
-@router.post("/signup")
+@router.post("/signup", response_model=NurseActionResponse, status_code=status.HTTP_201_CREATED)
 def nurse_account_creation(data: NurseSignUp):
     try:
         return nurse_service.nurse_signup(data)
@@ -46,20 +51,20 @@ def nurse_account_creation(data: NurseSignUp):
             status_code=status.HTTP_409_CONFLICT,
             detail=str(e)
         )
-        
-@router.post("/setup/{nurse_id}")
+
+@router.post("/setup/{nurse_id}", response_model=NurseActionResponse)
 def nurse_profile_setup(nurse_id: str, data: NurseRegister, current_nurse_id: str = Depends(get_current_nurse)):
     """Complete a nurse's profile after signup."""
     try:
-        return nurse_service.nurse_account_setup(nurse_id, data) 
+        return nurse_service.nurse_account_setup(nurse_id, data)
 
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(e)
         )
- 
-@router.post("/login")
+
+@router.post("/login", response_model=NurseLoginResponse)
 def nurse_login(data: NurseSignIn):
     try:
         nurse = nurse_service.nurse_signIn(data)
@@ -86,7 +91,7 @@ def nurse_login(data: NurseSignIn):
     }
 
 
-@router.post("/refresh")
+@router.post("/refresh", response_model=TokenResponse)
 def refresh_access_token(data: TokenRefreshRequest):
     """Exchanges a valid refresh token for a new short-lived access token."""
     try:
@@ -105,14 +110,14 @@ def refresh_access_token(data: TokenRefreshRequest):
     }
 
 
-@router.post("/logout")
+@router.post("/logout", response_model=MessageResponse)
 def logout(data: TokenRefreshRequest):
     """Revokes the refresh token so it can no longer be used."""
     nurse_service.revoke_refresh_token(data.refresh_token)
     return {"message": "Logged out successfully"}
 
- 
-@router.delete('/delete/{nurse_id}')
+
+@router.delete('/delete/{nurse_id}', response_model=NurseDeleteResponse)
 def delete_nurse_account(nurse_id: str, current_nurse_id: str = Depends(get_current_nurse)):
     try:
         deleted = nurse_service.delete_nurse(nurse_id)
@@ -125,15 +130,15 @@ def delete_nurse_account(nurse_id: str, current_nurse_id: str = Depends(get_curr
 
         return {
             "status": True,
-            "Message": f"Nurse {nurse_id} deleted successfully"
+            "message": f"Nurse {nurse_id} deleted successfully"
         }
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-    
+
 # used to make profile presistant
-@router.get("/{nurse_id}")
+@router.get("/{nurse_id}", response_model=NurseProfile)
 def get_nurse(nurse_id: str, current_nurse_id: str = Depends(get_current_nurse)):
     """Fetch a single nurse's profile."""
     try:

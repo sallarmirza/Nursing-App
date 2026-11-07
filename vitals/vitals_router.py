@@ -1,6 +1,6 @@
 from fastapi import APIRouter,HTTPException,status,Depends
 from vitals.vitals_service import Vitals
-from .vitals_schema import VitalsRegister
+from .vitals_schema import VitalsRegister, VitalsCreateResponse, VitalsListResponse
 from storage import db
 from core.deps import get_current_nurse
 
@@ -8,7 +8,7 @@ vitals=Vitals(db)
 
 router=APIRouter()
 
-@router.post("/{nurse_id}/{patient_id}")
+@router.post("/{nurse_id}/{patient_id}", response_model=VitalsCreateResponse, status_code=status.HTTP_201_CREATED)
 def create_vitals(
     nurse_id: str,
     patient_id: str,
@@ -28,7 +28,7 @@ def create_vitals(
             detail=str(e)
         )
         
-@router.get("/{nurse_id}/{patient_id}")
+@router.get("/{nurse_id}/{patient_id}", response_model=VitalsListResponse)
 def show_vitals(
     nurse_id: str,
     patient_id: str,

@@ -69,11 +69,7 @@ class Vitals:
             )
 
             if not rows:
-                return {
-                    "message": "No vitals found",
-                    "patient_id": patient_id,
-                    "vitals": [],
-                }
+                return {"patient_id": patient_id, "nurse_id": nurse_id, "vitals": []}
 
             return {
                 "patient_id": patient_id,

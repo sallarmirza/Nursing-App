@@ -47,3 +47,23 @@ class NursingNotesResponse(BaseModel):
     patient_id: str
     nurse_id: str
     notes: list[NursingNoteOut]
+
+
+# --- Mutation responses ---
+
+class NoteCreateResponse(BaseModel):
+    message: str
+    note_id: str
+
+class SoapCreateResponse(BaseModel):
+    message: str
+    note_id: str
+    version: int
+    soap: SoapEntry
+
+class NoteDeleteResponse(BaseModel):
+    message: str
+    status: bool
+    note_id: str
+    patient_id: str
+    nurse_id: str

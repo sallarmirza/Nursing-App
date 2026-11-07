@@ -2,7 +2,12 @@ from fastapi import APIRouter, HTTPException, status, Depends
 
 from storage import db
 from medication.medication_service import Medication
-from .medication_schema import CurrentMedicationRegister
+from .medication_schema import (
+    CurrentMedicationRegister,
+    MedicationCreateResponse,
+    MedicationListResponse,
+    MedicationDeleteResponse,
+)
 from core.deps import get_current_nurse
 
 
@@ -11,7 +16,7 @@ router = APIRouter(prefix="/medications", tags=["Medications"])
 medication_service = Medication(db)
 
 
-@router.get("/{nurse_id}/{patient_id}")
+@router.get("/{nurse_id}/{patient_id}", response_model=MedicationListResponse)
 def list_medications(
     nurse_id: str,
     patient_id: str,
@@ -29,7 +34,7 @@ def list_medications(
         )
 
 
-@router.post("/{nurse_id}/{patient_id}")
+@router.post("/{nurse_id}/{patient_id}", response_model=MedicationCreateResponse, status_code=status.HTTP_201_CREATED)
 def add_medication(
     nurse_id: str,
     patient_id: str,
@@ -49,7 +54,7 @@ def add_medication(
         )
 
 
-@router.delete("/{nurse_id}/{patient_id}/{med_id}")
+@router.delete("/{nurse_id}/{patient_id}/{med_id}", response_model=MedicationDeleteResponse)
 def delete_medication(
     nurse_id: str,
     patient_id: str,

@@ -31,3 +31,22 @@ class SBARResponse(BaseModel):
         from_attributes = True
 
 
+# --- Mutation / list responses ---
+
+class SBARCreateResponse(BaseModel):
+    message: str
+    sbar_id: str
+
+class SBARListResponse(BaseModel):
+    patient_id: str
+    nurse_id: str
+    handovers: list[SBARResponse]
+
+class SBARDeleteResponse(BaseModel):
+    message: str
+    status: bool
+    sbar_id: str
+    patient_id: str
+    nurse_id: str
+
+

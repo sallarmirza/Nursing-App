@@ -1,7 +1,7 @@
 from pydantic import BaseModel,Field,field_validator
 from enum import Enum
 from typing import Optional,List
-from datetime import date
+from datetime import date, datetime
 from vitals.vitals_schema import VitalsResponse
 from nursing_notes.notes_schema import NursingNoteOut
 from medication.medication_schema import MedicationResponse
@@ -60,3 +60,33 @@ class PatientResponse(BaseModel):
     
     class Config:
         from_attributes=True
+
+
+# --- Lightweight list item (no nested collections) ---
+
+class PatientListItem(BaseModel):
+    """Shape returned by patient-list endpoints."""
+    patient_id: str
+    patient_name: str
+    patient_gender: Optional[str] = None
+    date_of_birth: Optional[date] = None
+    patient_weight: Optional[float] = None
+    patient_height: Optional[float] = None
+    patient_blood_group: Optional[str] = None
+    ward: Optional[str] = None
+    assigned_nurse_id: str
+    patient_created_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+# --- Mutation responses ---
+
+class PatientCreateResponse(BaseModel):
+    patient_id: str
+    message: str
+
+class PatientDeleteResponse(BaseModel):
+    patient_id: str
+    message: str

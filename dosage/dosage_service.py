@@ -42,11 +42,7 @@ class DosageCalc:
             )
 
             if not rows:
-                return {
-                    "message": f"No dosage calculations for {patient_id}",
-                    "patient_id": patient_id,
-                    "dosages": []
-                }
+                return {"patient_id": patient_id, "dosages": []}
 
             return {
                 "patient_id": patient_id,
