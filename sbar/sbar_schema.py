@@ -40,6 +40,9 @@ class SBARCreateResponse(BaseModel):
 class SBARListResponse(BaseModel):
     patient_id: str
     nurse_id: str
+    total: int
+    page: int
+    limit: int
     handovers: list[SBARResponse]
 
 class SBARDeleteResponse(BaseModel):

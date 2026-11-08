@@ -35,6 +35,16 @@ export interface VitalsEntry {
   recorded_at: string;
 }
 
+// GET /vitals/{nurse_id}/{patient_id} response
+export interface VitalsListResponse {
+  patient_id: string;
+  nurse_id: string;
+  total: number;
+  page: number;
+  limit: number;
+  vitals: VitalsEntry[];
+}
+
 // Raw form values as held by a screen (strings until parsed on submit)
 export interface VitalsFormValues {
   bp: string;

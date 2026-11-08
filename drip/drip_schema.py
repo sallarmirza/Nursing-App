@@ -44,6 +44,9 @@ class DripPatientResponse(BaseModel):
 
 class DripListResponse(BaseModel):
     patient_id: str
+    total: int
+    page: int
+    limit: int
     drips: list[DripResponse]
 
 class DripDeleteResponse(BaseModel):

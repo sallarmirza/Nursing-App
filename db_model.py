@@ -2,7 +2,7 @@
 # All ForeignKey columns carry ondelete="CASCADE" so the DB enforces cleanup
 # automatically when a parent row is deleted (nurse → patients → all clinical data).
 # SQLite FK enforcement is enabled per-connection in storage.py.
-from sqlalchemy import Column,INTEGER,String,Float,ForeignKey,DateTime,TEXT,JSON,DATE,func,Boolean
+from sqlalchemy import Column,INTEGER,String,Float,ForeignKey,DateTime,TEXT,JSON,DATE,func,Boolean,Index
 from sqlalchemy.orm import declarative_base
 from datetime import datetime
 
@@ -127,3 +127,25 @@ class RefreshToken(Base):
     revoked = Column(Boolean, default=False, nullable=False)
     expires_at = Column(DateTime, nullable=False)
     created_at = Column(DateTime, server_default=func.current_timestamp())
+
+
+# ---------------------------------------------------------------------------
+# Composite indexes
+# Every clinical query filters on (patient_id, nurse_id) together.
+# Single-column indexes force the DB to pick one column and row-scan for the
+# other. These indexes encode both columns so the DB reaches the target rows
+# in one B-tree seek — no post-scan needed.
+#
+# CurrentMedication is excluded: it has no nurse_id column (access control
+# there goes through a JOIN on the patients table instead).
+#
+# create_all() picks these up on a fresh DB. For an existing SQLite file,
+# delete nursing.db and restart — data is dev-only. For PostgreSQL, Alembic
+# will generate the CREATE INDEX statements in the migration.
+# ---------------------------------------------------------------------------
+
+Index('ix_vitals_patient_nurse',   Vitals.patient_id,              Vitals.nurse_id)
+Index('ix_notes_patient_nurse',    NursingNote.patient_id,         NursingNote.nurse_id)
+Index('ix_sbar_patient_nurse',     SBAR.patient_id,                SBAR.nurse_id)
+Index('ix_drip_patient_nurse',     IVDripCalculation.patient_id,   IVDripCalculation.nurse_id)
+Index('ix_dosage_patient_nurse',   DosageCalculation.patient_id,   DosageCalculation.nurse_id)

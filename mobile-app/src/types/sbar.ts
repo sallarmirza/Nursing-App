@@ -36,6 +36,16 @@ export interface SbarRecord {
   sbar_created_at: string;
 }
 
+// GET /sbar/{nurse_id}/{patient_id} response
+export interface SbarListResponse {
+  patient_id: string;
+  nurse_id: string;
+  total: number;
+  page: number;
+  limit: number;
+  handovers: SbarRecord[];
+}
+
 // Values the screen hands to the hook
 export interface SbarFormValues {
   situation: string;

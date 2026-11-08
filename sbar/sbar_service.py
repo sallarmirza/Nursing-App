@@ -56,25 +56,28 @@ class Sbar:
                 "sbar_id": sbar_id
             }
 
-    def show_sbar(self, nurse_id: str, patient_id: str) -> dict[str, Any]:
-        """List all SBAR handovers for a patient recorded by a given nurse."""
+    def show_sbar(self, nurse_id: str, patient_id: str, page: int = 1, limit: int = 20) -> dict[str, Any]:
+        """List SBAR handovers for a patient by a nurse, paginated."""
         with self.db.get_session() as session:
+            base_query = session.query(SBARModel).filter(
+                SBARModel.nurse_id == nurse_id,
+                SBARModel.patient_id == patient_id,
+            )
+            total = base_query.count()
             rows = (
-                session.query(SBARModel)
-                .filter(
-                    SBARModel.nurse_id == nurse_id,
-                    SBARModel.patient_id == patient_id,
-                )
+                base_query
                 .order_by(SBARModel.sbar_created_at.desc())
+                .offset((page - 1) * limit)
+                .limit(limit)
                 .all()
             )
-
-            if not rows:
-                return {"patient_id": patient_id, "nurse_id": nurse_id, "handovers": []}
 
             return {
                 "patient_id": patient_id,
                 "nurse_id": nurse_id,
+                "total": total,
+                "page": page,
+                "limit": limit,
                 "handovers": [
                     {
                         "sbar_id": h.sbar_id,

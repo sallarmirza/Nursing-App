@@ -58,5 +58,8 @@ export interface NursingNote {
 export interface NursingNotesListResponse {
   patient_id: string;
   nurse_id: string;
+  total: number;
+  page: number;
+  limit: number;
   notes: NursingNote[];
 }

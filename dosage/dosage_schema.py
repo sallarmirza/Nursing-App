@@ -60,6 +60,9 @@ class DosagePatientResponse(DosageSimpleResponse):
 
 class DosageListResponse(BaseModel):
     patient_id: str
+    total: int
+    page: int
+    limit: int
     dosages: list[DosageResponse]
 
 class DosageDeleteResponse(BaseModel):

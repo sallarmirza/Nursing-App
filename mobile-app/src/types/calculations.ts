@@ -76,3 +76,21 @@ export interface DripRecord {
   drop_per_min: number | null;
   created_at: string;
 }
+
+// GET /calc/dose/{nurse_id}/{patient_id} response
+export interface DosageListResponse {
+  patient_id: string;
+  total: number;
+  page: number;
+  limit: number;
+  dosages: DosageRecord[];
+}
+
+// GET /calc/drip/{nurse_id}/{patient_id} response
+export interface DripListResponse {
+  patient_id: string;
+  total: number;
+  page: number;
+  limit: number;
+  drips: DripRecord[];
+}

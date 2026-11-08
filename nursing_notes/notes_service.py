@@ -107,22 +107,28 @@ class Notes:
                 "soap": new_soap
             }
 
-    def show_nursing_notes(self, nurse_id: str, patient_id: str) -> dict[str, Any]:
-        """Show all nursing notes for a patient."""
+    def show_nursing_notes(self, nurse_id: str, patient_id: str, page: int = 1, limit: int = 20) -> dict[str, Any]:
+        """Show nursing notes for a patient, paginated."""
         with self.db.get_session() as session:
+            base_query = session.query(NursingNote).filter(
+                NursingNote.nurse_id == nurse_id,
+                NursingNote.patient_id == patient_id,
+            )
+            total = base_query.count()
             rows = (
-                session.query(NursingNote)
-                .filter(
-                    NursingNote.nurse_id == nurse_id,
-                    NursingNote.patient_id == patient_id,
-                )
+                base_query
                 .order_by(NursingNote.notes_created_at.desc())
+                .offset((page - 1) * limit)
+                .limit(limit)
                 .all()
             )
 
             return {
                 "patient_id": patient_id,
                 "nurse_id": nurse_id,
+                "total": total,
+                "page": page,
+                "limit": limit,
                 "notes": [
                     {
                         "note_id": n.note_id,

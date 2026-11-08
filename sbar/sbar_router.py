@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends, Query
 from sbar.sbar_service import Sbar
 from storage import db
 from sbar.sbar_schema import (
@@ -37,12 +37,16 @@ def create_sbar_handover(
 def show_sbar_handovers(
     nurse_id: str,
     patient_id: str,
+    page: int = Query(default=1, ge=1),
+    limit: int = Query(default=20, ge=1, le=100),
     current_nurse_id: str = Depends(get_current_nurse),
 ):
     try:
         return sbar.show_sbar(
             nurse_id=nurse_id,
-            patient_id=patient_id
+            patient_id=patient_id,
+            page=page,
+            limit=limit,
         )
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
