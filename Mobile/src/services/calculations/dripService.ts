@@ -3,6 +3,7 @@ import { apiClient } from "../api/client";
 import {
   DripCalculatorRequest,
   DripCalculatorResponse,
+  DripListResponse,
   DripPatientCalculationResponse,
 } from "../../types/calculations";
 
@@ -25,6 +26,19 @@ export const dripService = {
     const response = await apiClient.post<DripPatientCalculationResponse>(
       `/calc/drip/${nurseId}/${patientId}`,
       data
+    );
+    return response.data;
+  },
+
+  list: async (
+    nurseId: string,
+    patientId: string,
+    page = 1,
+    limit = 20
+  ): Promise<DripListResponse> => {
+    const response = await apiClient.get<DripListResponse>(
+      `/calc/drip/${nurseId}/${patientId}`,
+      { params: { page, limit } }
     );
     return response.data;
   },
