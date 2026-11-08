@@ -17,8 +17,8 @@ class DosageCalc:
         unique = uuid.uuid4().hex[:8].upper()
         return f"DOSE-{year}-{unique}"
 
-    def list_dosage_calculations(self, nurse_id: str, patient_id: str) -> dict:
-        """List all dosage calculations for a patient, scoped by nurse."""
+    def list_dosage_calculations(self, nurse_id: str, patient_id: str, page: int = 1, limit: int = 20) -> dict:
+        """List dosage calculations for a patient, scoped by nurse, paginated."""
         with self.db.get_session() as session:
             patient = (
                 session.query(Patient)
@@ -34,18 +34,23 @@ class DosageCalc:
                     "Patient does not exist or is not assigned to this nurse"
                 )
 
+            base_query = session.query(DosageCalculation).filter(
+                DosageCalculation.patient_id == patient_id,
+            )
+            total = base_query.count()
             rows = (
-                session.query(DosageCalculation)
-                .filter(DosageCalculation.patient_id == patient_id)
+                base_query
                 .order_by(DosageCalculation.dosage_created_at.desc())
+                .offset((page - 1) * limit)
+                .limit(limit)
                 .all()
             )
 
-            if not rows:
-                return {"patient_id": patient_id, "dosages": []}
-
             return {
                 "patient_id": patient_id,
+                "total": total,
+                "page": page,
+                "limit": limit,
                 "dosages": [
                     {
                         "dose_calc_id": d.dose_calc_id,

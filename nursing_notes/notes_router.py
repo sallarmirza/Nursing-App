@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends, Query
 from nursing_notes.notes_service import Notes
 from storage import db
 from nursing_notes.notes_schema import (
@@ -69,13 +69,17 @@ def save_soap(
 def show_notes(
     nurse_id: str,
     patient_id: str,
+    page: int = Query(default=1, ge=1),
+    limit: int = Query(default=20, ge=1, le=100),
     current_nurse_id: str = Depends(get_current_nurse),
 ):
     """return the notes"""
     try:
         return notes.show_nursing_notes(
             nurse_id=nurse_id,
-            patient_id=patient_id
+            patient_id=patient_id,
+            page=page,
+            limit=limit,
         )
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))

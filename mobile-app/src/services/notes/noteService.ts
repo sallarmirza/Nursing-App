@@ -37,10 +37,13 @@ export const notesService = {
 
   getNotes: async (
     nurseId: string,
-    patientId: string
+    patientId: string,
+    page: number = 1,
+    limit: number = 20,
   ): Promise<NursingNotesListResponse> => {
     const response = await apiClient.get<NursingNotesListResponse>(
-      `/notes/${nurseId}/${patientId}`
+      `/notes/${nurseId}/${patientId}`,
+      { params: { page, limit } },
     );
     return response.data;
   },

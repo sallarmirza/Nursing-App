@@ -55,25 +55,28 @@ class Vitals:
                 "vitals_data": vital.vitals_data,
             }
 
-    def show_vitals(self, nurse_id: str, patient_id: str):
-        """List all vitals recorded for a patient by a given nurse."""
+    def show_vitals(self, nurse_id: str, patient_id: str, page: int = 1, limit: int = 20):
+        """List vitals for a patient by a nurse, paginated."""
         with self.db.get_session() as session:
+            base_query = session.query(VitalsModel).filter(
+                VitalsModel.nurse_id == nurse_id,
+                VitalsModel.patient_id == patient_id,
+            )
+            total = base_query.count()
             rows = (
-                session.query(VitalsModel)
-                .filter(
-                    VitalsModel.nurse_id == nurse_id,
-                    VitalsModel.patient_id == patient_id,
-                )
+                base_query
                 .order_by(VitalsModel.recorded_at.desc())
+                .offset((page - 1) * limit)
+                .limit(limit)
                 .all()
             )
-
-            if not rows:
-                return {"patient_id": patient_id, "nurse_id": nurse_id, "vitals": []}
 
             return {
                 "patient_id": patient_id,
                 "nurse_id": nurse_id,
+                "total": total,
+                "page": page,
+                "limit": limit,
                 "vitals": [
                     {
                         "vital_id": v.vital_id,

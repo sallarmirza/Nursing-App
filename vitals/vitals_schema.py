@@ -53,4 +53,7 @@ class VitalsCreateResponse(BaseModel):
 class VitalsListResponse(BaseModel):
     patient_id: str
     nurse_id: str
+    total: int
+    page: int
+    limit: int
     vitals: list[VitalsResponse]

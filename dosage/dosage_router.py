@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends, Query
 from dosage.dosage_schema import (
     DosageCalculatorRegister,
     DosageSimpleResponse,
@@ -45,10 +45,12 @@ def calculate_medication_dosage_for_patient(
 def return_all_dosage_for_patient(
     nurse_id: str,
     patient_id: str,
+    page: int = Query(default=1, ge=1),
+    limit: int = Query(default=20, ge=1, le=100),
     current_nurse_id: str = Depends(get_current_nurse),
 ):
     try:
-        return dosage_cal.list_dosage_calculations(nurse_id, patient_id)
+        return dosage_cal.list_dosage_calculations(nurse_id, patient_id, page=page, limit=limit)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 

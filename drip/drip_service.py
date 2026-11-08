@@ -18,24 +18,27 @@ class DripCalc:
         unique_part = uuid.uuid4().hex[:12].upper()
         return f"DRIP-{year}-{unique_part}"
 
-    def list_all_patient_drip_calculations(self, nurse_id: str, patient_id: str) -> dict:
-        """List all drip calculations for a patient, scoped to the requesting nurse."""
+    def list_all_patient_drip_calculations(self, nurse_id: str, patient_id: str, page: int = 1, limit: int = 20) -> dict:
+        """List drip calculations for a patient scoped to the requesting nurse, paginated."""
         with self.db.get_session() as session:
+            base_query = session.query(IVDripCalculation).filter(
+                IVDripCalculation.patient_id == patient_id,
+                IVDripCalculation.nurse_id == nurse_id,
+            )
+            total = base_query.count()
             rows = (
-                session.query(IVDripCalculation)
-                .filter(
-                    IVDripCalculation.patient_id == patient_id,
-                    IVDripCalculation.nurse_id == nurse_id,
-                )
+                base_query
                 .order_by(IVDripCalculation.created_at.desc())
+                .offset((page - 1) * limit)
+                .limit(limit)
                 .all()
             )
 
-            if not rows:
-                return {"patient_id": patient_id, "drips": []}
-
             return {
                 "patient_id": patient_id,
+                "total": total,
+                "page": page,
+                "limit": limit,
                 "drips": [
                     {
                         "drip_calc_id": d.drip_calc_id,
