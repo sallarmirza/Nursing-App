@@ -159,6 +159,7 @@ export default function PatientProfileScreen() {
             Records
           </Text>
           <View className="bg-white rounded-xl p-3.5">
+            {/* Ward — static, no history screen */}
             <View className="flex-row justify-between py-2">
               <Text className="text-[13px]" style={{ color: colors.textSecondary }}>
                 Ward
@@ -169,64 +170,63 @@ export default function PatientProfileScreen() {
             </View>
             <View className="h-[1px]" style={{ backgroundColor: colors.borderLight }} />
 
-            <View className="flex-row justify-between py-2">
-              <Text className="text-[13px]" style={{ color: colors.textSecondary }}>
-                Vitals Recorded
-              </Text>
-              <Text className="text-[13px] font-semibold" style={{ color: colors.textHeading }}>
-                {patient.vitals.length}
-              </Text>
-            </View>
-            <View className="h-[1px]" style={{ backgroundColor: colors.borderLight }} />
-
-            <View className="flex-row justify-between py-2">
-              <Text className="text-[13px]" style={{ color: colors.textSecondary }}>
-                Nursing Notes
-              </Text>
-              <Text className="text-[13px] font-semibold" style={{ color: colors.textHeading }}>
-                {patient.nursing_notes.length}
-              </Text>
-            </View>
-            <View className="h-[1px]" style={{ backgroundColor: colors.borderLight }} />
-
-            <View className="flex-row justify-between py-2">
-              <Text className="text-[13px]" style={{ color: colors.textSecondary }}>
-                Medications
-              </Text>
-              <Text className="text-[13px] font-semibold" style={{ color: colors.textHeading }}>
-                {patient.medications.length}
-              </Text>
-            </View>
-            <View className="h-[1px]" style={{ backgroundColor: colors.borderLight }} />
-
-            <View className="flex-row justify-between py-2">
-              <Text className="text-[13px]" style={{ color: colors.textSecondary }}>
-                SBAR Handovers
-              </Text>
-              <Text className="text-[13px] font-semibold" style={{ color: colors.textHeading }}>
-                {patient.sbar_handovers.length}
-              </Text>
-            </View>
-            <View className="h-[1px]" style={{ backgroundColor: colors.borderLight }} />
-
-            <View className="flex-row justify-between py-2">
-              <Text className="text-[13px]" style={{ color: colors.textSecondary }}>
-                Dosage Calculations
-              </Text>
-              <Text className="text-[13px] font-semibold" style={{ color: colors.textHeading }}>
-                {patient.dosage_calculations.length}
-              </Text>
-            </View>
-            <View className="h-[1px]" style={{ backgroundColor: colors.borderLight }} />
-
-            <View className="flex-row justify-between py-2">
-              <Text className="text-[13px]" style={{ color: colors.textSecondary }}>
-                Drip Calculations
-              </Text>
-              <Text className="text-[13px] font-semibold" style={{ color: colors.textHeading }}>
-                {patient.drip_calculations.length}
-              </Text>
-            </View>
+            {/* Tappable record rows */}
+            {(
+              [
+                {
+                  label: "Vitals Recorded",
+                  count: patient.vitals.length,
+                  pathname: "/vitals/history",
+                },
+                {
+                  label: "Nursing Notes",
+                  count: patient.nursing_notes.length,
+                  pathname: "/notes/history",
+                },
+                {
+                  label: "SBAR Handovers",
+                  count: patient.sbar_handovers.length,
+                  pathname: "/sbar/history",
+                },
+                {
+                  label: "Dosage Calculations",
+                  count: patient.dosage_calculations.length,
+                  pathname: "/calculations/dosage-history",
+                },
+                {
+                  label: "Drip Calculations",
+                  count: patient.drip_calculations.length,
+                  pathname: "/calculations/drip-history",
+                },
+              ] as const
+            ).map((row, index, arr) => (
+              <TouchableOpacity
+                key={row.label}
+                className={`flex-row items-center justify-between py-2 ${
+                  index < arr.length - 1 ? "border-b" : ""
+                }`}
+                style={index < arr.length - 1 ? { borderBottomColor: colors.borderLight } : undefined}
+                onPress={() =>
+                  router.push({
+                    pathname: row.pathname as any,
+                    params: {
+                      patientId: patient.patient_id,
+                      patientName: patient.patient_name,
+                    },
+                  })
+                }
+              >
+                <Text className="text-[13px]" style={{ color: colors.textSecondary }}>
+                  {row.label}
+                </Text>
+                <View className="flex-row items-center gap-1">
+                  <Text className="text-[13px] font-semibold" style={{ color: colors.textHeading }}>
+                    {row.count}
+                  </Text>
+                  <Ionicons name="chevron-forward" size={14} color={colors.textSecondary} />
+                </View>
+              </TouchableOpacity>
+            ))}
           </View>
         </View>
 
