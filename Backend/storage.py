@@ -7,16 +7,20 @@ import os
 
 load_dotenv()
 
-DB_URL = os.getenv("DATABASE_URL")
+DB_URL = os.getenv("DATABASE_URL", "sqlite:///./nursing_assistant.db")
+
+# PostgreSQL URLs from Render start with "postgres://" but SQLAlchemy requires
+# "postgresql://". Normalise here so the same .env value works on both.
+if DB_URL.startswith("postgres://"):
+    DB_URL = DB_URL.replace("postgres://", "postgresql://", 1)
 
 
 class DBManager:
 
     def __init__(self):
-        self.engine = create_engine(
-            DB_URL,
-            connect_args={"check_same_thread": False}
-        )
+        # check_same_thread is a SQLite-only argument; PostgreSQL rejects it.
+        connect_args = {"check_same_thread": False} if DB_URL.startswith("sqlite") else {}
+        self.engine = create_engine(DB_URL, connect_args=connect_args)
 
         # SQLite disables FK enforcement by default; enable it on every connection
         # so ondelete="CASCADE" rules actually fire. PostgreSQL enforces FKs natively.

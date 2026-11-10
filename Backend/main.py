@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from nurse.nurse_router import router as nursing_router
@@ -28,12 +29,15 @@ app = FastAPI(
     title="Nursing-App",
     lifespan=lifespan
 )
+# CORS_ORIGINS env var: comma-separated list of allowed origins.
+# Defaults to Streamlit dev server. Set "*" in Render for open access,
+# or list specific domains once you have a web frontend URL.
+_raw_origins = os.getenv("CORS_ORIGINS", "http://localhost:8501,http://127.0.0.1:8501")
+CORS_ORIGINS = [o.strip() for o in _raw_origins.split(",")]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:8501",
-        "http://127.0.0.1:8501",
-    ],
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

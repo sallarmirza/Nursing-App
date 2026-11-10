@@ -1,7 +1,8 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { tokenManager } from "../auth/tokenManager";
 
-const BASE_URL = "http://192.168.1.6:8000";
+// Set EXPO_PUBLIC_API_URL in .env (local) or in EAS environment variables (production).
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://192.168.100.20:8000";
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,
@@ -11,9 +12,6 @@ export const apiClient = axios.create({
   },
 });
 
-// A separate, plain instance for the refresh call itself. It must NOT go
-// through the response interceptor below — otherwise a failed refresh
-// would try to refresh itself and loop forever.
 const refreshClient = axios.create({
   baseURL: BASE_URL,
   timeout: 10000,
