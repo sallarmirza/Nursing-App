@@ -14,3 +14,4 @@ audit-schema.md
 .claude/
 skills-lock.json
 *.png
+!Mobile/assets/**/*.png
