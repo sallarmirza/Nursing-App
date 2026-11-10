@@ -15,3 +15,5 @@ audit-schema.md
 skills-lock.json
 *.png
 !Mobile/assets/**/*.png
+*.apk
+*.aab
