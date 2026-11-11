@@ -44,7 +44,7 @@ export default function PatientsRecordScreen() {
       style={{ backgroundColor: colors.backgroundAlt }}
       edges={["top", "left", "right"]}
     >
-      <ScreenHeader title="Patients Record" />
+      <ScreenHeader title="Patients Record" showBack={false} />
 
       <ScrollView
         contentContainerClassName="px-5 pt-5 pb-10"
