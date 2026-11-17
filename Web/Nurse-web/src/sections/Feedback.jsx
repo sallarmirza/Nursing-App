@@ -6,8 +6,7 @@ import { Link } from "react-router-dom";
 import SectionHeader from "../components/ui/SectionHeader";
 import { SITE } from "../config/site";
 
-const FORMSPREE_ID = import.meta.env.VITE_FORMSPREE_ID;
-const FORMSPREE_URL = FORMSPREE_ID ? `https://formspree.io/f/${FORMSPREE_ID}` : "";
+const FORMSPREE_URL = "https://formspree.io/f/xbgooljp";
 const TIMEOUT_MS = 15000;
 const MAX_LENGTH = 2000;
 
@@ -76,12 +75,6 @@ export default function Feedback() {
     }
 
     if (!validate()) return;
-
-    if (!FORMSPREE_URL) {
-      setStatus("error");
-      setErrorMessage("The feedback form is not set up yet. Please email us instead.");
-      return;
-    }
 
     setStatus("loading");
     setErrorMessage("");
